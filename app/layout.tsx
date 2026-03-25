@@ -1,11 +1,8 @@
 import type { Metadata } from "next";
-import Image from "next/image";
-import Link from "next/link";
 import "./globals.css";
-import { signOutAction } from "@/app/actions";
 import { CookieBanner } from "@/components/cookie-banner";
-import { LanguageSwitcher } from "@/components/language-switcher";
 import { PwaRegister } from "@/components/pwa-register";
+import { SiteHeader } from "@/components/site-header";
 import { getMessages } from "@/lib/i18n";
 import { getLocale } from "@/lib/i18n-server";
 import { getCurrentUser, getProfileDashboard } from "@/lib/queries";
@@ -70,60 +67,18 @@ export default async function RootLayout({
       <body>
         <PwaRegister />
         <div className="app-frame">
-          <header className="site-header">
-            <div className="site-utility">
-              <LanguageSwitcher currentLocale={locale} />
-            </div>
-
-            <div className="site-header-main">
-              <Link href="/" className="brand">
-                <span className="brand-mark">
-                  <Image
-                    src="/logo-sense-lletra-1.png"
-                    alt="Konexa icon"
-                    width={438}
-                    height={351}
-                    className="brand-logo-image"
-                    priority
-                  />
-                </span>
-                <span className="brand-copy">
-                  <Image
-                    src="/logo-wordmark.png"
-                    alt="Konexa"
-                    width={453}
-                    height={153}
-                    className="brand-wordmark-image"
-                    priority
-                  />
-                  <small>{messages.brandTagline}</small>
-                </span>
-              </Link>
-
-              <nav className="site-nav">
-                <Link href="/" className="nav-link-muted">{messages.navDiscover}</Link>
-                {dashboard && (dashboard.profile.role === "admin" || dashboard.profile.role === "host") ? (
-                  <Link href="/admin/pending" className="nav-link-muted">{messages.navAdmin}</Link>
-                ) : null}
-                {user ? (
-                  <div className="nav-user-area">
-                    <Link href="/profile" className="user-chip">
-                      {user.user_metadata.full_name || user.email}
-                    </Link>
-                    <form action={signOutAction}>
-                      <button type="submit" className="nav-plain-button">
-                        {messages.navLogout}
-                      </button>
-                    </form>
-                  </div>
-                ) : (
-                  <Link href="/login" className="nav-cta">
-                    {messages.navLogin}
-                  </Link>
-                )}
-              </nav>
-            </div>
-          </header>
+          <SiteHeader
+            locale={locale}
+            brandTagline={messages.brandTagline}
+            navDiscover={messages.navDiscover}
+            navAdmin={messages.navAdmin}
+            navLogin={messages.navLogin}
+            navLogout={messages.navLogout}
+            showAdminLink={Boolean(
+              dashboard && (dashboard.profile.role === "admin" || dashboard.profile.role === "host")
+            )}
+            userDisplayName={user ? user.user_metadata.full_name || user.email || null : null}
+          />
 
           <main>{children}</main>
 
