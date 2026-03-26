@@ -7,7 +7,9 @@ export function BrandSplash() {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    const storageKey = "konexa-brand-splash-seen";
+    const deviceKey =
+      window.matchMedia("(max-width: 768px)").matches ? "mobile" : "desktop";
+    const storageKey = `konexa-brand-splash-seen-${deviceKey}`;
     const alreadySeen = window.sessionStorage.getItem(storageKey) === "1";
 
     if (alreadySeen) {

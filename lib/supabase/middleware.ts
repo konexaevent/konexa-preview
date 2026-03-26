@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import type { Database } from "@/types/database";
+import { defaultLocale, localeCookieName } from "@/lib/i18n";
 import { isSupabaseConfigured, supabaseAnonKey, supabaseUrl } from "./config";
 
 type CookieToSet = {
@@ -10,11 +11,22 @@ type CookieToSet = {
 };
 
 export async function updateSession(request: NextRequest) {
+  const ensureLocaleCookie = (response: NextResponse) => {
+    if (!request.cookies.get(localeCookieName)) {
+      response.cookies.set(localeCookieName, defaultLocale, {
+        path: "/",
+        sameSite: "lax",
+        maxAge: 60 * 60 * 24 * 365
+      });
+    }
+    return response;
+  };
+
   if (!isSupabaseConfigured || !supabaseUrl || !supabaseAnonKey) {
-    return NextResponse.next({ request });
+    return ensureLocaleCookie(NextResponse.next({ request }));
   }
 
-  let response = NextResponse.next({ request });
+  let response = ensureLocaleCookie(NextResponse.next({ request }));
 
   const supabase = createServerClient<Database>(supabaseUrl, supabaseAnonKey, {
     cookies: {
@@ -32,5 +44,5 @@ export async function updateSession(request: NextRequest) {
   });
 
   await supabase.auth.getUser();
-  return response;
+  return ensureLocaleCookie(response);
 }
