@@ -38,25 +38,44 @@ export function SiteHeader({
 
   useEffect(() => {
     let lastScrollY = window.scrollY;
+    let ticking = false;
 
-    function handleScroll() {
+    function updateHeaderState() {
       const currentScrollY = window.scrollY;
       const shouldCompact = currentScrollY > 18;
-      const scrollingDown = currentScrollY > lastScrollY;
-      const shouldHide = currentScrollY > 110 && scrollingDown;
+      const delta = currentScrollY - lastScrollY;
+      const scrollingDown = delta > 6;
+      const scrollingUp = delta < -6;
+
+      let nextHidden = isHidden;
+      if (currentScrollY < 24) {
+        nextHidden = false;
+      } else if (scrollingDown && currentScrollY > 120) {
+        nextHidden = true;
+      } else if (scrollingUp) {
+        nextHidden = false;
+      }
 
       setIsCompact(shouldCompact);
-      setIsHidden(shouldHide);
-      if (!shouldHide || currentScrollY < 24 || !scrollingDown) {
+      setIsHidden(nextHidden);
+      if (!nextHidden || currentScrollY < 24 || scrollingUp) {
         setIsPeeked(false);
       }
       lastScrollY = currentScrollY;
+      ticking = false;
     }
 
-    handleScroll();
+    function handleScroll() {
+      if (!ticking) {
+        window.requestAnimationFrame(updateHeaderState);
+        ticking = true;
+      }
+    }
+
+    updateHeaderState();
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [isHidden]);
 
   return (
     <>
