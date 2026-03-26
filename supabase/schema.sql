@@ -29,9 +29,13 @@ create table if not exists public.activity_participants (
   activity_id uuid not null references public.activities (id) on delete cascade,
   user_id uuid not null references public.profiles (id) on delete cascade,
   status text not null default 'confirmed' check (status in ('pending', 'confirmed', 'cancelled')),
+  request_message text,
   joined_at timestamptz not null default now(),
   unique (activity_id, user_id)
 );
+
+alter table public.activity_participants
+  add column if not exists request_message text;
 
 create table if not exists public.user_connections (
   id uuid primary key default gen_random_uuid(),

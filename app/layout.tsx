@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import "./globals.css";
+import { BrandSplash } from "@/components/brand-splash";
 import { CookieBanner } from "@/components/cookie-banner";
-import { PwaRegister } from "@/components/pwa-register";
 import { SiteHeader } from "@/components/site-header";
 import { getMessages } from "@/lib/i18n";
 import { getLocale } from "@/lib/i18n-server";
@@ -14,16 +15,10 @@ export const metadata: Metadata = {
   description:
     "Konexa conecta personas a traves de actividades reales y pequenos grupos.",
   metadataBase: new URL(appUrl),
-  manifest: "/manifest.webmanifest",
   icons: {
     icon: "/logo.PNG",
     apple: "/logo.PNG",
     shortcut: "/logo.PNG"
-  },
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "default",
-    title: "Konexa"
   }
 };
 
@@ -65,12 +60,14 @@ export default async function RootLayout({
   return (
     <html lang={locale}>
       <body>
-        <PwaRegister />
+        <BrandSplash />
         <div className="app-frame">
           <SiteHeader
             locale={locale}
             brandTagline={messages.brandTagline}
-            navDiscover={messages.navDiscover}
+            navDiscover={messages.navActivities}
+            navHosts={messages.navHosts}
+            navEnergy={messages.navEnergy}
             navAdmin={messages.navAdmin}
             navLogin={messages.navLogin}
             navLogout={messages.navLogout}

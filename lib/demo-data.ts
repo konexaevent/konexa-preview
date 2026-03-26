@@ -12,6 +12,11 @@ export type ActivityCard = {
   maxParticipants: number;
   familiarityLabel?: string;
   joined?: boolean;
+  bookingStatus?: "pending" | "confirmed" | null;
+  host?: {
+    name: string;
+    avatarUrl: string;
+  };
 };
 
 export type ProfileSummary = {
@@ -28,23 +33,23 @@ export type ProfileSummary = {
 const profiles: ProfileSummary[] = [
   {
     id: "user-alex",
-    firstName: "Alex",
-    lastName: "Rivera Soler",
-    name: "Alex Rivera",
+    firstName: "Sara",
+    lastName: "Renart",
+    name: "Sara Renart",
     email: "alex@example.com",
     birthDate: "1992-04-18",
     role: "admin",
-    avatarUrl: "https://api.dicebear.com/9.x/lorelei/svg?seed=Alex"
+    avatarUrl: "https://api.dicebear.com/9.x/lorelei/svg?seed=Sara"
   },
   {
     id: "user-marta",
-    firstName: "Marta",
-    lastName: "Diaz Costa",
-    name: "Marta Diaz",
+    firstName: "Ariadna",
+    lastName: "Puig",
+    name: "Ariadna Puig",
     email: "marta@example.com",
     birthDate: "1990-09-10",
-    role: "member",
-    avatarUrl: "https://api.dicebear.com/9.x/lorelei/svg?seed=Marta"
+    role: "host",
+    avatarUrl: "/ariadnapuig.jpg"
   },
   {
     id: "user-lucas",
@@ -53,7 +58,7 @@ const profiles: ProfileSummary[] = [
     name: "Lucas Moreno",
     email: "lucas@example.com",
     birthDate: "1988-12-03",
-    role: "member",
+    role: "host",
     avatarUrl: "https://api.dicebear.com/9.x/lorelei/svg?seed=Lucas"
   },
   {
@@ -63,7 +68,7 @@ const profiles: ProfileSummary[] = [
     name: "Elena Vega",
     email: "elena@example.com",
     birthDate: "1994-01-26",
-    role: "member",
+    role: "host",
     avatarUrl: "https://api.dicebear.com/9.x/lorelei/svg?seed=Elena"
   }
 ];
@@ -75,7 +80,7 @@ const baseActivities: ActivityCard[] = [
     summary:
       "Un sopar guiat, amb ritme tranquil i converses facils, pensat per trencar el gel sense forcar res.",
     startsAt: "2026-03-27T19:30:00.000Z",
-    city: "Madrid",
+    city: "Girona",
     ageRange: "25-35",
     hostUserId: "user-alex",
     requiresApproval: false,
@@ -91,9 +96,9 @@ const baseActivities: ActivityCard[] = [
     summary:
       "Una caminada suau amb parada a una cafeteria bonica, ideal per a primeres vegades a Konexa.",
     startsAt: "2026-03-28T17:45:00.000Z",
-    city: "Madrid",
+    city: "Girona",
     ageRange: "18-25",
-    hostUserId: "user-alex",
+    hostUserId: "user-marta",
     requiresApproval: true,
     heroImageUrl:
       "https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&w=1200&q=80",
@@ -107,9 +112,9 @@ const baseActivities: ActivityCard[] = [
     summary:
       "Cuina compartida, equips petits i taula final conjunta per crear complicitat sense pressio.",
     startsAt: "2026-03-29T11:00:00.000Z",
-    city: "Madrid",
+    city: "Girona",
     ageRange: "35-50",
-    hostUserId: "user-alex",
+    hostUserId: "user-lucas",
     requiresApproval: false,
     heroImageUrl:
       "https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=1200&q=80",
@@ -123,9 +128,9 @@ const baseActivities: ActivityCard[] = [
     summary:
       "Collage, dinamica lleugera i una atmosfera serena per coneixer gent sense soroll ni presses.",
     startsAt: "2026-03-30T16:30:00.000Z",
-    city: "Madrid",
+    city: "Girona",
     ageRange: "50+",
-    hostUserId: "user-alex",
+    hostUserId: "user-elena",
     requiresApproval: false,
     heroImageUrl:
       "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1200&q=80",
@@ -139,9 +144,9 @@ const baseActivities: ActivityCard[] = [
     summary:
       "Una trobada de migdia per repetir amb gent coneguda i deixar que la conversa flueixi sense esforc.",
     startsAt: "2026-03-15T12:30:00.000Z",
-    city: "Madrid",
+    city: "Girona",
     ageRange: "35-50",
-    hostUserId: "user-alex",
+    hostUserId: "user-lucas",
     requiresApproval: false,
     heroImageUrl:
       "https://images.unsplash.com/photo-1485871981521-5b1fd3805eee?auto=format&fit=crop&w=1200&q=80",
@@ -151,7 +156,7 @@ const baseActivities: ActivityCard[] = [
   }
 ];
 
-const bookings = [
+let bookings = [
   { userId: "user-alex", activityId: "cena-social", status: "confirmed" },
   { userId: "user-alex", activityId: "coffee-walk", status: "pending" },
   { userId: "user-alex", activityId: "vermut-sunday", status: "confirmed" },
@@ -163,12 +168,46 @@ const bookings = [
   { userId: "user-elena", activityId: "vermut-sunday", status: "confirmed" }
 ];
 
-export function getDemoHomepageActivities() {
-  return baseActivities.slice(0, 4).map((activity) => ({
+function getParticipantCount(activityId: string) {
+  return bookings.filter(
+    (booking) => booking.activityId === activityId && booking.status !== "cancelled"
+  ).length;
+}
+
+function withDynamicParticipantCount(activity: ActivityCard): ActivityCard {
+  return {
     ...activity,
-    joined: bookings.some(
-      (booking) => booking.userId === "user-alex" && booking.activityId === activity.id
-    )
+    participantCount: getParticipantCount(activity.id)
+  };
+}
+
+export function cancelDemoBooking(userId: string, activityId: string) {
+  bookings = bookings.map((booking) =>
+    booking.userId === userId && booking.activityId === activityId
+      ? { ...booking, status: "cancelled" as const }
+      : booking
+  );
+}
+
+export function getDemoHomepageActivities() {
+  const bookingStatusByActivity = new Map(
+    bookings
+      .filter(
+        (booking) => booking.userId === "user-alex" && booking.status !== "cancelled"
+      )
+      .map((booking) => [booking.activityId, booking.status as "pending" | "confirmed"])
+  );
+
+  return baseActivities.slice(0, 4).map((activity) => ({
+    ...withDynamicParticipantCount(activity),
+    joined: bookingStatusByActivity.get(activity.id) === "confirmed",
+    bookingStatus: bookingStatusByActivity.get(activity.id) || null,
+    host: activity.hostUserId
+      ? {
+          name: getDemoProfile(activity.hostUserId).name,
+          avatarUrl: getDemoProfile(activity.hostUserId).avatarUrl
+        }
+      : undefined
   }));
 }
 
@@ -186,7 +225,7 @@ export function getDemoDashboard(userId = "user-alex") {
           booking.status === "confirmed"
       ) &&
       new Date(activity.startsAt) > new Date("2026-03-25T00:00:00.000Z")
-  );
+  ).map(withDynamicParticipantCount);
 
   const pendingActivities = baseActivities.filter(
     (activity) =>
@@ -197,7 +236,7 @@ export function getDemoDashboard(userId = "user-alex") {
           booking.status === "pending"
       ) &&
       new Date(activity.startsAt) > new Date("2026-03-25T00:00:00.000Z")
-  );
+  ).map(withDynamicParticipantCount);
 
   const pastActivities = baseActivities.filter(
     (activity) =>
@@ -208,7 +247,7 @@ export function getDemoDashboard(userId = "user-alex") {
           booking.status === "confirmed"
       ) &&
       new Date(activity.startsAt) <= new Date("2026-03-25T00:00:00.000Z")
-  );
+  ).map(withDynamicParticipantCount);
 
   const sharedConnections = profiles
     .filter((profile) => profile.id !== userId)
@@ -249,8 +288,15 @@ export function getDemoActivityDetail(id: string, viewerId = "user-alex") {
     return null;
   }
 
+  const viewerBooking = bookings.find(
+    (booking) =>
+      booking.userId === viewerId &&
+      booking.activityId === id &&
+      booking.status !== "cancelled"
+  );
+
   const participants = bookings
-    .filter((booking) => booking.activityId === id)
+    .filter((booking) => booking.activityId === id && booking.status !== "cancelled")
     .map((booking) => getDemoProfile(booking.userId))
     .map((profile) => {
       const sharedActivities = baseActivities
@@ -272,12 +318,17 @@ export function getDemoActivityDetail(id: string, viewerId = "user-alex") {
     });
 
   return {
-    ...activity,
+    ...withDynamicParticipantCount(activity),
+    host: activity.hostUserId
+      ? {
+          name: getDemoProfile(activity.hostUserId).name,
+          avatarUrl: getDemoProfile(activity.hostUserId).avatarUrl
+        }
+      : null,
     participants,
     knownParticipantsCount: participants.filter((participant) => participant.alreadyKnow).length,
-    viewerHasJoined: bookings.some(
-      (booking) => booking.userId === viewerId && booking.activityId === activity.id
-    )
+    viewerHasJoined: Boolean(viewerBooking),
+    viewerBookingStatus: viewerBooking?.status || null
   };
 }
 

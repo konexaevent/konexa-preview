@@ -12,7 +12,9 @@ type HomeActivityFeedProps = {
   initialSelectedAge: AgeOption;
   messages: {
     viewActivity: string;
+    host: string;
     joined: string;
+    pending: string;
     joinActivity: string;
     smallHostedGroup: string;
   };
@@ -27,7 +29,6 @@ type HomeActivityFeedProps = {
     spotsLeft: string;
   };
   locale: string;
-  joinAction: (formData: FormData) => void;
 };
 
 const ageOptions: AgeOption[] = ["all", "18-25", "25-35", "35-50", "50+"];
@@ -47,13 +48,25 @@ function getAgeToneClass(age: AgeOption) {
   }
 }
 
+function getHostAnchorId(age: Exclude<AgeOption, "all">) {
+  switch (age) {
+    case "18-25":
+      return "host-18-25";
+    case "25-35":
+      return "host-25-35";
+    case "35-50":
+      return "host-35-50";
+    case "50+":
+      return "host-50-plus";
+  }
+}
+
 export function HomeActivityFeed({
   activities,
   initialSelectedAge,
   messages,
   homeUi,
-  locale,
-  joinAction
+  locale
 }: HomeActivityFeedProps) {
   const [selectedAge, setSelectedAge] = useState<AgeOption>(initialSelectedAge);
 
@@ -65,9 +78,6 @@ export function HomeActivityFeed({
     selectedAge === "all"
       ? activities
       : activities.filter((activity) => activity.ageRange === selectedAge);
-
-  const currentHomeHref =
-    selectedAge === "all" ? "/#plans" : `/?age=${selectedAge}#plans`;
 
   function handleAgeChange(option: AgeOption) {
     setSelectedAge(option);
@@ -148,16 +158,31 @@ export function HomeActivityFeed({
                   <Link href={`/activities/${activity.id}`} className="text-link">
                     {messages.viewActivity}
                   </Link>
-                  {activity.joined ? (
+                  {activity.host ? (
+                    <Link
+                      href={`/#${getHostAnchorId(activity.ageRange)}`}
+                      className={`host-chip ${getAgeToneClass(activity.ageRange)}`}
+                      title={activity.host.name}
+                    >
+                      <span className="host-chip-label">{messages.host}</span>
+                      <Image
+                        src={activity.host.avatarUrl}
+                        alt={activity.host.name}
+                        width={28}
+                        height={28}
+                        className="host-chip-avatar"
+                        unoptimized
+                      />
+                    </Link>
+                  ) : null}
+                  {activity.bookingStatus === "pending" ? (
+                    <span className="pill pill-soft">{messages.pending}</span>
+                  ) : activity.joined ? (
                     <span className="pill">{messages.joined}</span>
                   ) : (
-                    <form action={joinAction}>
-                      <input type="hidden" name="activity_id" value={activity.id} />
-                      <input type="hidden" name="redirect_to" value={currentHomeHref} />
-                      <button type="submit" className="button button-primary button-small">
-                        {messages.joinActivity}
-                      </button>
-                    </form>
+                    <Link href={`/activities/${activity.id}/join`} className="button button-primary button-small">
+                      {messages.joinActivity}
+                    </Link>
                   )}
                 </div>
               </div>

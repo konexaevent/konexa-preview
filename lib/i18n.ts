@@ -8,6 +8,8 @@ type Messages = {
   brandTagline: string;
   navDiscover: string;
   navActivities: string;
+  navHosts: string;
+  navEnergy: string;
   navLogin: string;
   navLogout: string;
   navAdmin: string;
@@ -106,13 +108,20 @@ type Messages = {
   reject: string;
   noApprovals: string;
   statusConfirmed: string;
+  reservationPending: string;
+  reservationConfirmed: string;
+  cancelReservation: string;
+  reservationCancelled: string;
+  cancellationNotice: string;
 };
 
 const messages: Record<Locale, Messages> = {
   ca: {
-    brandTagline: "Experiencies socials en petit format",
+    brandTagline: "On la vida es viu",
     navDiscover: "Descobreix",
-    navActivities: "Les meves activitats",
+    navActivities: "Activitats",
+    navHosts: "Coneix els hosts",
+    navEnergy: "Energia Konexa",
     navLogin: "Inicia sessio",
     navLogout: "Tanca sessio",
     navAdmin: "Aprovacions",
@@ -216,12 +225,19 @@ const messages: Record<Locale, Messages> = {
     approve: "Confirmar",
     reject: "Rebutjar",
     noApprovals: "No hi ha cap sol.licitud pendent per revisar.",
-    statusConfirmed: "Canvis desats correctament."
+    statusConfirmed: "Canvis desats correctament.",
+    reservationPending: "Reserva pendent de confirmar",
+    reservationConfirmed: "Reserva confirmada",
+    cancelReservation: "Anul.lar reserva",
+    reservationCancelled: "Has anul.lat la reserva d'aquesta activitat.",
+    cancellationNotice: "Si l'anul.les, la teva plaça tornara a quedar disponible."
   },
   es: {
-    brandTagline: "Experiencias sociales en formato pequeno",
+    brandTagline: "Donde la vida se vive",
     navDiscover: "Descubrir",
-    navActivities: "Mis actividades",
+    navActivities: "Actividades",
+    navHosts: "Conoce los hosts",
+    navEnergy: "Energia Konexa",
     navLogin: "Iniciar sesion",
     navLogout: "Cerrar sesion",
     navAdmin: "Aprobaciones",
@@ -325,12 +341,19 @@ const messages: Record<Locale, Messages> = {
     approve: "Confirmar",
     reject: "Rechazar",
     noApprovals: "No hay ninguna solicitud pendiente por revisar.",
-    statusConfirmed: "Cambios guardados correctamente."
+    statusConfirmed: "Cambios guardados correctamente.",
+    reservationPending: "Reserva pendiente de confirmar",
+    reservationConfirmed: "Reserva confirmada",
+    cancelReservation: "Anular reserva",
+    reservationCancelled: "Has anulado la reserva de esta actividad.",
+    cancellationNotice: "Si la anulas, tu plaza volverá a quedar disponible."
   },
   en: {
-    brandTagline: "Small-format social experiences",
+    brandTagline: "Where life is lived",
     navDiscover: "Discover",
-    navActivities: "My Activities",
+    navActivities: "Activities",
+    navHosts: "Meet the hosts",
+    navEnergy: "Konexa energy",
     navLogin: "Log in",
     navLogout: "Log out",
     navAdmin: "Approvals",
@@ -434,7 +457,12 @@ const messages: Record<Locale, Messages> = {
     approve: "Approve",
     reject: "Reject",
     noApprovals: "There are no pending requests to review.",
-    statusConfirmed: "Changes saved successfully."
+    statusConfirmed: "Changes saved successfully.",
+    reservationPending: "Reservation pending confirmation",
+    reservationConfirmed: "Reservation confirmed",
+    cancelReservation: "Cancel reservation",
+    reservationCancelled: "You have cancelled your reservation for this activity.",
+    cancellationNotice: "If you cancel it, your spot will become available again."
   }
 };
 

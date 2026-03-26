@@ -49,7 +49,7 @@ To make Konexa accessible from any browser, like a normal public website:
 After that, users will be able to:
 
 - open Konexa from any browser using a public URL
-- install it as a mobile/desktop web app thanks to the web manifest and service worker
+- use it directly as a normal website from desktop or mobile browsers
 
 Good examples:
 
@@ -92,8 +92,8 @@ If you still do not have Supabase configured:
 
 - When Supabase is not configured, the app falls back to demo data so the UI
   still renders.
-- The project now includes a basic PWA setup with manifest and service worker,
-  so once deployed it can behave more like an installable app from the browser.
+- The project is oriented as a browser-based website, while keeping account,
+  profile, activity, and community functionality online.
 - Shared connections are not calculated with heavy joins on every request.
   They are precomputed into `user_connections` and `connection_activities`
   through triggers on `activity_participants`.

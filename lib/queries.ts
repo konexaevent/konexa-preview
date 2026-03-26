@@ -60,6 +60,7 @@ type QueryActivityLite = {
 
 type QueryParticipantRow = {
   user_id: string;
+  status?: "pending" | "confirmed" | "cancelled";
 };
 
 type DetailParticipant = {
@@ -112,6 +113,14 @@ export const getHomepageActivities = cache(async () => {
     return getDemoHomepageActivities();
   }
 
+  const hostIds = Array.from(
+    new Set(
+      data
+        .map((activity: QueryActivityCard) => activity.host_user_id)
+        .filter(Boolean)
+    )
+  ) as string[];
+
   const joinedRows =
     user && data.length > 0
       ? (
@@ -126,10 +135,19 @@ export const getHomepageActivities = cache(async () => {
         ).data || []
       : [];
 
-  const joinedSet = new Set(
+  const [hostProfilesResult] = await Promise.all([
+    hostIds.length > 0
+      ? db.from("profiles").select("id,full_name,avatar_url").in("id", hostIds)
+      : Promise.resolve({ data: [], error: null })
+  ]);
+
+  const bookingStatusByActivity = new Map(
     joinedRows
       .filter((row: QueryBookingRow) => row.status === "confirmed" || row.status === "pending")
-      .map((row: QueryBookingRow) => row.activity_id)
+      .map((row: QueryBookingRow) => [row.activity_id, row.status as "pending" | "confirmed"])
+  );
+  const hostProfileMap = new Map<string, QueryProfileLite>(
+    (hostProfilesResult.data || []).map((profile: QueryProfileLite) => [profile.id, profile])
   );
 
   return data.map((activity: QueryActivityCard) => ({
@@ -137,13 +155,22 @@ export const getHomepageActivities = cache(async () => {
     title: activity.title,
     summary: activity.summary,
     startsAt: activity.starts_at,
-    city: activity.city,
+    city: "Girona",
     ageRange: activity.age_range || fallbackAgeRanges[activity.id] || "25-35",
     heroImageUrl: activity.hero_image_url,
     participantCount: activity.participant_count,
     maxParticipants: activity.max_participants,
     familiarityLabel: "Shared connections available after login",
-    joined: joinedSet.has(activity.id)
+    joined: bookingStatusByActivity.get(activity.id) === "confirmed",
+    bookingStatus: bookingStatusByActivity.get(activity.id) || null,
+    host: activity.host_user_id
+      ? {
+          name: hostProfileMap.get(activity.host_user_id)?.full_name || "Host",
+          avatarUrl:
+            hostProfileMap.get(activity.host_user_id)?.avatar_url ||
+            `https://api.dicebear.com/9.x/lorelei/svg?seed=${encodeURIComponent(activity.host_user_id)}`
+        }
+      : undefined
   }));
 });
 
@@ -355,10 +382,14 @@ export const getActivityDetail = cache(async (activityId: string, viewerId: stri
   const [activityResult, participantsResult, sharedActivitiesResult] = await Promise.all([
     db
       .from("activity_cards")
-      .select("id,title,summary,starts_at,city,hero_image_url,participant_count,max_participants")
+      .select("id,title,summary,starts_at,city,hero_image_url,host_user_id,participant_count,max_participants")
       .eq("id", activityId)
       .single(),
-    db.from("activity_participants").select("user_id").eq("activity_id", activityId),
+    db
+      .from("activity_participants")
+      .select("user_id,status")
+      .eq("activity_id", activityId)
+      .neq("status", "cancelled"),
     viewerId
       ? db
           .from("connection_activities")
@@ -372,11 +403,21 @@ export const getActivityDetail = cache(async (activityId: string, viewerId: stri
   }
 
   const participantIds = (participantsResult.data || []).map((row: QueryParticipantRow) => row.user_id);
+  const viewerBooking = viewerId
+    ? (participantsResult.data || []).find(
+        (row: QueryParticipantRow) => row.user_id === viewerId
+      )
+    : null;
   const sharedActivityIds = (sharedActivitiesResult.data || []).map((row: QueryConnectionActivityRow) => row.activity_id);
 
+  const hostUserId = activityResult.data.host_user_id as string | null | undefined;
+  const profileIdsToLoad = hostUserId
+    ? Array.from(new Set([...participantIds, hostUserId]))
+    : participantIds;
+
   const [profileResult, activitiesCatalogResult] = await Promise.all([
-    participantIds.length > 0
-      ? db.from("profiles").select("id,full_name,avatar_url").in("id", participantIds)
+    profileIdsToLoad.length > 0
+      ? db.from("profiles").select("id,full_name,avatar_url").in("id", profileIdsToLoad)
       : Promise.resolve({ data: [], error: null }),
     sharedActivityIds.length > 0
       ? db.from("activities").select("id,title").in("id", sharedActivityIds)
@@ -420,12 +461,19 @@ export const getActivityDetail = cache(async (activityId: string, viewerId: stri
     startsAt: activityResult.data.starts_at,
     city: activityResult.data.city,
     heroImageUrl: activityResult.data.hero_image_url,
+    host: hostUserId
+      ? {
+          name: profileCatalog.get(hostUserId)?.full_name || "Host",
+          avatarUrl:
+            profileCatalog.get(hostUserId)?.avatar_url ||
+            `https://api.dicebear.com/9.x/lorelei/svg?seed=${encodeURIComponent(hostUserId)}`
+        }
+      : null,
     participantCount: activityResult.data.participant_count,
     maxParticipants: activityResult.data.max_participants,
     participants,
     knownParticipantsCount: participants.filter((participant: DetailParticipant) => participant.alreadyKnow).length,
-    viewerHasJoined: viewerId
-      ? participants.some((participant: DetailParticipant) => participant.id === viewerId)
-      : false
+    viewerHasJoined: Boolean(viewerBooking),
+    viewerBookingStatus: viewerBooking?.status || null
   };
 });

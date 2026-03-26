@@ -1,6 +1,5 @@
 import Image from "next/image";
 import Link from "next/link";
-import { joinActivityAction } from "./actions";
 import { HomeActivityFeed } from "@/components/home-activity-feed";
 import { getMessages } from "@/lib/i18n";
 import { getLocale } from "@/lib/i18n-server";
@@ -25,19 +24,19 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       heroStats: ["6-10 persones per grup", "Reserva en menys d'1 minut", "Ambients cuidats i sense pressio"],
       trustStrip: ["Gent nova i repetidora", "Grups petits amb host", "Experiencies pensades per connectar"],
       stepsEyebrow: "Com funciona",
-      stepsTitle: "Apuntar-te a un pla hauria de sentir-se facil des del primer moment",
+      stepsTitle: "Activitats reals per coneixer gent d'una manera facil i acompanyada",
       steps: [
         {
-          title: "Escull l'ambient",
-          text: "Veus de seguida si el grup es tranquil, social o mes actiu."
+          title: "Vine sola o acompanyada",
+          text: "Et pots apuntar tant si vens pel teu compte com si prefereixes venir amb algu."
         },
         {
-          title: "Mira qui hi ha",
-          text: "Abans d'apuntar-te, tens context del grup i de les cares conegudes."
+          title: "Fes activitats amb gent",
+          text: "Cada pla esta pensat per compartir una experiencia real i ajudar que la conversa surti naturalment."
         },
         {
-          title: "Reserva i ves-hi",
-          text: "Sense passos innecessaris, sense haver de pensar massa."
+          title: "Deixa't guiar pel teu amfitrio",
+          text: "Cada grup d'edat te un amfitrio que us acompanya i us ajuda el dia de l'activitat si ho necessiteu."
         }
       ],
       energy: ["Ambient tranquil", "Ambient social", "Ambient actiu"],
@@ -63,25 +62,60 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         "Passejos tranquils amb cafe",
         "Tallers creatius en grup petit"
       ],
-      plansAnchorHint: "Plans seleccionats per aquesta setmana"
+      plansAnchorHint: "Plans seleccionats per aquesta setmana",
+      hostsEyebrow: "Hosts",
+      hostsTitle: "Coneix qui acompanya cada grup d'edat",
+      hostsText:
+        "Cada franja te un host de referencia perquè la gent arribi amb més confiança, sàpiga qui trobarà i pugui veure una petita presentació abans de venir.",
+      hostVideoLabel: "Video de presentacio",
+      hostCards: [
+        {
+          age: "18-25 anys",
+          name: "Ariadna Puig",
+          role: "Host del grup 18-25",
+          bio: "Fa de pont perquè la gent nova se senti integrada des del primer moment.",
+          avatarUrl: "/ariadnapuig.jpg"
+        },
+        {
+          age: "25-35 anys",
+          name: "Sara Renart",
+          role: "Host del grup 25-35",
+          bio: "Cuida l'ambient i ajuda que les converses surtin de manera natural.",
+          avatarUrl: "https://api.dicebear.com/9.x/lorelei/svg?seed=Sara"
+        },
+        {
+          age: "35-50 anys",
+          name: "Lucas Moreno",
+          role: "Host del grup 35-50",
+          bio: "Acompanya el grup perquè tothom se senti comode i benvingut.",
+          avatarUrl: "https://api.dicebear.com/9.x/lorelei/svg?seed=Lucas"
+        },
+        {
+          age: "Mes de 50 anys",
+          name: "Elena Vega",
+          role: "Host del grup +50",
+          bio: "Transmet calma i dona suport si algu necessita un primer punt de referencia.",
+          avatarUrl: "https://api.dicebear.com/9.x/lorelei/svg?seed=Elena"
+        }
+      ]
     },
     es: {
       heroStats: ["6-10 personas por grupo", "Reserva en menos de 1 minuto", "Ambientes cuidados y sin presion"],
       trustStrip: ["Gente nueva y repetidora", "Grupos pequenos con host", "Experiencias pensadas para conectar"],
       stepsEyebrow: "Como funciona",
-      stepsTitle: "Apuntarte a un plan deberia sentirse facil desde el primer momento",
+      stepsTitle: "Actividades reales para conocer gente de forma facil y acompanada",
       steps: [
         {
-          title: "Elige el ambiente",
-          text: "Ves enseguida si el grupo es tranquilo, social o mas activo."
+          title: "Ven sola o acompanada",
+          text: "Puedes apuntarte tanto si vienes por tu cuenta como si prefieres venir con alguien."
         },
         {
-          title: "Mira quien va",
-          text: "Antes de apuntarte, tienes contexto del grupo y de las caras conocidas."
+          title: "Haz actividades con gente",
+          text: "Cada plan esta pensado para compartir una experiencia real y hacer que la conversacion aparezca de forma natural."
         },
         {
-          title: "Reserva y ve",
-          text: "Sin pasos innecesarios y sin tener que pensartelo demasiado."
+          title: "Dejate guiar por tu anfitrion",
+          text: "Cada grupo de edad tiene un anfitrion que os acompana y os ayuda el dia de la actividad si lo necesitais."
         }
       ],
       energy: ["Ambiente tranquilo", "Ambiente social", "Ambiente activo"],
@@ -107,25 +141,60 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         "Paseos tranquilos con cafe",
         "Talleres creativos en grupos pequenos"
       ],
-      plansAnchorHint: "Planes seleccionados para esta semana"
+      plansAnchorHint: "Planes seleccionados para esta semana",
+      hostsEyebrow: "Hosts",
+      hostsTitle: "Conoce a quien acompana cada grupo de edad",
+      hostsText:
+        "Cada franja tiene un host de referencia para que la gente llegue con más confianza, sepa a quién encontrará y pueda ver una pequeña presentación antes de venir.",
+      hostVideoLabel: "Video de presentacion",
+      hostCards: [
+        {
+          age: "18-25 anos",
+          name: "Ariadna Puig",
+          role: "Host del grupo 18-25",
+          bio: "Hace de puente para que la gente nueva se sienta integrada desde el primer momento.",
+          avatarUrl: "/ariadnapuig.jpg"
+        },
+        {
+          age: "25-35 anos",
+          name: "Sara Renart",
+          role: "Host del grupo 25-35",
+          bio: "Cuida el ambiente y ayuda a que las conversaciones aparezcan de forma natural.",
+          avatarUrl: "https://api.dicebear.com/9.x/lorelei/svg?seed=Sara"
+        },
+        {
+          age: "35-50 anos",
+          name: "Lucas Moreno",
+          role: "Host del grupo 35-50",
+          bio: "Acompana al grupo para que todo el mundo se sienta comodo y bienvenido.",
+          avatarUrl: "https://api.dicebear.com/9.x/lorelei/svg?seed=Lucas"
+        },
+        {
+          age: "Mas de 50 anos",
+          name: "Elena Vega",
+          role: "Host del grupo +50",
+          bio: "Transmite calma y da apoyo si alguien necesita un primer punto de referencia.",
+          avatarUrl: "https://api.dicebear.com/9.x/lorelei/svg?seed=Elena"
+        }
+      ]
     },
     en: {
       heroStats: ["6-10 people per group", "Reserve in under 1 minute", "Curated low-pressure atmospheres"],
       trustStrip: ["New and returning people", "Small hosted groups", "Experiences designed to connect"],
       stepsEyebrow: "How it works",
-      stepsTitle: "Joining a plan should feel easy from the very first moment",
+      stepsTitle: "Real activities designed to help people connect with ease",
       steps: [
         {
-          title: "Pick the mood",
-          text: "See at a glance whether the group feels calm, social, or more active."
+          title: "Come alone or with someone",
+          text: "You can join on your own or come accompanied if that feels better for you."
         },
         {
-          title: "See who is going",
-          text: "Before you join, you get enough context about the group and familiar faces."
+          title: "Join activities with people",
+          text: "Every plan is built around a real shared experience so conversation can happen naturally."
         },
         {
-          title: "Reserve and show up",
-          text: "No extra friction and no overthinking."
+          title: "Be guided by your host",
+          text: "Each age group has a host who guides the group and helps out on the day if anyone needs support."
         }
       ],
       energy: ["Calm mood", "Social mood", "Active mood"],
@@ -151,7 +220,42 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         "Calm coffee walks",
         "Creative workshops in small groups"
       ],
-      plansAnchorHint: "Plans selected for this week"
+      plansAnchorHint: "Plans selected for this week",
+      hostsEyebrow: "Hosts",
+      hostsTitle: "Meet the host for each age group",
+      hostsText:
+        "Each age range has a dedicated host so people arrive with more trust, know who will welcome them, and can watch a short introduction first.",
+      hostVideoLabel: "Intro video",
+      hostCards: [
+        {
+          age: "18-25 years",
+          name: "Ariadna Puig",
+          role: "Host for ages 18-25",
+          bio: "She helps new people feel included from the very first moment.",
+          avatarUrl: "/ariadnapuig.jpg"
+        },
+        {
+          age: "25-35 years",
+          name: "Sara Renart",
+          role: "Host for ages 25-35",
+          bio: "He protects the atmosphere and helps conversation happen naturally.",
+          avatarUrl: "https://api.dicebear.com/9.x/lorelei/svg?seed=Sara"
+        },
+        {
+          age: "35-50 years",
+          name: "Lucas Moreno",
+          role: "Host for ages 35-50",
+          bio: "He guides the group so everyone can feel comfortable and welcome.",
+          avatarUrl: "https://api.dicebear.com/9.x/lorelei/svg?seed=Lucas"
+        },
+        {
+          age: "Over 50",
+          name: "Elena Vega",
+          role: "Host for 50+",
+          bio: "She brings calm energy and offers support whenever someone needs an easy first contact point.",
+          avatarUrl: "https://api.dicebear.com/9.x/lorelei/svg?seed=Elena"
+        }
+      ]
     }
   }[locale];
   const selectedAgeValue =
@@ -161,9 +265,24 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   const currentHomeHref =
     selectedAgeValue === "all" ? "/#plans" : `/?age=${selectedAgeValue}#plans`;
 
+  const hostToneClasses = ["age-tone-18-25", "age-tone-25-35", "age-tone-35-50", "age-tone-50-plus"];
+  const hostAnchorIds = ["host-18-25", "host-25-35", "host-35-50", "host-50-plus"];
+
   return (
     <div className="page-stack">
       <section className="hero-card">
+        <div className="hero-carousel" aria-hidden="true">
+          {[
+            "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1600&q=80",
+            "https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=1600&q=80",
+            "https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&w=1600&q=80"
+          ].map((src, index) => (
+            <div className={`hero-carousel-slide hero-carousel-slide-${index + 1}`} key={src}>
+              <Image src={src} alt="" fill className="hero-image" priority={index === 0} />
+            </div>
+          ))}
+        </div>
+        <div className="hero-overlay" aria-hidden="true" />
         <div className="hero-copy">
           <p className="eyebrow">{messages.heroEyebrow}</p>
           <h1>{messages.heroTitle}</h1>
@@ -194,25 +313,6 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                 {item}
               </span>
             ))}
-          </div>
-        </div>
-
-        <div className="hero-image-wrap">
-          <Image
-            src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1400&q=80"
-            alt={messages.heroTitle}
-            fill
-            className="hero-image"
-            priority
-          />
-          <div className="hero-floating-card hero-floating-primary">
-            <span className="pill pill-soft">{messages.sharedConnectionsTitle}</span>
-            <strong>{messages.heroTitle}</strong>
-            <p>{messages.sharedAvailable}</p>
-          </div>
-          <div className="hero-floating-card hero-floating-secondary">
-            <span className="pill">{messages.smallHostedGroup}</span>
-            <strong>{homeUi.heroStats[0]}</strong>
           </div>
         </div>
       </section>
@@ -271,7 +371,9 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         initialSelectedAge={selectedAgeValue}
         messages={{
           viewActivity: messages.viewActivity,
+          host: "Host",
           joined: messages.joined,
+          pending: messages.reservationPending,
           joinActivity: messages.joinActivity,
           smallHostedGroup: messages.smallHostedGroup
         }}
@@ -286,10 +388,9 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           spotsLeft: homeUi.spotsLeft
         }}
         locale={locale}
-        joinAction={joinActivityAction}
       />
 
-      <section className="memory-section">
+      <section className="memory-section" id="memories">
         <div className="section-header">
           <div>
             <p className="eyebrow">{homeUi.galleryEyebrow}</p>
@@ -339,6 +440,53 @@ export default async function HomePage({ searchParams }: HomePageProps) {
               </article>
             ))}
           </div>
+        </div>
+      </section>
+
+      <section className="hosts-panel" id="hosts">
+        <div className="section-header">
+          <div>
+            <p className="eyebrow">{homeUi.hostsEyebrow}</p>
+            <h2>{homeUi.hostsTitle}</h2>
+          </div>
+          <p className="section-note">{homeUi.hostsText}</p>
+        </div>
+        <div className="hosts-grid">
+          {homeUi.hostCards.map((host, index) => (
+            <article
+              className={`host-card ${hostToneClasses[index]}`}
+              key={host.age}
+              id={hostAnchorIds[index]}
+            >
+              <div className="host-card-top">
+                <Image
+                  src={host.avatarUrl}
+                  alt={host.name}
+                  width={68}
+                  height={68}
+                  className="avatar avatar-large"
+                  unoptimized
+                />
+                <div>
+                  <span className={`signal-tag signal-tag-age ${hostToneClasses[index]}`}>
+                    {host.age}
+                  </span>
+                  <h3>{host.name}</h3>
+                  <p className="host-role">{host.role}</p>
+                </div>
+              </div>
+              <p className="host-bio">{host.bio}</p>
+              <div className="host-video-frame">
+                <iframe
+                  src="https://www.youtube.com/embed/Scxs7L0vhZ4?rel=0"
+                  title={`${homeUi.hostVideoLabel} - ${host.name}`}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
+              <span className="host-video-label">{homeUi.hostVideoLabel}</span>
+            </article>
+          ))}
         </div>
       </section>
     </div>

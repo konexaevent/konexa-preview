@@ -11,6 +11,8 @@ type SiteHeaderProps = {
   locale: Locale;
   brandTagline: string;
   navDiscover: string;
+  navHosts: string;
+  navEnergy: string;
   navAdmin: string;
   navLogin: string;
   navLogout: string;
@@ -22,22 +24,33 @@ export function SiteHeader({
   locale,
   brandTagline,
   navDiscover,
+  navHosts,
+  navEnergy,
   navAdmin,
   navLogin,
   navLogout,
   showAdminLink,
   userDisplayName
 }: SiteHeaderProps) {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCompact, setIsCompact] = useState(false);
+  const [isHidden, setIsHidden] = useState(false);
   const [isPeeked, setIsPeeked] = useState(false);
 
   useEffect(() => {
+    let lastScrollY = window.scrollY;
+
     function handleScroll() {
-      const nextCollapsed = window.scrollY > 28;
-      setIsCollapsed(nextCollapsed);
-      if (!nextCollapsed) {
+      const currentScrollY = window.scrollY;
+      const shouldCompact = currentScrollY > 18;
+      const scrollingDown = currentScrollY > lastScrollY;
+      const shouldHide = currentScrollY > 110 && scrollingDown;
+
+      setIsCompact(shouldCompact);
+      setIsHidden(shouldHide);
+      if (!shouldHide || currentScrollY < 24 || !scrollingDown) {
         setIsPeeked(false);
       }
+      lastScrollY = currentScrollY;
     }
 
     handleScroll();
@@ -47,7 +60,7 @@ export function SiteHeader({
 
   return (
     <>
-      {isCollapsed ? (
+      {isHidden ? (
         <div
           className="site-header-peek-zone"
           onMouseEnter={() => setIsPeeked(true)}
@@ -55,14 +68,9 @@ export function SiteHeader({
         />
       ) : null}
       <header
-        className={`site-header ${isCollapsed ? "site-header-collapsed" : ""} ${isPeeked ? "site-header-peeked" : ""}`}
-        onMouseEnter={() => {
-          if (isCollapsed) {
-            setIsPeeked(true);
-          }
-        }}
+        className={`site-header ${isCompact ? "site-header-compact" : ""} ${isHidden ? "site-header-hidden" : ""} ${isPeeked ? "site-header-peeked" : ""}`}
         onMouseLeave={() => {
-          if (isCollapsed) {
+          if (isHidden) {
             setIsPeeked(false);
           }
         }}
@@ -94,7 +102,9 @@ export function SiteHeader({
           </Link>
 
           <nav className="site-nav">
-            <Link href="/" className="nav-link-muted">{navDiscover}</Link>
+            <Link href="/#plans" className="nav-link-muted">{navDiscover}</Link>
+            <Link href="/#memories" className="nav-link-muted">{navEnergy}</Link>
+            <Link href="/#hosts" className="nav-link-muted">{navHosts}</Link>
             {showAdminLink ? (
               <Link href="/admin/pending" className="nav-link-muted">{navAdmin}</Link>
             ) : null}

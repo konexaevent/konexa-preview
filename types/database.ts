@@ -82,6 +82,7 @@ export type Database = {
           activity_id: string;
           user_id: string;
           status: "pending" | "confirmed" | "cancelled";
+          request_message: string | null;
           joined_at: string;
         };
         Insert: {
@@ -89,6 +90,7 @@ export type Database = {
           activity_id: string;
           user_id: string;
           status?: "pending" | "confirmed" | "cancelled";
+          request_message?: string | null;
           joined_at?: string;
         };
         Update: {
@@ -96,6 +98,7 @@ export type Database = {
           activity_id?: string;
           user_id?: string;
           status?: "pending" | "confirmed" | "cancelled";
+          request_message?: string | null;
           joined_at?: string;
         };
       };
