@@ -6,7 +6,14 @@ import crypto from "node:crypto";
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { cancelDemoBooking } from "@/lib/demo-data";
+import {
+  cancelDemoBooking,
+  deleteDemoActivity,
+  getDemoAdminDashboard,
+  requestDemoBooking,
+  reviewDemoPendingApproval,
+  upsertDemoActivity
+} from "@/lib/demo-data";
 import { getStoredDemoProfile, setStoredDemoProfile } from "@/lib/demo-profile";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -35,9 +42,52 @@ async function saveDemoAvatar(file: File, userId: string) {
   return `/${relativeDir}/${fileName}`;
 }
 
+async function saveDemoActivityImage(file: File, activityId: string) {
+  const extension = file.name.includes(".")
+    ? file.name.split(".").pop()?.toLowerCase() || "jpg"
+    : "jpg";
+  const relativeDir = path.join("demo-uploads", "activities");
+  const targetDir = path.join(process.cwd(), "public", relativeDir);
+  const fileName = `${activityId}-${Date.now()}.${extension}`;
+  const targetPath = path.join(targetDir, fileName);
+
+  await mkdir(targetDir, { recursive: true });
+  await writeFile(targetPath, Buffer.from(await file.arrayBuffer()));
+
+  return `/${relativeDir}/${fileName}`;
+}
+
 async function getOrigin() {
   const headersList = await headers();
   return headersList.get("origin") || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+}
+
+async function requireAdminOrRedirect(next = "/admin") {
+  const supabase = await createSupabaseServerClient();
+
+  if (!supabase) {
+    const demoProfile = await getStoredDemoProfile();
+    if (demoProfile.role !== "admin") {
+      redirect("/profile");
+    }
+    return { supabase: null as any, user: { id: demoProfile.id, email: demoProfile.email } };
+  }
+
+  const {
+    data: { user }
+  } = await supabase.auth.getUser();
+  const db = supabase as any;
+
+  if (!user) {
+    redirect(`/login?next=${encodeURIComponent(next)}`);
+  }
+
+  const profileResult = await db.from("profiles").select("role").eq("id", user.id).single();
+  if (profileResult.data?.role !== "admin") {
+    redirect("/profile");
+  }
+
+  return { supabase, user };
 }
 
 export async function joinActivityAction(formData: FormData) {
@@ -104,7 +154,9 @@ export async function requestActivityJoinAction(formData: FormData) {
   const lastName = String(formData.get("last_name") || "").trim();
   const email = String(formData.get("email") || "").trim().toLowerCase();
   const birthDate = String(formData.get("birth_date") || "").trim();
+  const phoneNumber = String(formData.get("phone_number") || "").trim();
   const motivation = String(formData.get("motivation") || "").trim();
+  const whatsappConsent = String(formData.get("whatsapp_consent") || "") === "on";
 
   if (!activityId) {
     redirect("/");
@@ -115,6 +167,29 @@ export async function requestActivityJoinAction(formData: FormData) {
 
   const supabase = await createSupabaseServerClient();
   if (!supabase) {
+    const demoProfile = await getStoredDemoProfile();
+    if (firstName || lastName || email || birthDate || phoneNumber) {
+      await setStoredDemoProfile({
+        firstName: firstName || demoProfile.firstName,
+        lastName: lastName || demoProfile.lastName,
+        email: email || demoProfile.email,
+        birthDate: birthDate || demoProfile.birthDate,
+        phoneNumber: phoneNumber || demoProfile.phoneNumber || "",
+        avatarUrl: demoProfile.avatarUrl
+      });
+    }
+    requestDemoBooking({
+      userId: demoProfile.id,
+      activityId,
+      phoneNumber: phoneNumber || demoProfile.phoneNumber,
+      requestMessage: motivation,
+      whatsappOptIn: whatsappConsent
+    });
+    revalidatePath("/");
+    revalidatePath("/profile");
+    revalidatePath("/admin");
+    revalidatePath(`/activities/${activityId}`);
+    revalidatePath(`/activities/${activityId}/join`);
     redirect(successRedirect);
   }
 
@@ -132,15 +207,31 @@ export async function requestActivityJoinAction(formData: FormData) {
       .join(" ")
       .trim() || user.user_metadata.full_name || user.email || "User";
 
-    await db.from("profiles").upsert({
+    const profileUpsert = await db.from("profiles").upsert({
       id: user.id,
       first_name: firstName || user.user_metadata.first_name || null,
       last_name: lastName || user.user_metadata.last_name || null,
       full_name: fullName,
-      birth_date: birthDate || user.user_metadata.birth_date || null
+      birth_date: birthDate || user.user_metadata.birth_date || null,
+      phone_number: phoneNumber || user.user_metadata.phone_number || null
     });
+
+    if (profileUpsert?.error) {
+      const errorMessage = String(profileUpsert.error.message || "");
+      if (errorMessage.includes("phone_number")) {
+        await db.from("profiles").upsert({
+          id: user.id,
+          first_name: firstName || user.user_metadata.first_name || null,
+          last_name: lastName || user.user_metadata.last_name || null,
+          full_name: fullName,
+          birth_date: birthDate || user.user_metadata.birth_date || null
+        });
+      } else {
+        redirect(errorRedirect);
+      }
+    }
   } else {
-    if (!firstName || !lastName || !email || !birthDate || !motivation) {
+    if (!firstName || !lastName || !email || !birthDate || !phoneNumber || !motivation || !whatsappConsent) {
       redirect(errorRedirect);
     }
 
@@ -162,7 +253,8 @@ export async function requestActivityJoinAction(formData: FormData) {
           full_name: `${firstName} ${lastName}`.trim(),
           first_name: firstName,
           last_name: lastName,
-          birth_date: birthDate
+          birth_date: birthDate,
+          phone_number: phoneNumber
         }
       });
 
@@ -175,13 +267,29 @@ export async function requestActivityJoinAction(formData: FormData) {
 
     targetUserId = existingUser.id;
 
-    await (admin as any).from("profiles").upsert({
+    const adminProfileUpsert = await (admin as any).from("profiles").upsert({
       id: existingUser.id,
       first_name: firstName || null,
       last_name: lastName || null,
       full_name: `${firstName} ${lastName}`.trim(),
-      birth_date: birthDate || null
+      birth_date: birthDate || null,
+      phone_number: phoneNumber || null
     });
+
+    if (adminProfileUpsert?.error) {
+      const errorMessage = String(adminProfileUpsert.error.message || "");
+      if (errorMessage.includes("phone_number")) {
+        await (admin as any).from("profiles").upsert({
+          id: existingUser.id,
+          first_name: firstName || null,
+          last_name: lastName || null,
+          full_name: `${firstName} ${lastName}`.trim(),
+          birth_date: birthDate || null
+        });
+      } else {
+        redirect(errorRedirect);
+      }
+    }
 
     await admin.auth.admin.generateLink({
       type: "magiclink",
@@ -213,21 +321,55 @@ export async function requestActivityJoinAction(formData: FormData) {
   }
 
   if (!existingBooking) {
-    await requestDb.from("activity_participants").insert({
+    const insertResult = await requestDb.from("activity_participants").insert({
       activity_id: activityId,
       user_id: targetUserId,
       status: "pending",
-      request_message: motivation || null
+      request_message: motivation || null,
+      phone_number: phoneNumber || null,
+      whatsapp_opt_in: whatsappConsent
     });
+
+    if (insertResult?.error) {
+      const errorMessage = String(insertResult.error.message || "");
+      if (errorMessage.includes("phone_number") || errorMessage.includes("whatsapp_opt_in")) {
+        await requestDb.from("activity_participants").insert({
+          activity_id: activityId,
+          user_id: targetUserId,
+          status: "pending",
+          request_message: motivation || null
+        });
+      } else {
+        redirect(errorRedirect);
+      }
+    }
   } else {
-    await requestDb
+    const updateResult = await requestDb
       .from("activity_participants")
       .update({
         status: "pending",
-        request_message: motivation || null
+        request_message: motivation || null,
+        phone_number: phoneNumber || null,
+        whatsapp_opt_in: whatsappConsent
       })
       .eq("activity_id", activityId)
       .eq("user_id", targetUserId);
+
+    if (updateResult?.error) {
+      const errorMessage = String(updateResult.error.message || "");
+      if (errorMessage.includes("phone_number") || errorMessage.includes("whatsapp_opt_in")) {
+        await requestDb
+          .from("activity_participants")
+          .update({
+            status: "pending",
+            request_message: motivation || null
+          })
+          .eq("activity_id", activityId)
+          .eq("user_id", targetUserId);
+      } else {
+        redirect(errorRedirect);
+      }
+    }
   }
 
   revalidatePath("/");
@@ -244,6 +386,7 @@ export async function updateProfileAction(formData: FormData) {
   const lastName = String(formData.get("last_name") || "").trim();
   const email = String(formData.get("email") || "").trim();
   const birthDate = String(formData.get("birth_date") || "").trim();
+  const phoneNumber = String(formData.get("phone_number") || "").trim();
   const avatarFile = formData.get("avatar_file");
 
   const supabase = await createSupabaseServerClient();
@@ -259,6 +402,7 @@ export async function updateProfileAction(formData: FormData) {
       lastName,
       email,
       birthDate,
+      phoneNumber,
       avatarUrl
     });
     revalidatePath("/");
@@ -302,14 +446,33 @@ export async function updateProfileAction(formData: FormData) {
     }
   }
 
-  await db.from("profiles").upsert({
+  const profilePayload = {
     id: user.id,
     first_name: firstName || null,
     last_name: lastName || null,
     full_name: fullName,
     birth_date: birthDate || null,
+    phone_number: phoneNumber || null,
     avatar_url: resolvedAvatarUrl
-  });
+  };
+
+  const profileUpsert = await db.from("profiles").upsert(profilePayload);
+
+  if (profileUpsert?.error) {
+    const errorMessage = String(profileUpsert.error.message || "");
+    if (errorMessage.includes("phone_number")) {
+      await db.from("profiles").upsert({
+        id: user.id,
+        first_name: firstName || null,
+        last_name: lastName || null,
+        full_name: fullName,
+        birth_date: birthDate || null,
+        avatar_url: resolvedAvatarUrl
+      });
+    } else {
+      redirect(`${redirectTo}${redirectTo.includes("?") ? "&" : "?"}error=1`);
+    }
+  }
 
   if (email && email !== user.email) {
     await supabase.auth.updateUser({
@@ -320,6 +483,7 @@ export async function updateProfileAction(formData: FormData) {
         first_name: firstName,
         last_name: lastName,
         birth_date: birthDate,
+        phone_number: phoneNumber,
         avatar_url: resolvedAvatarUrl
       }
     });
@@ -331,6 +495,7 @@ export async function updateProfileAction(formData: FormData) {
         first_name: firstName,
         last_name: lastName,
         birth_date: birthDate,
+        phone_number: phoneNumber,
         avatar_url: resolvedAvatarUrl
       }
     });
@@ -354,20 +519,21 @@ export async function reviewPendingAction(formData: FormData) {
   const activityId = String(formData.get("activity_id") || "");
   const attendeeId = String(formData.get("attendee_id") || "");
   const decision = String(formData.get("decision") || "confirmed");
-  const supabase = await createSupabaseServerClient();
+  const { supabase } = await requireAdminOrRedirect("/admin");
 
   if (!supabase) {
-    redirect("/admin/pending?review=demo");
+    reviewDemoPendingApproval(
+      activityId,
+      attendeeId,
+      decision === "cancelled" ? "cancelled" : "confirmed"
+    );
+    revalidatePath("/admin");
+    revalidatePath("/profile");
+    revalidatePath(`/activities/${activityId}`);
+    redirect("/admin?review=1");
   }
 
-  const {
-    data: { user }
-  } = await supabase.auth.getUser();
   const db = supabase as any;
-
-  if (!user) {
-    redirect("/login?next=/admin/pending");
-  }
 
   await db
     .from("activity_participants")
@@ -377,9 +543,11 @@ export async function reviewPendingAction(formData: FormData) {
     .eq("activity_id", activityId)
     .eq("user_id", attendeeId);
 
+  revalidatePath("/admin");
   revalidatePath("/admin/pending");
   revalidatePath("/profile");
-  redirect("/admin/pending?review=1");
+  revalidatePath(`/activities/${activityId}`);
+  redirect("/admin?review=1");
 }
 
 export async function cancelActivityReservationAction(formData: FormData) {
@@ -426,4 +594,131 @@ export async function cancelActivityReservationAction(formData: FormData) {
   revalidatePath(`/activities/${activityId}/join`);
 
   redirect(successRedirect);
+}
+
+export async function saveActivityAction(formData: FormData) {
+  const { supabase } = await requireAdminOrRedirect("/admin");
+  const activityId = String(formData.get("activity_id") || "").trim();
+  const title = String(formData.get("title") || "").trim();
+  const summary = String(formData.get("summary") || "").trim();
+  const startsAt = String(formData.get("starts_at") || "").trim();
+  const city = String(formData.get("city") || "Girona").trim() || "Girona";
+  const ageRange = String(formData.get("age_range") || "25-35").trim() as
+    | "18-25"
+    | "25-35"
+    | "35-50"
+    | "50+";
+  const hostUserId = String(formData.get("host_user_id") || "").trim();
+  const existingImageUrl = String(formData.get("existing_image_url") || "").trim();
+  const requiresApproval = String(formData.get("requires_approval") || "") === "on";
+  const maxParticipants = Number(formData.get("max_participants") || 8);
+  const imageFile = formData.get("hero_image_file");
+
+  if (!title || !summary || !startsAt) {
+    redirect("/admin?error=activity");
+  }
+
+  let heroImageUrl = existingImageUrl;
+
+  if (!supabase) {
+    if (imageFile instanceof File && imageFile.size > 0) {
+      heroImageUrl = await saveDemoActivityImage(imageFile, activityId || crypto.randomUUID());
+    }
+
+    upsertDemoActivity({
+      id: activityId || undefined,
+      title,
+      summary,
+      startsAt,
+      city,
+      ageRange,
+      heroImageUrl:
+        heroImageUrl ||
+        "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1200&q=80",
+      hostUserId: hostUserId || undefined,
+      requiresApproval,
+      maxParticipants: Number.isFinite(maxParticipants) ? Math.max(2, maxParticipants) : 8
+    });
+
+    revalidatePath("/");
+    revalidatePath("/admin");
+    if (activityId) {
+      revalidatePath(`/activities/${activityId}`);
+    }
+    redirect("/admin?saved=1");
+  }
+
+  if (imageFile instanceof File && imageFile.size > 0) {
+    const extension = imageFile.name.includes(".")
+      ? imageFile.name.split(".").pop()?.toLowerCase() || "jpg"
+      : "jpg";
+    const filePath = `${activityId || crypto.randomUUID()}/hero-${Date.now()}.${extension}`;
+    const fileBuffer = Buffer.from(await imageFile.arrayBuffer());
+    const { error: uploadError } = await supabase.storage
+      .from("activity-images")
+      .upload(filePath, fileBuffer, {
+        contentType: getAvatarContentType(imageFile),
+        upsert: true
+      });
+
+    if (!uploadError) {
+      const { data: publicUrlData } = supabase.storage
+        .from("activity-images")
+        .getPublicUrl(filePath);
+      heroImageUrl = publicUrlData.publicUrl;
+    }
+  }
+
+  const db = supabase as any;
+  const payload = {
+    title,
+    summary,
+    starts_at: startsAt,
+    city,
+    age_range: ageRange,
+    hero_image_url:
+      heroImageUrl ||
+      "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1200&q=80",
+    host_user_id: hostUserId || null,
+    requires_approval: requiresApproval,
+    max_participants: Number.isFinite(maxParticipants) ? Math.max(2, maxParticipants) : 8
+  };
+
+  if (activityId) {
+    await db.from("activities").update(payload).eq("id", activityId);
+  } else {
+    await db.from("activities").insert(payload);
+  }
+
+  revalidatePath("/");
+  revalidatePath("/admin");
+  if (activityId) {
+    revalidatePath(`/activities/${activityId}`);
+  }
+  redirect("/admin?saved=1");
+}
+
+export async function deleteActivityAction(formData: FormData) {
+  const { supabase } = await requireAdminOrRedirect("/admin");
+  const activityId = String(formData.get("activity_id") || "").trim();
+
+  if (!activityId) {
+    redirect("/admin");
+  }
+
+  if (!supabase) {
+    deleteDemoActivity(activityId);
+    revalidatePath("/");
+    revalidatePath("/admin");
+    revalidatePath("/profile");
+    redirect("/admin?deleted=1");
+  }
+
+  const db = supabase as any;
+  await db.from("activities").delete().eq("id", activityId);
+
+  revalidatePath("/");
+  revalidatePath("/admin");
+  revalidatePath("/profile");
+  redirect("/admin?deleted=1");
 }

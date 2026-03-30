@@ -6,6 +6,7 @@ create table if not exists public.profiles (
   last_name text,
   full_name text not null,
   birth_date date,
+  phone_number text,
   role text not null default 'member' check (role in ('member', 'host', 'admin')),
   avatar_url text not null default 'https://api.dicebear.com/9.x/lorelei/svg?seed=konexa',
   created_at timestamptz not null default now()
@@ -17,6 +18,7 @@ create table if not exists public.activities (
   summary text not null,
   starts_at timestamptz not null,
   city text not null,
+  age_range text check (age_range in ('18-25', '25-35', '35-50', '50+')),
   hero_image_url text not null,
   host_user_id uuid references public.profiles (id) on delete set null,
   requires_approval boolean not null default false,
@@ -30,12 +32,26 @@ create table if not exists public.activity_participants (
   user_id uuid not null references public.profiles (id) on delete cascade,
   status text not null default 'confirmed' check (status in ('pending', 'confirmed', 'cancelled')),
   request_message text,
+  phone_number text,
+  whatsapp_opt_in boolean not null default false,
   joined_at timestamptz not null default now(),
   unique (activity_id, user_id)
 );
 
+alter table public.profiles
+  add column if not exists phone_number text;
+
 alter table public.activity_participants
   add column if not exists request_message text;
+
+alter table public.activities
+  add column if not exists age_range text check (age_range in ('18-25', '25-35', '35-50', '50+'));
+
+alter table public.activity_participants
+  add column if not exists phone_number text;
+
+alter table public.activity_participants
+  add column if not exists whatsapp_opt_in boolean not null default false;
 
 create table if not exists public.user_connections (
   id uuid primary key default gen_random_uuid(),
@@ -76,6 +92,7 @@ select
   a.summary,
   a.starts_at,
   a.city,
+  a.age_range,
   a.hero_image_url,
   a.host_user_id,
   a.requires_approval,
@@ -211,11 +228,61 @@ for select
 to authenticated
 using (true);
 
+create policy "Users can update their own profile"
+on public.profiles
+for update
+to authenticated
+using (auth.uid() = id)
+with check (auth.uid() = id);
+
 create policy "Activities are readable by everyone"
 on public.activities
 for select
 to anon, authenticated
 using (true);
+
+create policy "Admins can create activities"
+on public.activities
+for insert
+to authenticated
+with check (
+  exists (
+    select 1 from public.profiles p
+    where p.id = auth.uid()
+      and p.role = 'admin'
+  )
+);
+
+create policy "Admins can update activities"
+on public.activities
+for update
+to authenticated
+using (
+  exists (
+    select 1 from public.profiles p
+    where p.id = auth.uid()
+      and p.role = 'admin'
+  )
+)
+with check (
+  exists (
+    select 1 from public.profiles p
+    where p.id = auth.uid()
+      and p.role = 'admin'
+  )
+);
+
+create policy "Admins can delete activities"
+on public.activities
+for delete
+to authenticated
+using (
+  exists (
+    select 1 from public.profiles p
+    where p.id = auth.uid()
+      and p.role = 'admin'
+  )
+);
 
 create policy "Participants are readable by authenticated users"
 on public.activity_participants
@@ -229,7 +296,7 @@ for insert
 to authenticated
 with check (auth.uid() = user_id);
 
-create policy "Hosts or admins can update participant status"
+create policy "Admins can update participant status"
 on public.activity_participants
 for update
 to authenticated
@@ -238,15 +305,7 @@ using (
     select 1
     from public.profiles p
     where p.id = auth.uid()
-      and (
-        p.role = 'admin'
-        or exists (
-          select 1
-          from public.activities a
-          where a.id = activity_participants.activity_id
-            and a.host_user_id = auth.uid()
-        )
-      )
+      and p.role = 'admin'
   )
 )
 with check (
@@ -254,15 +313,7 @@ with check (
     select 1
     from public.profiles p
     where p.id = auth.uid()
-      and (
-        p.role = 'admin'
-        or exists (
-          select 1
-          from public.activities a
-          where a.id = activity_participants.activity_id
-            and a.host_user_id = auth.uid()
-        )
-      )
+      and p.role = 'admin'
   )
 );
 
@@ -280,6 +331,11 @@ using (auth.uid() = user_id);
 
 insert into storage.buckets (id, name, public)
 values ('avatars', 'avatars', true)
+on conflict (id) do update
+set public = excluded.public;
+
+insert into storage.buckets (id, name, public)
+values ('activity-images', 'activity-images', true)
 on conflict (id) do update
 set public = excluded.public;
 
@@ -309,4 +365,57 @@ using (
 with check (
   bucket_id = 'avatars'
   and (storage.foldername(name))[1] = auth.uid()::text
+);
+
+create policy "Activity images are public"
+on storage.objects
+for select
+to public
+using (bucket_id = 'activity-images');
+
+create policy "Admins can upload activity images"
+on storage.objects
+for insert
+to authenticated
+with check (
+  bucket_id = 'activity-images'
+  and exists (
+    select 1 from public.profiles p
+    where p.id = auth.uid()
+      and p.role = 'admin'
+  )
+);
+
+create policy "Admins can update activity images"
+on storage.objects
+for update
+to authenticated
+using (
+  bucket_id = 'activity-images'
+  and exists (
+    select 1 from public.profiles p
+    where p.id = auth.uid()
+      and p.role = 'admin'
+  )
+)
+with check (
+  bucket_id = 'activity-images'
+  and exists (
+    select 1 from public.profiles p
+    where p.id = auth.uid()
+      and p.role = 'admin'
+  )
+);
+
+create policy "Admins can delete activity images"
+on storage.objects
+for delete
+to authenticated
+using (
+  bucket_id = 'activity-images'
+  and exists (
+    select 1 from public.profiles p
+    where p.id = auth.uid()
+      and p.role = 'admin'
+  )
 );

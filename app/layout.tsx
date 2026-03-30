@@ -72,7 +72,7 @@ export default async function RootLayout({
             navLogin={messages.navLogin}
             navLogout={messages.navLogout}
             showAdminLink={Boolean(
-              dashboard && (dashboard.profile.role === "admin" || dashboard.profile.role === "host")
+              dashboard && dashboard.profile.role === "admin"
             )}
             userDisplayName={user ? user.user_metadata.full_name || user.email || null : null}
           />

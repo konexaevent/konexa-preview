@@ -10,6 +10,7 @@ export type Database = {
           last_name: string | null;
           full_name: string;
           birth_date: string | null;
+          phone_number: string | null;
           role: "member" | "host" | "admin";
           avatar_url: string;
           created_at: string;
@@ -20,6 +21,7 @@ export type Database = {
           last_name?: string | null;
           full_name: string;
           birth_date?: string | null;
+          phone_number?: string | null;
           role?: "member" | "host" | "admin";
           avatar_url?: string;
           created_at?: string;
@@ -30,6 +32,7 @@ export type Database = {
           last_name?: string | null;
           full_name?: string;
           birth_date?: string | null;
+          phone_number?: string | null;
           role?: "member" | "host" | "admin";
           avatar_url?: string;
           created_at?: string;
@@ -83,6 +86,8 @@ export type Database = {
           user_id: string;
           status: "pending" | "confirmed" | "cancelled";
           request_message: string | null;
+          phone_number: string | null;
+          whatsapp_opt_in: boolean;
           joined_at: string;
         };
         Insert: {
@@ -91,6 +96,8 @@ export type Database = {
           user_id: string;
           status?: "pending" | "confirmed" | "cancelled";
           request_message?: string | null;
+          phone_number?: string | null;
+          whatsapp_opt_in?: boolean;
           joined_at?: string;
         };
         Update: {
@@ -99,6 +106,8 @@ export type Database = {
           user_id?: string;
           status?: "pending" | "confirmed" | "cancelled";
           request_message?: string | null;
+          phone_number?: string | null;
+          whatsapp_opt_in?: boolean;
           joined_at?: string;
         };
       };

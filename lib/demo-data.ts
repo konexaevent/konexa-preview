@@ -19,6 +19,15 @@ export type ActivityCard = {
   };
 };
 
+type DemoBooking = {
+  userId: string;
+  activityId: string;
+  status: "pending" | "confirmed" | "cancelled";
+  requestMessage?: string;
+  phoneNumber?: string;
+  whatsappOptIn?: boolean;
+};
+
 export type ProfileSummary = {
   id: string;
   firstName: string;
@@ -26,6 +35,7 @@ export type ProfileSummary = {
   name: string;
   email: string;
   birthDate: string;
+  phoneNumber?: string;
   role?: "member" | "host" | "admin";
   avatarUrl: string;
 };
@@ -38,6 +48,7 @@ const profiles: ProfileSummary[] = [
     name: "Sara Renart",
     email: "alex@example.com",
     birthDate: "1992-04-18",
+    phoneNumber: "+34 600 111 222",
     role: "admin",
     avatarUrl: "https://api.dicebear.com/9.x/lorelei/svg?seed=Sara"
   },
@@ -48,6 +59,7 @@ const profiles: ProfileSummary[] = [
     name: "Ariadna Puig",
     email: "marta@example.com",
     birthDate: "1990-09-10",
+    phoneNumber: "+34 600 222 333",
     role: "host",
     avatarUrl: "/ariadnapuig.jpg"
   },
@@ -58,6 +70,7 @@ const profiles: ProfileSummary[] = [
     name: "Lucas Moreno",
     email: "lucas@example.com",
     birthDate: "1988-12-03",
+    phoneNumber: "+34 600 333 444",
     role: "host",
     avatarUrl: "https://api.dicebear.com/9.x/lorelei/svg?seed=Lucas"
   },
@@ -68,12 +81,13 @@ const profiles: ProfileSummary[] = [
     name: "Elena Vega",
     email: "elena@example.com",
     birthDate: "1994-01-26",
+    phoneNumber: "+34 600 444 555",
     role: "host",
     avatarUrl: "https://api.dicebear.com/9.x/lorelei/svg?seed=Elena"
   }
 ];
 
-const baseActivities: ActivityCard[] = [
+let baseActivities: ActivityCard[] = [
   {
     id: "cena-social",
     title: "Sopar entre desconeguts que volen sentir-se com entre coneguts",
@@ -92,7 +106,7 @@ const baseActivities: ActivityCard[] = [
   },
   {
     id: "coffee-walk",
-    title: "Passeig amb cafe per coneixer gent sense haver d'impressionar ningu",
+    title: "Passeig amb cafe per coneixer gent d'una manera natural",
     summary:
       "Una caminada suau amb parada a una cafeteria bonica, ideal per a primeres vegades a Konexa.",
     startsAt: "2026-03-28T17:45:00.000Z",
@@ -110,7 +124,7 @@ const baseActivities: ActivityCard[] = [
     id: "cooking-lab",
     title: "Taller de cuina on l'activitat fa facil que la conversa aparegui sola",
     summary:
-      "Cuina compartida, equips petits i taula final conjunta per crear complicitat sense pressio.",
+      "Cuina compartida, equips petits i taula final conjunta per crear complicitat de manera natural.",
     startsAt: "2026-03-29T11:00:00.000Z",
     city: "Girona",
     ageRange: "35-50",
@@ -156,9 +170,16 @@ const baseActivities: ActivityCard[] = [
   }
 ];
 
-let bookings = [
+let bookings: DemoBooking[] = [
   { userId: "user-alex", activityId: "cena-social", status: "confirmed" },
-  { userId: "user-alex", activityId: "coffee-walk", status: "pending" },
+  {
+    userId: "user-alex",
+    activityId: "coffee-walk",
+    status: "pending",
+    requestMessage: "M'agradaria venir per coneixer gent nova a Girona.",
+    phoneNumber: "+34 600 111 222",
+    whatsappOptIn: true
+  },
   { userId: "user-alex", activityId: "vermut-sunday", status: "confirmed" },
   { userId: "user-marta", activityId: "cena-social", status: "confirmed" },
   { userId: "user-marta", activityId: "vermut-sunday", status: "confirmed" },
@@ -187,6 +208,45 @@ export function cancelDemoBooking(userId: string, activityId: string) {
       ? { ...booking, status: "cancelled" as const }
       : booking
   );
+}
+
+export function requestDemoBooking(input: {
+  userId: string;
+  activityId: string;
+  phoneNumber?: string;
+  requestMessage?: string;
+  whatsappOptIn?: boolean;
+}) {
+  const existing = bookings.find(
+    (booking) => booking.userId === input.userId && booking.activityId === input.activityId
+  );
+
+  if (existing) {
+    bookings = bookings.map((booking) =>
+      booking.userId === input.userId && booking.activityId === input.activityId
+        ? {
+            ...booking,
+            status: "pending",
+            phoneNumber: input.phoneNumber || booking.phoneNumber,
+            requestMessage: input.requestMessage || booking.requestMessage,
+            whatsappOptIn: input.whatsappOptIn ?? booking.whatsappOptIn
+          }
+        : booking
+    );
+    return;
+  }
+
+  bookings = [
+    ...bookings,
+    {
+      userId: input.userId,
+      activityId: input.activityId,
+      status: "pending",
+      phoneNumber: input.phoneNumber,
+      requestMessage: input.requestMessage,
+      whatsappOptIn: input.whatsappOptIn ?? false
+    }
+  ];
 }
 
 export function getDemoHomepageActivities() {
@@ -334,7 +394,7 @@ export function getDemoActivityDetail(id: string, viewerId = "user-alex") {
 
 export function getDemoPendingApprovals(userId = "user-alex") {
   const profile = getDemoProfile(userId);
-  if (profile.role !== "admin" && profile.role !== "host") {
+  if (profile.role !== "admin") {
     return [];
   }
 
@@ -352,8 +412,100 @@ export function getDemoPendingApprovals(userId = "user-alex") {
         activityDate: activity.startsAt,
         attendeeId: attendee.id,
         attendeeName: attendee.name,
-        attendeeAvatarUrl: attendee.avatarUrl
+        attendeeAvatarUrl: attendee.avatarUrl,
+        attendeeEmail: attendee.email,
+        attendeePhoneNumber: booking.phoneNumber || attendee.phoneNumber || "",
+        requestMessage: booking.requestMessage || "",
+        whatsappOptIn: Boolean(booking.whatsappOptIn)
       };
     })
     .filter(Boolean);
+}
+
+export function reviewDemoPendingApproval(
+  activityId: string,
+  attendeeId: string,
+  decision: "confirmed" | "cancelled"
+) {
+  bookings = bookings.map((booking) =>
+    booking.activityId === activityId && booking.userId === attendeeId
+      ? { ...booking, status: decision }
+      : booking
+  );
+}
+
+export function upsertDemoActivity(input: {
+  id?: string;
+  title: string;
+  summary: string;
+  startsAt: string;
+  city: string;
+  ageRange: "18-25" | "25-35" | "35-50" | "50+";
+  heroImageUrl: string;
+  hostUserId?: string;
+  requiresApproval?: boolean;
+  maxParticipants: number;
+}) {
+  const activityId = input.id || crypto.randomUUID();
+  const existing = baseActivities.find((activity) => activity.id === activityId);
+  const nextActivity: ActivityCard = {
+    id: activityId,
+    title: input.title,
+    summary: input.summary,
+    startsAt: input.startsAt,
+    city: input.city,
+    ageRange: input.ageRange,
+    heroImageUrl: input.heroImageUrl,
+    hostUserId: input.hostUserId,
+    requiresApproval: input.requiresApproval ?? false,
+    participantCount: existing?.participantCount || 0,
+    maxParticipants: input.maxParticipants,
+    familiarityLabel: existing?.familiarityLabel
+  };
+
+  if (existing) {
+    baseActivities = baseActivities.map((activity) => (activity.id === activityId ? nextActivity : activity));
+  } else {
+    baseActivities = [nextActivity, ...baseActivities];
+  }
+
+  return activityId;
+}
+
+export function deleteDemoActivity(activityId: string) {
+  baseActivities = baseActivities.filter((activity) => activity.id !== activityId);
+  bookings = bookings.filter((booking) => booking.activityId !== activityId);
+}
+
+export function getDemoAdminDashboard(userId = "user-alex") {
+  const profile = getDemoProfile(userId);
+  if (profile.role !== "admin") {
+    return null;
+  }
+
+  return {
+    profile,
+    hosts: profiles
+      .filter((entry) => entry.role === "host" || entry.role === "admin")
+      .map((entry) => ({
+        id: entry.id,
+        name: entry.name,
+        role: entry.role || "member",
+        avatarUrl: entry.avatarUrl
+      })),
+    activities: baseActivities
+      .map((activity) => {
+        const activityBookings = bookings.filter(
+          (booking) => booking.activityId === activity.id && booking.status !== "cancelled"
+        );
+        return {
+          ...withDynamicParticipantCount(activity),
+          pendingCount: activityBookings.filter((booking) => booking.status === "pending").length,
+          confirmedCount: activityBookings.filter((booking) => booking.status === "confirmed").length,
+          hostName: activity.hostUserId ? getDemoProfile(activity.hostUserId).name : "Sense host"
+        };
+      })
+      .sort((left, right) => left.startsAt.localeCompare(right.startsAt)),
+    pendingApprovals: getDemoPendingApprovals(userId)
+  };
 }

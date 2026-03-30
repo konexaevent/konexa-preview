@@ -47,6 +47,7 @@ type Messages = {
   logIn: string;
   returnDashboard: string;
   email: string;
+  phone: string;
   password: string;
   accessAccount: string;
   createAccount: string;
@@ -124,11 +125,11 @@ const messages: Record<Locale, Messages> = {
     navEnergy: "Energia Konexa",
     navLogin: "Inicia sessio",
     navLogout: "Tanca sessio",
-    navAdmin: "Aprovacions",
+    navAdmin: "Administracio",
     heroEyebrow: "Grups petits. Converses reals. Zero incomoditat.",
-    heroTitle: "Plans per coneixer gent sense pressio",
+    heroTitle: "Descobreix activitats i connecta amb gent nova de forma natural.",
     heroText:
-      "Descobreix plans cuidats per coneixer gent d'una manera natural, amb grups petits, bon ambient i prou context per sentir que no hi arribes sola.",
+      "A Konexa, la vida no s'explica: es viu.",
     heroCtaPlans: "Veure plans",
     heroCtaProfile: "Obrir perfil",
     heroCtaCreate: "Crear compte",
@@ -143,8 +144,8 @@ const messages: Record<Locale, Messages> = {
     trustPastText: "Cada activitat completada passa a formar part de la teva historia.",
     trustSharedTitle: "Compartides",
     trustSharedText: "Les connexions neixen de manera natural de les activitats viscudes plegats.",
-    feedEyebrow: "Feed d'activitats",
-    feedTitle: "Escull el teu proper pla amb una sensacio mes humana",
+    feedEyebrow: "",
+    feedTitle: "Activitats",
     feedNote:
       "Sense filtres expressament. El feed prioritza la claredat, el to del grup i la familiaritat social per ajudar-te a decidir de seguida.",
     sharedAvailable: "Connexions compartides disponibles quan iniciis sessio",
@@ -162,6 +163,7 @@ const messages: Record<Locale, Messages> = {
     logIn: "Inicia sessio",
     returnDashboard: "Torna al teu perfil i al teu historial d'activitats.",
     email: "Correu electronic",
+    phone: "Telefon",
     password: "Contrasenya",
     accessAccount: "Accedir al compte",
     createAccount: "Crear compte",
@@ -240,11 +242,11 @@ const messages: Record<Locale, Messages> = {
     navEnergy: "Energia Konexa",
     navLogin: "Iniciar sesion",
     navLogout: "Cerrar sesion",
-    navAdmin: "Aprobaciones",
+    navAdmin: "Administracion",
     heroEyebrow: "Grupos pequenos. Conversaciones reales. Cero incomodidad.",
-    heroTitle: "Planes para conocer gente sin presion",
+    heroTitle: "Descubre actividades y conecta con gente nueva de forma natural.",
     heroText:
-      "Descubre planes cuidados para conocer gente de forma natural, con grupos reducidos, buen ambiente y el contexto necesario para no sentir que llegas solo.",
+      "En Konexa, la vida no se explica: se vive.",
     heroCtaPlans: "Ver planes",
     heroCtaProfile: "Abrir perfil",
     heroCtaCreate: "Crear cuenta",
@@ -259,8 +261,8 @@ const messages: Record<Locale, Messages> = {
     trustPastText: "Cada actividad completada pasa a formar parte de tu historia.",
     trustSharedTitle: "Compartidas",
     trustSharedText: "Las conexiones nacen de forma natural de las actividades vividas juntos.",
-    feedEyebrow: "Feed de actividades",
-    feedTitle: "Elige tu proximo plan con una sensacion mas humana",
+    feedEyebrow: "",
+    feedTitle: "Actividades",
     feedNote:
       "Sin filtros a proposito. El feed prioriza claridad, tono del grupo y familiaridad social para ayudarte a decidir rapido.",
     sharedAvailable: "Conexiones compartidas disponibles al iniciar sesion",
@@ -278,6 +280,7 @@ const messages: Record<Locale, Messages> = {
     logIn: "Iniciar sesion",
     returnDashboard: "Vuelve a tu perfil y a tu historial de actividades.",
     email: "Correo electronico",
+    phone: "Telefono",
     password: "Contrasena",
     accessAccount: "Acceder a la cuenta",
     createAccount: "Crear cuenta",
@@ -356,11 +359,11 @@ const messages: Record<Locale, Messages> = {
     navEnergy: "Konexa energy",
     navLogin: "Log in",
     navLogout: "Log out",
-    navAdmin: "Approvals",
+    navAdmin: "Admin",
     heroEyebrow: "Small groups. Real conversation. No awkwardness.",
-    heroTitle: "Plans to meet people without pressure",
+    heroTitle: "Discover activities and connect with new people naturally.",
     heroText:
-      "Discover thoughtfully hosted plans designed to help people meet naturally, with small groups, a welcoming atmosphere, and enough context to avoid feeling alone on arrival.",
+      "At Konexa, life is not explained: it is lived.",
     heroCtaPlans: "See plans",
     heroCtaProfile: "Open profile",
     heroCtaCreate: "Create account",
@@ -375,8 +378,8 @@ const messages: Record<Locale, Messages> = {
     trustPastText: "Every completed activity becomes part of your history.",
     trustSharedTitle: "Shared",
     trustSharedText: "Connections emerge naturally from activities attended together.",
-    feedEyebrow: "Activity feed",
-    feedTitle: "Choose your next plan with more clarity and confidence",
+    feedEyebrow: "",
+    feedTitle: "Activities",
     feedNote:
       "No filters on purpose. The feed stays simple while surfacing group mood, ease of entry, and social familiarity right on each card.",
     sharedAvailable: "Shared connections available after login",
@@ -394,6 +397,7 @@ const messages: Record<Locale, Messages> = {
     logIn: "Log in",
     returnDashboard: "Return to your profile and your activity history.",
     email: "Email",
+    phone: "Phone",
     password: "Password",
     accessAccount: "Access account",
     createAccount: "Create account",

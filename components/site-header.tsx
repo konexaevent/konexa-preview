@@ -125,7 +125,7 @@ export function SiteHeader({
             <Link href="/#memories" className="nav-link-muted">{navEnergy}</Link>
             <Link href="/#hosts" className="nav-link-muted">{navHosts}</Link>
             {showAdminLink ? (
-              <Link href="/admin/pending" className="nav-link-muted">{navAdmin}</Link>
+              <Link href="/admin" className="nav-link-muted">{navAdmin}</Link>
             ) : null}
             {userDisplayName ? (
               <div className="nav-user-area">

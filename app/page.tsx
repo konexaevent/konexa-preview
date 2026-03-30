@@ -3,15 +3,14 @@ import Link from "next/link";
 import { HomeActivityFeed } from "@/components/home-activity-feed";
 import { getMessages } from "@/lib/i18n";
 import { getLocale } from "@/lib/i18n-server";
-import { getCurrentUser, getHomepageActivities } from "@/lib/queries";
+import { getHomepageActivities } from "@/lib/queries";
 
 type HomePageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
 
 export default async function HomePage({ searchParams }: HomePageProps) {
-  const [user, activities, locale, messages] = await Promise.all([
-    getCurrentUser(),
+  const [activities, locale, messages] = await Promise.all([
     getHomepageActivities(),
     getLocale(),
     getLocale().then((resolvedLocale) => getMessages(resolvedLocale))
@@ -21,7 +20,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
     typeof resolvedSearchParams.age === "string" ? resolvedSearchParams.age : "all";
   const homeUi = {
     ca: {
-      heroStats: ["6-10 persones per grup", "Reserva en menys d'1 minut", "Ambients cuidats i sense pressio"],
+      heroStats: ["Reserva en menys d'1 minut", "Ambients cuidats i naturals"],
       trustStrip: ["Gent nova i repetidora", "Grups petits amb host", "Experiencies pensades per connectar"],
       stepsEyebrow: "Com funciona",
       stepsTitle: "Activitats reals per coneixer gent d'una manera facil i acompanyada",
@@ -100,7 +99,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       ]
     },
     es: {
-      heroStats: ["6-10 personas por grupo", "Reserva en menos de 1 minuto", "Ambientes cuidados y sin presion"],
+      heroStats: ["Reserva en menos de 1 minuto", "Ambientes cuidados y naturales"],
       trustStrip: ["Gente nueva y repetidora", "Grupos pequenos con host", "Experiencias pensadas para conectar"],
       stepsEyebrow: "Como funciona",
       stepsTitle: "Actividades reales para conocer gente de forma facil y acompanada",
@@ -179,7 +178,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       ]
     },
     en: {
-      heroStats: ["6-10 people per group", "Reserve in under 1 minute", "Curated low-pressure atmospheres"],
+      heroStats: ["Reserve in under 1 minute", "Curated, natural atmospheres"],
       trustStrip: ["New and returning people", "Small hosted groups", "Experiences designed to connect"],
       stepsEyebrow: "How it works",
       stepsTitle: "Real activities designed to help people connect with ease",
@@ -262,9 +261,6 @@ export default async function HomePage({ searchParams }: HomePageProps) {
     selectedAge === "18-25" || selectedAge === "25-35" || selectedAge === "35-50" || selectedAge === "50+"
       ? selectedAge
       : "all";
-  const currentHomeHref =
-    selectedAgeValue === "all" ? "/#plans" : `/?age=${selectedAgeValue}#plans`;
-
   const hostToneClasses = ["age-tone-18-25", "age-tone-25-35", "age-tone-35-50", "age-tone-50-plus"];
   const hostAnchorIds = ["host-18-25", "host-25-35", "host-35-50", "host-50-plus"];
 
@@ -284,15 +280,11 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         </div>
         <div className="hero-overlay" aria-hidden="true" />
         <div className="hero-copy">
-          <p className="eyebrow">{messages.heroEyebrow}</p>
           <h1>{messages.heroTitle}</h1>
           <p className="lede">{messages.heroText}</p>
           <div className="hero-actions">
             <Link href="#plans" className="button button-primary">
               {messages.heroCtaPlans}
-            </Link>
-            <Link href={user ? "/profile" : "/login"} className="button button-secondary">
-              {user ? messages.heroCtaProfile : messages.heroCtaCreate}
             </Link>
           </div>
           <ul className="hero-benefits">
@@ -335,6 +327,39 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         </div>
       </section>
 
+      <section className="activity-section" id="plans">
+        <div className="section-header">
+          <div>
+            {messages.feedEyebrow ? <p className="eyebrow">{messages.feedEyebrow}</p> : null}
+            <h2>{messages.feedTitle}</h2>
+          </div>
+        </div>
+
+        <HomeActivityFeed
+          activities={activities}
+          initialSelectedAge={selectedAgeValue}
+          messages={{
+            viewActivity: messages.viewActivity,
+            host: "Host",
+            joined: messages.joined,
+            pending: messages.reservationPending,
+            joinActivity: messages.joinActivity,
+            smallHostedGroup: messages.smallHostedGroup
+          }}
+          homeUi={{
+            ageEyebrow: homeUi.ageEyebrow,
+            ageTitle: homeUi.ageTitle,
+            ageAll: homeUi.ageAll,
+            ageLabels: homeUi.ageLabels,
+            energy: homeUi.energy,
+            hostApproval: homeUi.hostApproval,
+            instantJoin: homeUi.instantJoin,
+            spotsLeft: homeUi.spotsLeft
+          }}
+          locale={locale}
+        />
+      </section>
+
       <section className="trust-panel">
         <div>
           <p className="eyebrow">{messages.trustEyebrow}</p>
@@ -356,39 +381,6 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           </article>
         </div>
       </section>
-
-      <section className="section-header" id="plans">
-        <div>
-          <p className="eyebrow">{messages.feedEyebrow}</p>
-          <h2>{messages.feedTitle}</h2>
-          <p className="section-anchor-copy">{homeUi.plansAnchorHint}</p>
-        </div>
-        <p className="section-note">{messages.feedNote}</p>
-      </section>
-
-      <HomeActivityFeed
-        activities={activities}
-        initialSelectedAge={selectedAgeValue}
-        messages={{
-          viewActivity: messages.viewActivity,
-          host: "Host",
-          joined: messages.joined,
-          pending: messages.reservationPending,
-          joinActivity: messages.joinActivity,
-          smallHostedGroup: messages.smallHostedGroup
-        }}
-        homeUi={{
-          ageEyebrow: homeUi.ageEyebrow,
-          ageTitle: homeUi.ageTitle,
-          ageAll: homeUi.ageAll,
-          ageLabels: homeUi.ageLabels,
-          energy: homeUi.energy,
-          hostApproval: homeUi.hostApproval,
-          instantJoin: homeUi.instantJoin,
-          spotsLeft: homeUi.spotsLeft
-        }}
-        locale={locale}
-      />
 
       <section className="memory-section" id="memories">
         <div className="section-header">

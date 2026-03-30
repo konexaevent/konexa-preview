@@ -4,7 +4,10 @@ import { getDemoProfile, type ProfileSummary } from "./demo-data";
 const DEMO_PROFILE_COOKIE = "konexa_demo_profile";
 
 type DemoProfileCookie = Partial<
-  Pick<ProfileSummary, "firstName" | "lastName" | "name" | "email" | "birthDate" | "avatarUrl">
+  Pick<
+    ProfileSummary,
+    "firstName" | "lastName" | "name" | "email" | "birthDate" | "phoneNumber" | "avatarUrl"
+  >
 >;
 
 function parseDemoProfileCookie(value: string | undefined): DemoProfileCookie {
@@ -39,7 +42,10 @@ export async function getStoredDemoProfile(userId = "user-alex") {
 }
 
 export async function setStoredDemoProfile(
-  profile: Pick<ProfileSummary, "firstName" | "lastName" | "email" | "birthDate" | "avatarUrl">
+  profile: Pick<
+    ProfileSummary,
+    "firstName" | "lastName" | "email" | "birthDate" | "phoneNumber" | "avatarUrl"
+  >
 ) {
   const cookieStore = await cookies();
   const fullName = [profile.firstName, profile.lastName].filter(Boolean).join(" ").trim();
@@ -49,6 +55,7 @@ export async function setStoredDemoProfile(
     lastName: profile.lastName,
     email: profile.email,
     birthDate: profile.birthDate,
+    phoneNumber: profile.phoneNumber,
     avatarUrl: profile.avatarUrl,
     name: fullName || getDemoProfile().name
   };

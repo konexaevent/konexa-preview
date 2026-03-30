@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { locales, type Locale } from "@/lib/i18n";
 
@@ -19,14 +18,13 @@ export function LanguageSwitcher({ currentLocale }: { currentLocale: Locale }) {
   return (
     <div className="language-switcher" aria-label="Language switcher">
       {locales.map((locale) => (
-        <Link
+        <a
           key={locale}
           href={`/lang/${locale}?next=${encodeURIComponent(next)}`}
-          scroll={false}
           className={`language-pill ${currentLocale === locale ? "language-pill-active" : ""}`}
         >
           {labels[locale]}
-        </Link>
+        </a>
       ))}
     </div>
   );

@@ -10,6 +10,7 @@ type ProfileFormProps = {
     firstName: string;
     lastName: string;
     email: string;
+    phone: string;
     birthDate: string;
     avatarFile: string;
     avatarFileHelp: string;
@@ -19,6 +20,7 @@ type ProfileFormProps = {
     firstName: string;
     lastName: string;
     email: string;
+    phoneNumber: string;
     birthDate: string;
     avatarUrl: string;
   };
@@ -66,6 +68,10 @@ export function ProfileForm({ action, messages, values }: ProfileFormProps) {
       <label>
         {messages.email}
         <input type="email" name="email" defaultValue={values.email} />
+      </label>
+      <label>
+        {messages.phone}
+        <input type="tel" name="phone_number" defaultValue={values.phoneNumber} />
       </label>
       <label>
         {messages.birthDate}

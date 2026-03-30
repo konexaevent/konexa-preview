@@ -39,9 +39,12 @@ export default async function JoinActivityPage({
       text:
         "Això ens ajuda a cuidar l'ambient del grup i gestionar millor l'aforament abans de confirmar la teva plaça.",
       aboutYou: "Les teves dades",
+      phoneHint: "Necessitem el teu telefon per poder contactar-te si hi ha algun canvi o detall logistic.",
       motivation: "Per que vols venir a aquesta activitat?",
       motivationPlaceholder:
         "Explica breument que t'agradaria trobar-hi o per que et ve de gust venir.",
+      whatsappConsent:
+        "En enviar la sol.licitud, acceptes que et puguem afegir a un grup de WhatsApp temporal per facilitar la gestio d'aquesta activitat.",
       submit: "Enviar sol.licitud",
       success:
         "Ja estas apuntat/da. Aquesta sol.licitud no garanteix l'assistencia: l'organitzacio ha d'acceptar la peticio segons l'aforament.",
@@ -57,9 +60,13 @@ export default async function JoinActivityPage({
       text:
         "Esto nos ayuda a cuidar el ambiente del grupo y gestionar mejor el aforo antes de confirmar tu plaza.",
       aboutYou: "Tus datos",
+      phoneHint:
+        "Necesitamos tu telefono para poder contactarte si hay algun cambio o detalle logistico.",
       motivation: "¿Por qué quieres venir a esta actividad?",
       motivationPlaceholder:
         "Explica brevemente qué te gustaría encontrar o por qué te apetece venir.",
+      whatsappConsent:
+        "Al enviar la solicitud, aceptas que podamos anadirte a un grupo temporal de WhatsApp para facilitar la gestion de esta actividad.",
       submit: "Enviar solicitud",
       success:
         "Ya estás apuntado/a. Esta solicitud no garantiza la asistencia: la organización debe aceptar la petición según el aforo.",
@@ -75,9 +82,13 @@ export default async function JoinActivityPage({
       text:
         "This helps us protect the group atmosphere and manage capacity before confirming your spot.",
       aboutYou: "Your details",
+      phoneHint:
+        "We need your phone number so we can contact you if there is any change or logistics update.",
       motivation: "Why would you like to join this activity?",
       motivationPlaceholder:
         "Briefly share what you would love to find there or why you feel like joining.",
+      whatsappConsent:
+        "By sending this request, you agree that we may add you to a temporary WhatsApp group to help coordinate this activity.",
       submit: "Send request",
       success:
         "You are now signed up. This request does not guarantee attendance: the organizers must accept it depending on capacity.",
@@ -91,14 +102,16 @@ export default async function JoinActivityPage({
 
   const requested = typeof resolvedSearchParams.requested === "string";
   const profile = dashboard?.profile;
+  const userMetadata = (user?.user_metadata || {}) as Record<string, string | undefined>;
   const fullName =
     profile?.name ||
-    user?.user_metadata.full_name ||
+    userMetadata.full_name ||
     "";
   const [firstName = "", ...lastNameParts] = fullName.split(" ");
   const lastName = profile?.lastName || lastNameParts.join(" ");
   const email = profile?.email || user?.email || "";
-  const birthDate = profile?.birthDate || user?.user_metadata.birth_date || "";
+  const birthDate = profile?.birthDate || userMetadata.birth_date || "";
+  const phoneNumber = profile?.phoneNumber || userMetadata.phone_number || "";
 
   return (
     <div className="page-stack">
@@ -167,6 +180,11 @@ export default async function JoinActivityPage({
                   <span>{messages.birthDate}</span>
                   <input type="date" name="birth_date" defaultValue={birthDate} required />
                 </label>
+                <label className="form-field">
+                  <span>{messages.phone}</span>
+                  <input type="tel" name="phone_number" defaultValue={phoneNumber} required />
+                  <small>{joinUi.phoneHint}</small>
+                </label>
               </>
             ) : (
               <div className="join-request-identity">
@@ -182,6 +200,11 @@ export default async function JoinActivityPage({
                   <p className="label">{messages.email}</p>
                   <p className="value">{email || "-"}</p>
                 </div>
+                <label className="form-field">
+                  <span>{messages.phone}</span>
+                  <input type="tel" name="phone_number" defaultValue={phoneNumber} required />
+                  <small>{joinUi.phoneHint}</small>
+                </label>
               </div>
             )}
 
@@ -193,6 +216,11 @@ export default async function JoinActivityPage({
                 placeholder={joinUi.motivationPlaceholder}
                 required
               />
+            </label>
+
+            <label className="checkbox-field">
+              <input type="checkbox" name="whatsapp_consent" required />
+              <span>{joinUi.whatsappConsent}</span>
             </label>
 
             <button type="submit" className="button button-primary">

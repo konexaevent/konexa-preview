@@ -1,11 +1,13 @@
 import { cache } from "react";
 import { getStoredDemoProfile } from "./demo-profile";
 import {
+  getDemoAdminDashboard,
   getDemoActivityDetail,
   getDemoDashboard,
   getDemoHomepageActivities,
   getDemoPendingApprovals
 } from "./demo-data";
+import { createSupabaseAdminClient } from "./supabase/admin";
 import { createSupabaseServerClient } from "./supabase/server";
 
 const fallbackAgeRanges: Record<string, "18-25" | "25-35" | "35-50" | "50+"> = {
@@ -49,6 +51,8 @@ type QueryProfileLite = {
   id: string;
   full_name: string;
   avatar_url: string;
+  role?: "member" | "host" | "admin";
+  phone_number?: string | null;
 };
 
 type QueryActivityLite = {
@@ -191,7 +195,7 @@ export const getProfileDashboard = cache(async (userId: string) => {
   const [profileResult, bookingResult, connectionsResult, sharedActivitiesResult] = await Promise.all([
     db
       .from("profiles")
-      .select("id,first_name,last_name,full_name,birth_date,role,avatar_url")
+      .select("id,first_name,last_name,full_name,birth_date,phone_number,role,avatar_url")
       .eq("id", userId)
       .single(),
     db
@@ -309,6 +313,7 @@ export const getProfileDashboard = cache(async (userId: string) => {
       name: profileResult.data.full_name,
       email: (await getCurrentUser())?.email || "",
       birthDate: profileResult.data.birth_date || "",
+      phoneNumber: profileResult.data.phone_number || "",
       role: profileResult.data.role || "member",
       avatarUrl: profileResult.data.avatar_url
     },
@@ -347,7 +352,7 @@ export const getPendingApprovals = cache(async (userId: string) => {
 
   const role = profileResult.data?.role || "member";
   const activities = (activitiesResult.data || []).filter(
-    (activity: QueryActivityLite) => role === "admin" || activity.host_user_id === userId
+    (activity: QueryActivityLite) => role === "admin"
   );
   const allowedIds = new Set(activities.map((activity: QueryActivityLite) => activity.id));
   const activityMap = new Map<string, QueryActivityLite>(
@@ -369,6 +374,122 @@ export const getPendingApprovals = cache(async (userId: string) => {
         profileMap.get(item.user_id)?.avatar_url ||
         "https://api.dicebear.com/9.x/lorelei/svg?seed=Unknown"
     }));
+});
+
+export const getAdminDashboard = cache(async (userId: string) => {
+  const supabase = await createSupabaseServerClient();
+
+  if (!supabase) {
+    return getDemoAdminDashboard(userId);
+  }
+  const db = supabase as any;
+
+  const [profileResult, activitiesResult, participantsResult, profilesResult] = await Promise.all([
+    db.from("profiles").select("id,role").eq("id", userId).single(),
+    db
+      .from("activity_cards")
+      .select("id,title,summary,starts_at,city,age_range,hero_image_url,host_user_id,requires_approval,participant_count,max_participants")
+      .order("starts_at", { ascending: true }),
+    db
+      .from("activity_participants")
+      .select("activity_id,user_id,status,request_message,phone_number,whatsapp_opt_in"),
+    db.from("profiles").select("id,full_name,avatar_url,role,phone_number")
+  ]);
+
+  if (profileResult.data?.role !== "admin") {
+    return null;
+  }
+
+  const hostProfiles = (profilesResult.data || []) as QueryProfileLite[];
+  const hostMap = new Map(hostProfiles.map((profile) => [profile.id, profile]));
+  const pendingRows = (participantsResult.data || []) as Array<
+    QueryParticipantRow & {
+      activity_id: string;
+      request_message?: string | null;
+      phone_number?: string | null;
+      whatsapp_opt_in?: boolean;
+    }
+  >;
+  const activityMap = new Map(
+    ((activitiesResult.data || []) as QueryActivityCard[]).map((activity) => [activity.id, activity])
+  );
+
+  const participantCountsByActivity = new Map<
+    string,
+    { pendingCount: number; confirmedCount: number }
+  >();
+  for (const row of pendingRows) {
+    const current = participantCountsByActivity.get(row.activity_id) || {
+      pendingCount: 0,
+      confirmedCount: 0
+    };
+    if (row.status === "pending") {
+      current.pendingCount += 1;
+    }
+    if (row.status === "confirmed") {
+      current.confirmedCount += 1;
+    }
+    participantCountsByActivity.set(row.activity_id, current);
+  }
+
+  const admin = process.env.SUPABASE_SERVICE_ROLE_KEY ? createSupabaseAdminClient() : null;
+  const authUsers =
+    admin
+      ? await admin.auth.admin.listUsers()
+      : null;
+  const emailMap = new Map(
+    (authUsers?.data?.users || []).map((entry) => [entry.id, entry.email || ""])
+  );
+
+  return {
+    profile: profileResult.data,
+    hosts: hostProfiles
+      .filter((profile) => profile.role === "host" || profile.role === "admin")
+      .map((profile) => ({
+        id: profile.id,
+        name: profile.full_name,
+        role: profile.role || "member",
+        avatarUrl: profile.avatar_url
+      })),
+    activities: ((activitiesResult.data || []) as QueryActivityCard[]).map((activity) => {
+      const counts = participantCountsByActivity.get(activity.id) || {
+        pendingCount: 0,
+        confirmedCount: 0
+      };
+      return {
+        id: activity.id,
+        title: activity.title,
+        summary: activity.summary,
+        startsAt: activity.starts_at,
+        city: activity.city,
+        ageRange: activity.age_range || fallbackAgeRanges[activity.id] || "25-35",
+        heroImageUrl: activity.hero_image_url,
+        hostUserId: activity.host_user_id || "",
+        hostName: activity.host_user_id ? hostMap.get(activity.host_user_id)?.full_name || "Host" : "Sense host",
+        requiresApproval: Boolean(activity.requires_approval),
+        participantCount: activity.participant_count,
+        maxParticipants: activity.max_participants,
+        pendingCount: counts.pendingCount,
+        confirmedCount: counts.confirmedCount
+      };
+    }),
+    pendingApprovals: pendingRows
+      .filter((row) => row.status === "pending")
+      .map((row) => ({
+        activityId: row.activity_id,
+        activityTitle: activityMap.get(row.activity_id)?.title || "Activity",
+        activityDate: activityMap.get(row.activity_id)?.starts_at || "",
+        attendeeId: row.user_id,
+        attendeeName: hostMap.get(row.user_id)?.full_name || "User",
+        attendeeAvatarUrl:
+          hostMap.get(row.user_id)?.avatar_url ||
+          "https://api.dicebear.com/9.x/lorelei/svg?seed=Unknown",
+        attendeeEmail: emailMap.get(row.user_id) || "",
+        attendeePhoneNumber: row.phone_number || hostMap.get(row.user_id)?.phone_number || "",
+        requestMessage: row.request_message || "",
+        whatsappOptIn: Boolean(row.whatsapp_opt_in)
+      }))
+  };
 });
 
 export const getActivityDetail = cache(async (activityId: string, viewerId: string | null) => {

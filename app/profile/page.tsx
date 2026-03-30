@@ -189,6 +189,10 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
               <p className="value">{dashboard.profile.email || "-"}</p>
             </div>
             <div className="info-item">
+              <p className="label">{messages.phone}</p>
+              <p className="value">{dashboard.profile.phoneNumber || "-"}</p>
+            </div>
+            <div className="info-item">
               <p className="label">{messages.birthDate}</p>
               <p className="value">{dashboard.profile.birthDate || "-"}</p>
             </div>
@@ -205,6 +209,7 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
               firstName: messages.firstName,
               lastName: messages.lastName,
               email: messages.email,
+              phone: messages.phone,
               birthDate: messages.birthDate,
               avatarFile: messages.avatarFile,
               avatarFileHelp: messages.avatarFileHelp,
@@ -214,6 +219,7 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
               firstName: dashboard.profile.firstName || "",
               lastName: dashboard.profile.lastName || "",
               email: dashboard.profile.email || "",
+              phoneNumber: dashboard.profile.phoneNumber || "",
               birthDate: dashboard.profile.birthDate || "",
               avatarUrl: dashboard.profile.avatarUrl || ""
             }}
