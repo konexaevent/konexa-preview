@@ -89,6 +89,7 @@ type Messages = {
   youMetIn: string;
   noSharedYet: string;
   date: string;
+  priceLabel: string;
   participants: string;
   socialSignal: string;
   knowPeopleInActivity: string;
@@ -127,7 +128,7 @@ const messages: Record<Locale, Messages> = {
     navLogout: "Tanca sessio",
     navAdmin: "Administracio",
     heroEyebrow: "Grups petits. Converses reals. Zero incomoditat.",
-    heroTitle: "Descobreix activitats i connecta amb gent nova de forma natural.",
+    heroTitle: "No sempre és fàcil quedar, aquí sí.",
     heroText:
       "A Konexa, la vida no s'explica: es viu.",
     heroCtaPlans: "Veure plans",
@@ -207,6 +208,7 @@ const messages: Record<Locale, Messages> = {
     youMetIn: "Us vau coneixer a: {activities}",
     noSharedYet: "Les connexions compartides apareixeran despres del teu primer pla en grup.",
     date: "Data",
+    priceLabel: "Preu",
     participants: "Participants",
     socialSignal: "Senyal social",
     knowPeopleInActivity: "Ja coneixes {count} persones en aquesta activitat",
@@ -324,6 +326,7 @@ const messages: Record<Locale, Messages> = {
     youMetIn: "Os conocisteis en: {activities}",
     noSharedYet: "Las conexiones compartidas apareceran despues de tu primer plan en grupo.",
     date: "Fecha",
+    priceLabel: "Precio",
     participants: "Participantes",
     socialSignal: "Senal social",
     knowPeopleInActivity: "Ya conoces a {count} personas en esta actividad",
@@ -441,6 +444,7 @@ const messages: Record<Locale, Messages> = {
     youMetIn: "You met in: {activities}",
     noSharedYet: "Shared connections will appear after your first group plan.",
     date: "Date",
+    priceLabel: "Price",
     participants: "Participants",
     socialSignal: "Social signal",
     knowPeopleInActivity: "You already know {count} people in this activity",

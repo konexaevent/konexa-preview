@@ -4,6 +4,7 @@ import {
   getDemoAdminDashboard,
   getDemoActivityDetail,
   getDemoDashboard,
+  getDemoHomepageContent,
   getDemoHomepageActivities,
   getDemoPendingApprovals
 } from "./demo-data";
@@ -22,11 +23,17 @@ type QueryActivityCard = {
   id: string;
   title: string;
   summary: string;
+  price?: string | null;
   starts_at: string;
   city: string;
   age_range?: "18-25" | "25-35" | "35-50" | "50+" | null;
   hero_image_url: string;
+  image_focus_x?: number | null;
+  image_focus_y?: number | null;
+  image_zoom?: number | null;
   host_user_id?: string | null;
+  host_name?: string | null;
+  host_avatar_url?: string | null;
   requires_approval?: boolean;
   participant_count: number;
   max_participants: number;
@@ -53,6 +60,10 @@ type QueryProfileLite = {
   avatar_url: string;
   role?: "member" | "host" | "admin";
   phone_number?: string | null;
+  first_name?: string | null;
+  last_name?: string | null;
+  birth_date?: string | null;
+  created_at?: string;
 };
 
 type QueryActivityLite = {
@@ -109,7 +120,7 @@ export const getHomepageActivities = cache(async () => {
 
   const { data, error } = await db
     .from("activity_cards")
-    .select("id,title,summary,starts_at,city,age_range,hero_image_url,host_user_id,requires_approval,participant_count,max_participants")
+    .select("id,title,summary,price,starts_at,city,age_range,hero_image_url,image_focus_x,image_focus_y,image_zoom,host_user_id,host_name,host_avatar_url,requires_approval,participant_count,max_participants")
     .order("starts_at", { ascending: true })
     .limit(4);
 
@@ -158,10 +169,14 @@ export const getHomepageActivities = cache(async () => {
     id: activity.id,
     title: activity.title,
     summary: activity.summary,
+    price: activity.price || "",
     startsAt: activity.starts_at,
     city: "Girona",
     ageRange: activity.age_range || fallbackAgeRanges[activity.id] || "25-35",
     heroImageUrl: activity.hero_image_url,
+    imageFocusX: activity.image_focus_x ?? 50,
+    imageFocusY: activity.image_focus_y ?? 50,
+    imageZoom: activity.image_zoom ?? 1,
     participantCount: activity.participant_count,
     maxParticipants: activity.max_participants,
     familiarityLabel: "Shared connections available after login",
@@ -174,8 +189,51 @@ export const getHomepageActivities = cache(async () => {
             hostProfileMap.get(activity.host_user_id)?.avatar_url ||
             `https://api.dicebear.com/9.x/lorelei/svg?seed=${encodeURIComponent(activity.host_user_id)}`
         }
+      : activity.host_name
+        ? {
+            name: activity.host_name,
+            avatarUrl:
+              activity.host_avatar_url ||
+              `https://api.dicebear.com/9.x/lorelei/svg?seed=${encodeURIComponent(activity.host_name)}`
+          }
       : undefined
   }));
+});
+
+export const getHomepageContent = cache(async () => {
+  const supabase = await createSupabaseServerClient();
+
+  if (!supabase) {
+    return getDemoHomepageContent();
+  }
+  const db = supabase as any;
+
+  const { data } = await db
+    .from("homepage_content")
+    .select("hero_carousel_images,hosts,memories_video_url,memories_items")
+    .eq("id", "home")
+    .maybeSingle();
+
+  if (!data) {
+    return getDemoHomepageContent();
+  }
+
+  return {
+    heroCarouselImages:
+      Array.isArray(data.hero_carousel_images) && data.hero_carousel_images.length > 0
+        ? data.hero_carousel_images
+        : getDemoHomepageContent().heroCarouselImages,
+    hosts:
+      Array.isArray(data.hosts) && data.hosts.length > 0
+        ? data.hosts
+        : getDemoHomepageContent().hosts,
+    memoriesVideoUrl:
+      data.memories_video_url || getDemoHomepageContent().memoriesVideoUrl,
+    memoriesItems:
+      Array.isArray(data.memories_items) && data.memories_items.length > 0
+        ? data.memories_items
+        : getDemoHomepageContent().memoriesItems
+  };
 });
 
 export const getProfileDashboard = cache(async (userId: string) => {
@@ -226,7 +284,7 @@ export const getProfileDashboard = cache(async (userId: string) => {
       activityIds.length > 0
         ? db
             .from("activity_cards")
-            .select("id,title,summary,starts_at,city,hero_image_url,host_user_id,requires_approval,participant_count,max_participants")
+            .select("id,title,summary,price,starts_at,city,hero_image_url,image_focus_x,image_focus_y,image_zoom,host_user_id,host_name,host_avatar_url,requires_approval,participant_count,max_participants")
             .in("id", activityIds)
         : Promise.resolve({ data: [], error: null }),
       connectedIds.length > 0
@@ -263,18 +321,26 @@ export const getProfileDashboard = cache(async (userId: string) => {
     id: string;
     title: string;
     summary: string;
+    price?: string | null;
     starts_at: string;
     city: string;
     hero_image_url: string;
+    image_focus_x?: number | null;
+    image_focus_y?: number | null;
+    image_zoom?: number | null;
     participant_count: number;
     max_participants: number;
   }) => ({
     id: activity.id,
     title: activity.title,
     summary: activity.summary,
+    price: activity.price || "",
     startsAt: activity.starts_at,
     city: activity.city,
     heroImageUrl: activity.hero_image_url,
+    imageFocusX: activity.image_focus_x ?? 50,
+    imageFocusY: activity.image_focus_y ?? 50,
+    imageZoom: activity.image_zoom ?? 1,
     participantCount: activity.participant_count,
     maxParticipants: activity.max_participants
   });
@@ -384,16 +450,21 @@ export const getAdminDashboard = cache(async (userId: string) => {
   }
   const db = supabase as any;
 
-  const [profileResult, activitiesResult, participantsResult, profilesResult] = await Promise.all([
+  const [profileResult, activitiesResult, participantsResult, profilesResult, homepageContentResult] = await Promise.all([
     db.from("profiles").select("id,role").eq("id", userId).single(),
     db
       .from("activity_cards")
-      .select("id,title,summary,starts_at,city,age_range,hero_image_url,host_user_id,requires_approval,participant_count,max_participants")
+      .select("id,title,summary,price,starts_at,city,age_range,hero_image_url,image_focus_x,image_focus_y,image_zoom,host_user_id,host_name,host_avatar_url,requires_approval,participant_count,max_participants")
       .order("starts_at", { ascending: true }),
     db
       .from("activity_participants")
       .select("activity_id,user_id,status,request_message,phone_number,whatsapp_opt_in"),
-    db.from("profiles").select("id,full_name,avatar_url,role,phone_number")
+    db.from("profiles").select("id,first_name,last_name,full_name,birth_date,avatar_url,role,phone_number,created_at"),
+    db
+      .from("homepage_content")
+      .select("hero_carousel_images,hosts,memories_video_url,memories_items")
+      .eq("id", "home")
+      .maybeSingle()
   ]);
 
   if (profileResult.data?.role !== "admin") {
@@ -443,6 +514,17 @@ export const getAdminDashboard = cache(async (userId: string) => {
 
   return {
     profile: profileResult.data,
+    users: hostProfiles
+      .map((profile) => ({
+        id: profile.id,
+        name: profile.full_name,
+        avatarUrl: profile.avatar_url,
+        role: profile.role || "member",
+        phoneNumber: profile.phone_number || "",
+        email: emailMap.get(profile.id) || "",
+        createdAt: profile.created_at || ""
+      }))
+      .sort((left, right) => right.createdAt.localeCompare(left.createdAt)),
     hosts: hostProfiles
       .filter((profile) => profile.role === "host" || profile.role === "admin")
       .map((profile) => ({
@@ -460,12 +542,21 @@ export const getAdminDashboard = cache(async (userId: string) => {
         id: activity.id,
         title: activity.title,
         summary: activity.summary,
+        price: activity.price || "",
         startsAt: activity.starts_at,
         city: activity.city,
         ageRange: activity.age_range || fallbackAgeRanges[activity.id] || "25-35",
         heroImageUrl: activity.hero_image_url,
+        imageFocusX: activity.image_focus_x ?? 50,
+        imageFocusY: activity.image_focus_y ?? 50,
+        imageZoom: activity.image_zoom ?? 1,
         hostUserId: activity.host_user_id || "",
-        hostName: activity.host_user_id ? hostMap.get(activity.host_user_id)?.full_name || "Host" : "Sense host",
+        hostName:
+          activity.host_name ||
+          (activity.host_user_id ? hostMap.get(activity.host_user_id)?.full_name || "Host" : "Sense host"),
+        hostAvatarUrl:
+          activity.host_avatar_url ||
+          (activity.host_user_id ? hostMap.get(activity.host_user_id)?.avatar_url || "" : ""),
         requiresApproval: Boolean(activity.requires_approval),
         participantCount: activity.participant_count,
         maxParticipants: activity.max_participants,
@@ -488,7 +579,198 @@ export const getAdminDashboard = cache(async (userId: string) => {
         attendeePhoneNumber: row.phone_number || hostMap.get(row.user_id)?.phone_number || "",
         requestMessage: row.request_message || "",
         whatsappOptIn: Boolean(row.whatsapp_opt_in)
-      }))
+      })),
+    homepageContent: homepageContentResult.data
+      ? {
+          heroCarouselImages:
+            Array.isArray(homepageContentResult.data.hero_carousel_images) &&
+            homepageContentResult.data.hero_carousel_images.length > 0
+              ? homepageContentResult.data.hero_carousel_images
+              : getDemoHomepageContent().heroCarouselImages,
+          hosts:
+            Array.isArray(homepageContentResult.data.hosts) &&
+            homepageContentResult.data.hosts.length > 0
+              ? homepageContentResult.data.hosts
+              : getDemoHomepageContent().hosts,
+          memoriesVideoUrl:
+            homepageContentResult.data.memories_video_url ||
+            getDemoHomepageContent().memoriesVideoUrl,
+          memoriesItems:
+            Array.isArray(homepageContentResult.data.memories_items) &&
+            homepageContentResult.data.memories_items.length > 0
+              ? homepageContentResult.data.memories_items
+              : getDemoHomepageContent().memoriesItems
+        }
+      : getDemoHomepageContent()
+  };
+});
+
+export const getAdminUserProfile = cache(async (adminUserId: string, targetUserId: string) => {
+  const supabase = await createSupabaseServerClient();
+
+  if (!supabase) {
+    const adminProfile = await getStoredDemoProfile(adminUserId);
+    if (adminProfile.role !== "admin") {
+      return null;
+    }
+
+    const dashboard = getDemoDashboard(targetUserId);
+    return {
+      profile: dashboard.profile,
+      upcomingActivities: dashboard.upcomingActivities,
+      pendingActivities: dashboard.pendingActivities,
+      pastActivities: dashboard.pastActivities,
+      sharedConnections: dashboard.sharedConnections
+    };
+  }
+
+  const db = supabase as any;
+  const [adminProfileResult, targetProfileResult, bookingResult, connectionsResult, sharedActivitiesResult] =
+    await Promise.all([
+      db.from("profiles").select("id,role").eq("id", adminUserId).single(),
+      db
+        .from("profiles")
+        .select("id,first_name,last_name,full_name,birth_date,phone_number,role,avatar_url,created_at")
+        .eq("id", targetUserId)
+        .single(),
+      db.from("activity_participants").select("activity_id,status").eq("user_id", targetUserId),
+      db
+        .from("user_connections")
+        .select("connected_user_id,shared_activities_count")
+        .eq("user_id", targetUserId)
+        .order("shared_activities_count", { ascending: false }),
+      db
+        .from("connection_activities")
+        .select("connected_user_id,activity_id")
+        .eq("user_id", targetUserId)
+    ]);
+
+  if (adminProfileResult.data?.role !== "admin" || targetProfileResult.error || !targetProfileResult.data) {
+    return null;
+  }
+
+  const activityIds = (bookingResult.data || []).map((row: QueryBookingRow) => row.activity_id);
+  const connectedIds = (connectionsResult.data || []).map((row: QueryConnectionRow) => row.connected_user_id);
+  const sharedActivityIds = (sharedActivitiesResult.data || []).map((row: QueryConnectionActivityRow) => row.activity_id);
+
+  const [activityCardsResult, connectionProfilesResult, sharedActivitiesCatalogResult] =
+    await Promise.all([
+      activityIds.length > 0
+        ? db
+            .from("activity_cards")
+            .select("id,title,summary,price,starts_at,city,hero_image_url,image_focus_x,image_focus_y,image_zoom,host_user_id,requires_approval,participant_count,max_participants")
+            .in("id", activityIds)
+        : Promise.resolve({ data: [], error: null }),
+      connectedIds.length > 0
+        ? db.from("profiles").select("id,full_name,avatar_url").in("id", connectedIds)
+        : Promise.resolve({ data: [], error: null }),
+      sharedActivityIds.length > 0
+        ? db.from("activities").select("id,title").in("id", sharedActivityIds)
+        : Promise.resolve({ data: [], error: null })
+    ]);
+
+  const admin = process.env.SUPABASE_SERVICE_ROLE_KEY ? createSupabaseAdminClient() : null;
+  const authUsers = admin ? await admin.auth.admin.listUsers() : null;
+  const emailMap = new Map(
+    (authUsers?.data?.users || []).map((entry) => [entry.id, entry.email || ""])
+  );
+
+  const activityCards = (activityCardsResult.data || []) as QueryActivityCard[];
+  const bookingStatusByActivity = new Map(
+    (bookingResult.data || []).map((row: QueryBookingRow) => [row.activity_id, row.status])
+  );
+  const sharedActivitiesCatalog = new Map<string, string>(
+    (sharedActivitiesCatalogResult.data || []).map((activity: QueryActivityLite) => [activity.id, activity.title])
+  );
+  const profileCatalog = new Map<string, QueryProfileLite>(
+    (connectionProfilesResult.data || []).map((profile: QueryProfileLite) => [profile.id, profile])
+  );
+
+  const sharedTitlesByUser = new Map<string, string[]>();
+  for (const row of (sharedActivitiesResult.data || []) as QueryConnectionActivityRow[]) {
+    const key = row.connected_user_id;
+    const titles = sharedTitlesByUser.get(key) || [];
+    const title = sharedActivitiesCatalog.get(row.activity_id) as string | undefined;
+    if (title) {
+      titles.push(title);
+      sharedTitlesByUser.set(key, titles);
+    }
+  }
+
+  const now = new Date().toISOString();
+  const mapActivity = (activity: {
+    id: string;
+    title: string;
+    summary: string;
+    price?: string | null;
+    starts_at: string;
+    city: string;
+    hero_image_url: string;
+    image_focus_x?: number | null;
+    image_focus_y?: number | null;
+    image_zoom?: number | null;
+    participant_count: number;
+    max_participants: number;
+  }) => ({
+    id: activity.id,
+    title: activity.title,
+    summary: activity.summary,
+    price: activity.price || "",
+    startsAt: activity.starts_at,
+    city: activity.city,
+    heroImageUrl: activity.hero_image_url,
+    imageFocusX: activity.image_focus_x ?? 50,
+    imageFocusY: activity.image_focus_y ?? 50,
+    imageZoom: activity.image_zoom ?? 1,
+    participantCount: activity.participant_count,
+    maxParticipants: activity.max_participants
+  });
+
+  const upcomingActivities = activityCards
+    .filter((activity) => activity.starts_at > now && bookingStatusByActivity.get(activity.id) === "confirmed")
+    .sort((left, right) => left.starts_at.localeCompare(right.starts_at))
+    .map(mapActivity);
+
+  const pendingActivities = activityCards
+    .filter((activity) => activity.starts_at > now && bookingStatusByActivity.get(activity.id) === "pending")
+    .sort((left, right) => left.starts_at.localeCompare(right.starts_at))
+    .map(mapActivity);
+
+  const pastActivities = activityCards
+    .filter((activity) => activity.starts_at <= now && bookingStatusByActivity.get(activity.id) === "confirmed")
+    .sort((left, right) => right.starts_at.localeCompare(left.starts_at))
+    .map(mapActivity);
+
+  return {
+    profile: {
+      id: targetProfileResult.data.id,
+      firstName:
+        targetProfileResult.data.first_name ||
+        targetProfileResult.data.full_name.split(" ")[0] ||
+        "",
+      lastName:
+        targetProfileResult.data.last_name ||
+        targetProfileResult.data.full_name.split(" ").slice(1).join(" "),
+      name: targetProfileResult.data.full_name,
+      email: emailMap.get(targetProfileResult.data.id) || "",
+      birthDate: targetProfileResult.data.birth_date || "",
+      phoneNumber: targetProfileResult.data.phone_number || "",
+      role: targetProfileResult.data.role || "member",
+      avatarUrl: targetProfileResult.data.avatar_url,
+      createdAt: targetProfileResult.data.created_at || ""
+    },
+    upcomingActivities,
+    pendingActivities,
+    pastActivities,
+    sharedConnections: (connectionsResult.data || []).map((connection: QueryConnectionRow) => ({
+      userId: connection.connected_user_id,
+      name: profileCatalog.get(connection.connected_user_id)?.full_name || "Unknown user",
+      avatarUrl:
+        profileCatalog.get(connection.connected_user_id)?.avatar_url ||
+        "https://api.dicebear.com/9.x/lorelei/svg?seed=Unknown",
+      sharedActivitiesCount: connection.shared_activities_count,
+      sharedActivities: sharedTitlesByUser.get(connection.connected_user_id) || []
+    }))
   };
 });
 
@@ -503,7 +785,7 @@ export const getActivityDetail = cache(async (activityId: string, viewerId: stri
   const [activityResult, participantsResult, sharedActivitiesResult] = await Promise.all([
     db
       .from("activity_cards")
-      .select("id,title,summary,starts_at,city,hero_image_url,host_user_id,participant_count,max_participants")
+      .select("id,title,summary,price,starts_at,city,hero_image_url,image_focus_x,image_focus_y,image_zoom,host_user_id,host_name,host_avatar_url,participant_count,max_participants")
       .eq("id", activityId)
       .single(),
     db
@@ -579,9 +861,13 @@ export const getActivityDetail = cache(async (activityId: string, viewerId: stri
     id: activityResult.data.id,
     title: activityResult.data.title,
     summary: activityResult.data.summary,
+    price: activityResult.data.price || "",
     startsAt: activityResult.data.starts_at,
     city: activityResult.data.city,
     heroImageUrl: activityResult.data.hero_image_url,
+    imageFocusX: activityResult.data.image_focus_x ?? 50,
+    imageFocusY: activityResult.data.image_focus_y ?? 50,
+    imageZoom: activityResult.data.image_zoom ?? 1,
     host: hostUserId
       ? {
           name: profileCatalog.get(hostUserId)?.full_name || "Host",
@@ -589,6 +875,13 @@ export const getActivityDetail = cache(async (activityId: string, viewerId: stri
             profileCatalog.get(hostUserId)?.avatar_url ||
             `https://api.dicebear.com/9.x/lorelei/svg?seed=${encodeURIComponent(hostUserId)}`
         }
+      : activityResult.data.host_name
+        ? {
+            name: activityResult.data.host_name,
+            avatarUrl:
+              activityResult.data.host_avatar_url ||
+              `https://api.dicebear.com/9.x/lorelei/svg?seed=${encodeURIComponent(activityResult.data.host_name)}`
+          }
       : null,
     participantCount: activityResult.data.participant_count,
     maxParticipants: activityResult.data.max_participants,

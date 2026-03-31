@@ -4,37 +4,55 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 
 export function BrandSplash() {
-  const [isVisible, setIsVisible] = useState(false);
+  const [phase, setPhase] = useState<"hidden" | "visible" | "closing">("hidden");
 
   useEffect(() => {
     const deviceKey =
       window.matchMedia("(max-width: 768px)").matches ? "mobile" : "desktop";
     const storageKey = `konexa-brand-splash-seen-${deviceKey}`;
-    const alreadySeen = window.sessionStorage.getItem(storageKey) === "1";
+    let alreadySeen = false;
+
+    try {
+      alreadySeen = window.sessionStorage.getItem(storageKey) === "1";
+    } catch {
+      alreadySeen = false;
+    }
 
     if (alreadySeen) {
-      setIsVisible(false);
+      setPhase("hidden");
       return;
     }
 
-    setIsVisible(true);
-    window.sessionStorage.setItem(storageKey, "1");
+    setPhase("visible");
 
+    try {
+      window.sessionStorage.setItem(storageKey, "1");
+    } catch {
+      // Ignore storage issues and still show the intro once.
+    }
+
+    const closeTimer = window.setTimeout(() => {
+      setPhase("closing");
+    }, 2200);
     const hideTimer = window.setTimeout(() => {
-      setIsVisible(false);
-    }, 2800);
+      setPhase("hidden");
+    }, 3000);
 
     return () => {
+      window.clearTimeout(closeTimer);
       window.clearTimeout(hideTimer);
     };
   }, []);
 
-  if (!isVisible) {
+  if (phase === "hidden") {
     return null;
   }
 
   return (
-    <div className="brand-splash" aria-hidden="true">
+    <div
+      className={`brand-splash ${phase === "closing" ? "brand-splash-closing" : ""}`}
+      aria-hidden="true"
+    >
       <div className="brand-splash-glow" />
       <div className="brand-splash-mark">
         <Image

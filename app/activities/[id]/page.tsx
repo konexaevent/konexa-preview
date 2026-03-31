@@ -140,12 +140,19 @@ export default async function ActivityDetailPage({ params, searchParams }: Activ
             alt={detail.title}
             fill
             className="activity-image"
+            style={{
+              objectPosition: `${detail.imageFocusX ?? 50}% ${detail.imageFocusY ?? 50}%`,
+              transform: `scale(${detail.imageZoom ?? 1})`
+            }}
           />
         </div>
         <div className="detail-copy">
           <p className="eyebrow">{messages.cityLabel}: {detail.city}</p>
           <h1>{detail.title}</h1>
           <p className="lede">{detail.summary}</p>
+          <p className="detail-price">
+            {messages.priceLabel}: {detail.price}
+          </p>
           <div className="detail-chip-row">
             <span className="signal-tag">{detailUi.hostedGroup}</span>
             <span className="signal-tag signal-tag-muted">{detailUi.easyArrival}</span>

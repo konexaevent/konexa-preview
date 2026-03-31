@@ -3,15 +3,16 @@ import Link from "next/link";
 import { HomeActivityFeed } from "@/components/home-activity-feed";
 import { getMessages } from "@/lib/i18n";
 import { getLocale } from "@/lib/i18n-server";
-import { getHomepageActivities } from "@/lib/queries";
+import { getHomepageActivities, getHomepageContent } from "@/lib/queries";
 
 type HomePageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
 
 export default async function HomePage({ searchParams }: HomePageProps) {
-  const [activities, locale, messages] = await Promise.all([
+  const [activities, homepageContent, locale, messages] = await Promise.all([
     getHomepageActivities(),
+    getHomepageContent(),
     getLocale(),
     getLocale().then((resolvedLocale) => getMessages(resolvedLocale))
   ]);
@@ -67,36 +68,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       hostsText:
         "Cada franja te un host de referencia perquè la gent arribi amb més confiança, sàpiga qui trobarà i pugui veure una petita presentació abans de venir.",
       hostVideoLabel: "Video de presentacio",
-      hostCards: [
-        {
-          age: "18-25 anys",
-          name: "Ariadna Puig",
-          role: "Host del grup 18-25",
-          bio: "Fa de pont perquè la gent nova se senti integrada des del primer moment.",
-          avatarUrl: "/ariadnapuig.jpg"
-        },
-        {
-          age: "25-35 anys",
-          name: "Sara Renart",
-          role: "Host del grup 25-35",
-          bio: "Cuida l'ambient i ajuda que les converses surtin de manera natural.",
-          avatarUrl: "https://api.dicebear.com/9.x/lorelei/svg?seed=Sara"
-        },
-        {
-          age: "35-50 anys",
-          name: "Lucas Moreno",
-          role: "Host del grup 35-50",
-          bio: "Acompanya el grup perquè tothom se senti comode i benvingut.",
-          avatarUrl: "https://api.dicebear.com/9.x/lorelei/svg?seed=Lucas"
-        },
-        {
-          age: "Mes de 50 anys",
-          name: "Elena Vega",
-          role: "Host del grup +50",
-          bio: "Transmet calma i dona suport si algu necessita un primer punt de referencia.",
-          avatarUrl: "https://api.dicebear.com/9.x/lorelei/svg?seed=Elena"
-        }
-      ]
+      hostCards: []
     },
     es: {
       heroStats: ["Reserva en menos de 1 minuto", "Ambientes cuidados y naturales"],
@@ -146,36 +118,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       hostsText:
         "Cada franja tiene un host de referencia para que la gente llegue con más confianza, sepa a quién encontrará y pueda ver una pequeña presentación antes de venir.",
       hostVideoLabel: "Video de presentacion",
-      hostCards: [
-        {
-          age: "18-25 anos",
-          name: "Ariadna Puig",
-          role: "Host del grupo 18-25",
-          bio: "Hace de puente para que la gente nueva se sienta integrada desde el primer momento.",
-          avatarUrl: "/ariadnapuig.jpg"
-        },
-        {
-          age: "25-35 anos",
-          name: "Sara Renart",
-          role: "Host del grupo 25-35",
-          bio: "Cuida el ambiente y ayuda a que las conversaciones aparezcan de forma natural.",
-          avatarUrl: "https://api.dicebear.com/9.x/lorelei/svg?seed=Sara"
-        },
-        {
-          age: "35-50 anos",
-          name: "Lucas Moreno",
-          role: "Host del grupo 35-50",
-          bio: "Acompana al grupo para que todo el mundo se sienta comodo y bienvenido.",
-          avatarUrl: "https://api.dicebear.com/9.x/lorelei/svg?seed=Lucas"
-        },
-        {
-          age: "Mas de 50 anos",
-          name: "Elena Vega",
-          role: "Host del grupo +50",
-          bio: "Transmite calma y da apoyo si alguien necesita un primer punto de referencia.",
-          avatarUrl: "https://api.dicebear.com/9.x/lorelei/svg?seed=Elena"
-        }
-      ]
+      hostCards: []
     },
     en: {
       heroStats: ["Reserve in under 1 minute", "Curated, natural atmospheres"],
@@ -225,36 +168,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       hostsText:
         "Each age range has a dedicated host so people arrive with more trust, know who will welcome them, and can watch a short introduction first.",
       hostVideoLabel: "Intro video",
-      hostCards: [
-        {
-          age: "18-25 years",
-          name: "Ariadna Puig",
-          role: "Host for ages 18-25",
-          bio: "She helps new people feel included from the very first moment.",
-          avatarUrl: "/ariadnapuig.jpg"
-        },
-        {
-          age: "25-35 years",
-          name: "Sara Renart",
-          role: "Host for ages 25-35",
-          bio: "He protects the atmosphere and helps conversation happen naturally.",
-          avatarUrl: "https://api.dicebear.com/9.x/lorelei/svg?seed=Sara"
-        },
-        {
-          age: "35-50 years",
-          name: "Lucas Moreno",
-          role: "Host for ages 35-50",
-          bio: "He guides the group so everyone can feel comfortable and welcome.",
-          avatarUrl: "https://api.dicebear.com/9.x/lorelei/svg?seed=Lucas"
-        },
-        {
-          age: "Over 50",
-          name: "Elena Vega",
-          role: "Host for 50+",
-          bio: "She brings calm energy and offers support whenever someone needs an easy first contact point.",
-          avatarUrl: "https://api.dicebear.com/9.x/lorelei/svg?seed=Elena"
-        }
-      ]
+      hostCards: []
     }
   }[locale];
   const selectedAgeValue =
@@ -263,16 +177,49 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       : "all";
   const hostToneClasses = ["age-tone-18-25", "age-tone-25-35", "age-tone-35-50", "age-tone-50-plus"];
   const hostAnchorIds = ["host-18-25", "host-25-35", "host-35-50", "host-50-plus"];
+  const homepageHosts = homepageContent.hosts as Array<{
+    age: "18-25" | "25-35" | "35-50" | "50+";
+    name: string;
+    role: string;
+    bio: string;
+    avatarUrl: string;
+    videoUrl: string;
+  }>;
+  const heroCarouselImages = homepageContent.heroCarouselImages as string[];
+  const memoriesItems = homepageContent.memoriesItems as Array<{
+    title: string;
+    imageUrl: string;
+  }>;
+  const ageLabelMap = {
+    ca: {
+      "18-25": "18-25 anys",
+      "25-35": "25-35 anys",
+      "35-50": "35-50 anys",
+      "50+": "Mes de 50 anys"
+    },
+    es: {
+      "18-25": "18-25 anos",
+      "25-35": "25-35 anos",
+      "35-50": "35-50 anos",
+      "50+": "Mas de 50 anos"
+    },
+    en: {
+      "18-25": "18-25 years",
+      "25-35": "25-35 years",
+      "35-50": "35-50 years",
+      "50+": "Over 50"
+    }
+  }[locale];
+  const localizedHostCards = homepageHosts.map((host) => ({
+    ...host,
+    age: ageLabelMap[host.age]
+  }));
 
   return (
     <div className="page-stack">
       <section className="hero-card">
         <div className="hero-carousel" aria-hidden="true">
-          {[
-            "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1600&q=80",
-            "https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=1600&q=80",
-            "https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&w=1600&q=80"
-          ].map((src, index) => (
+          {heroCarouselImages.map((src: string, index: number) => (
             <div className={`hero-carousel-slide hero-carousel-slide-${index + 1}`} key={src}>
               <Image src={src} alt="" fill className="hero-image" priority={index === 0} />
             </div>
@@ -344,7 +291,8 @@ export default async function HomePage({ searchParams }: HomePageProps) {
             joined: messages.joined,
             pending: messages.reservationPending,
             joinActivity: messages.joinActivity,
-            smallHostedGroup: messages.smallHostedGroup
+            smallHostedGroup: messages.smallHostedGroup,
+            priceLabel: messages.priceLabel
           }}
           homeUi={{
             ageEyebrow: homeUi.ageEyebrow,
@@ -395,7 +343,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           <article className="memory-video-card">
             <div className="memory-video-frame">
               <iframe
-                src="https://www.youtube.com/embed/Scxs7L0vhZ4?si=Vv8H7MLegQmCj0xy"
+                src={homepageContent.memoriesVideoUrl}
                 title={homeUi.videoTitle}
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
@@ -408,26 +356,13 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           </article>
 
           <div className="memory-photo-grid">
-            {[
-              {
-                src: "https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=1200&q=80",
-                alt: homeUi.memories[0]
-              },
-              {
-                src: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1200&q=80",
-                alt: homeUi.memories[1]
-              },
-              {
-                src: "https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&w=1200&q=80",
-                alt: homeUi.memories[2]
-              }
-            ].map((item) => (
-              <article className="memory-photo-card" key={item.alt}>
+            {memoriesItems.map((item) => (
+              <article className="memory-photo-card" key={item.title}>
                 <div className="memory-photo-frame">
-                  <Image src={item.src} alt={item.alt} fill className="activity-image" />
+                  <Image src={item.imageUrl} alt={item.title} fill className="activity-image" />
                 </div>
                 <div className="memory-card-copy">
-                  <strong>{item.alt}</strong>
+                  <strong>{item.title}</strong>
                 </div>
               </article>
             ))}
@@ -444,7 +379,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           <p className="section-note">{homeUi.hostsText}</p>
         </div>
         <div className="hosts-grid">
-          {homeUi.hostCards.map((host, index) => (
+          {localizedHostCards.map((host, index) => (
             <article
               className={`host-card ${hostToneClasses[index]}`}
               key={host.age}
@@ -470,7 +405,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
               <p className="host-bio">{host.bio}</p>
               <div className="host-video-frame">
                 <iframe
-                  src="https://www.youtube.com/embed/Scxs7L0vhZ4?rel=0"
+                  src={homepageContent.hosts[index]?.videoUrl || ""}
                   title={`${homeUi.hostVideoLabel} - ${host.name}`}
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen

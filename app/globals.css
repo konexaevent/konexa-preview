@@ -57,6 +57,12 @@ body {
   animation:
     splashFadeIn 320ms ease both,
     splashAutoDismiss 2500ms ease 180ms forwards;
+  transition: opacity 420ms ease, visibility 420ms ease;
+}
+
+.brand-splash.brand-splash-closing {
+  opacity: 0;
+  visibility: hidden;
 }
 
 .brand-splash-glow {
@@ -686,6 +692,13 @@ button {
 
 .hero-image,
 .activity-image {
+  transform-origin: center center;
+  will-change: transform;
+}
+
+.activity-image,
+.admin-existing-image-frame,
+.admin-activity-thumb {
   object-fit: cover;
 }
 
@@ -1284,6 +1297,12 @@ small {
   color: rgba(25, 22, 63, 0.7);
 }
 
+.card-price {
+  margin: -0.1rem 0 0;
+  font-weight: 700;
+  color: #a05122;
+}
+
 .known-row {
   margin-top: 0.2rem;
   padding-top: 0.9rem;
@@ -1824,6 +1843,78 @@ textarea {
   flex-wrap: wrap;
 }
 
+.admin-image-editor {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: 24px;
+  border: 1px solid var(--line);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(247, 244, 255, 0.9)),
+    radial-gradient(circle at top right, rgba(103, 84, 255, 0.08), transparent 36%);
+}
+
+.admin-image-editor-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(260px, 0.8fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+.admin-image-preview-frame {
+  position: relative;
+  min-height: 260px;
+  overflow: hidden;
+  border-radius: 24px;
+  border: 1px solid rgba(62, 56, 133, 0.1);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(244, 241, 255, 0.94));
+}
+
+.admin-image-preview-media {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform-origin: center center;
+}
+
+.admin-image-preview-safezone {
+  position: absolute;
+  inset: 14px;
+  border-radius: 18px;
+  border: 1px dashed rgba(62, 56, 133, 0.28);
+  pointer-events: none;
+}
+
+.admin-image-preview-empty {
+  min-height: 260px;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  text-align: center;
+  color: rgba(25, 22, 63, 0.62);
+}
+
+.admin-image-controls {
+  display: grid;
+  gap: 0.95rem;
+  padding: 1rem;
+  border-radius: 20px;
+  border: 1px solid rgba(62, 56, 133, 0.08);
+  background: rgba(103, 84, 255, 0.04);
+}
+
+.admin-image-controls label {
+  display: grid;
+  gap: 0.45rem;
+  font-weight: 700;
+  color: var(--primary-deep);
+}
+
+.admin-image-controls input[type="range"] {
+  width: 100%;
+}
+
 .admin-activity-card {
   display: grid;
   grid-template-columns: 132px minmax(0, 1fr) auto;
@@ -1834,6 +1925,51 @@ textarea {
   border-radius: 22px;
   background:
     linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(248, 248, 255, 0.92));
+}
+
+.admin-user-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(248, 248, 255, 0.92));
+}
+
+.admin-user-main {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  min-width: 0;
+}
+
+.admin-user-copy {
+  display: grid;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.admin-user-copy h3,
+.admin-user-copy p,
+.admin-user-copy small {
+  margin: 0;
+}
+
+.admin-user-copy p,
+.admin-user-copy small {
+  color: var(--ink-soft);
+  overflow-wrap: anywhere;
+}
+
+.admin-user-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .admin-activity-thumb {
@@ -1850,6 +1986,12 @@ textarea {
 
 .admin-activity-copy h3 {
   margin: 0;
+}
+
+.admin-activity-price {
+  margin: 0.15rem 0 0;
+  font-weight: 700;
+  color: #a05122;
 }
 
 .admin-badge-row {
@@ -1876,6 +2018,31 @@ textarea {
 
 .admin-request-meta strong {
   color: var(--ink);
+}
+
+.admin-media-block {
+  display: grid;
+  gap: 0.8rem;
+  padding: 1rem;
+  border-radius: 20px;
+  border: 1px solid var(--line);
+  background: rgba(103, 84, 255, 0.04);
+}
+
+.admin-host-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.admin-host-card {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 248, 255, 0.92));
 }
 
 .shared-tags {
@@ -1975,6 +2142,12 @@ textarea {
 .detail-booking-state .section-note {
   margin: 0;
   max-width: 28rem;
+}
+
+.detail-price {
+  margin: -0.2rem 0 0.3rem;
+  font-weight: 700;
+  color: #a05122;
 }
 
 .detail-meta-grid article {
@@ -2189,6 +2362,27 @@ textarea {
   .host-card-top,
   .detail-host-card {
     align-items: flex-start;
+  }
+
+  .admin-host-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-activity-card {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-user-card {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin-user-actions {
+    justify-content: flex-start;
+  }
+
+  .admin-image-editor-grid {
+    grid-template-columns: 1fr;
   }
 }
 

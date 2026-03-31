@@ -118,7 +118,16 @@ export default async function JoinActivityPage({
       <section className="join-request-layout">
         <article className="join-request-activity-card">
           <div className="join-request-cover">
-            <Image src={detail.heroImageUrl} alt={detail.title} fill className="activity-image" />
+            <Image
+              src={detail.heroImageUrl}
+              alt={detail.title}
+              fill
+              className="activity-image"
+              style={{
+                objectPosition: `${detail.imageFocusX ?? 50}% ${detail.imageFocusY ?? 50}%`,
+                transform: `scale(${detail.imageZoom ?? 1})`
+              }}
+            />
           </div>
           <div className="join-request-copy">
             <p className="eyebrow">{joinUi.eyebrow}</p>
@@ -132,6 +141,10 @@ export default async function JoinActivityPage({
               <article>
                 <strong>{messages.cityLabel}</strong>
                 <p>{detail.city}</p>
+              </article>
+              <article>
+                <strong>{messages.priceLabel}</strong>
+                <p>{detail.price}</p>
               </article>
               <article>
                 <strong>{messages.participants}</strong>

@@ -2,6 +2,7 @@
 
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 const getOrigin = async () => {
@@ -39,24 +40,54 @@ export async function signUpWithPassword(formData: FormData) {
   const email = String(formData.get("email") || "");
   const password = String(formData.get("password") || "");
   const fullName = String(formData.get("full_name") || "");
-  const origin = await getOrigin();
+  const admin = createSupabaseAdminClient();
+  let error: { message: string } | null = null;
 
-  const { error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      data: { full_name: fullName },
-      emailRedirectTo: `${origin}/auth/callback`
+  if (admin) {
+    const existingUsers = await admin.auth.admin.listUsers();
+    const existingUser = existingUsers.data.users.find(
+      (candidate) => candidate.email?.toLowerCase() === email.toLowerCase()
+    );
+
+    if (existingUser) {
+      error = { message: "Aquest correu ja esta registrat" };
+    } else {
+      const created = await admin.auth.admin.createUser({
+        email,
+        password,
+        email_confirm: true,
+        user_metadata: {
+          full_name: fullName
+        }
+      });
+
+      if (created.error) {
+        error = { message: created.error.message };
+      } else {
+        const signInResult = await supabase.auth.signInWithPassword({ email, password });
+        if (signInResult.error) {
+          error = { message: signInResult.error.message };
+        }
+      }
     }
-  });
+  } else {
+    const origin = await getOrigin();
+    const signUpResult = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { full_name: fullName },
+        emailRedirectTo: `${origin}/auth/callback`
+      }
+    });
+    error = signUpResult.error ? { message: signUpResult.error.message } : null;
+  }
 
   if (error) {
     redirect(`/login?error=${encodeURIComponent(error.message)}`);
   }
 
-  redirect(
-    `/login?success=${encodeURIComponent("Check your email to confirm your account")}&next=${encodeURIComponent(next)}`
-  );
+  redirect(next);
 }
 
 export async function signInWithGoogle(formData: FormData) {

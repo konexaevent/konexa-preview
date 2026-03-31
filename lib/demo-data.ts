@@ -2,11 +2,17 @@ export type ActivityCard = {
   id: string;
   title: string;
   summary: string;
+  price: string;
   startsAt: string;
   city: string;
   ageRange: "18-25" | "25-35" | "35-50" | "50+";
   heroImageUrl: string;
+  imageFocusX?: number;
+  imageFocusY?: number;
+  imageZoom?: number;
   hostUserId?: string;
+  hostName?: string;
+  hostAvatarUrl?: string;
   requiresApproval?: boolean;
   participantCount: number;
   maxParticipants: number;
@@ -17,6 +23,27 @@ export type ActivityCard = {
     name: string;
     avatarUrl: string;
   };
+};
+
+export type HomepageHostCard = {
+  age: "18-25" | "25-35" | "35-50" | "50+";
+  name: string;
+  role: string;
+  bio: string;
+  avatarUrl: string;
+  videoUrl: string;
+};
+
+export type HomepageMemoryItem = {
+  title: string;
+  imageUrl: string;
+};
+
+export type HomepageContent = {
+  heroCarouselImages: string[];
+  hosts: HomepageHostCard[];
+  memoriesVideoUrl: string;
+  memoriesItems: HomepageMemoryItem[];
 };
 
 type DemoBooking = {
@@ -93,6 +120,7 @@ let baseActivities: ActivityCard[] = [
     title: "Sopar entre desconeguts que volen sentir-se com entre coneguts",
     summary:
       "Un sopar guiat, amb ritme tranquil i converses facils, pensat per trencar el gel sense forcar res.",
+    price: "22 EUR",
     startsAt: "2026-03-27T19:30:00.000Z",
     city: "Girona",
     ageRange: "25-35",
@@ -100,15 +128,21 @@ let baseActivities: ActivityCard[] = [
     requiresApproval: false,
     heroImageUrl:
       "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=1200&q=80",
+    imageFocusX: 50,
+    imageFocusY: 50,
+    imageZoom: 1,
     participantCount: 8,
     maxParticipants: 10,
-    familiarityLabel: "Potser ja coneixes 2 persones"
+    familiarityLabel: "Potser ja coneixes 2 persones",
+    hostName: "Sara Renart",
+    hostAvatarUrl: "https://api.dicebear.com/9.x/lorelei/svg?seed=Sara"
   },
   {
     id: "coffee-walk",
     title: "Passeig amb cafe per coneixer gent d'una manera natural",
     summary:
       "Una caminada suau amb parada a una cafeteria bonica, ideal per a primeres vegades a Konexa.",
+    price: "12 EUR",
     startsAt: "2026-03-28T17:45:00.000Z",
     city: "Girona",
     ageRange: "18-25",
@@ -116,15 +150,21 @@ let baseActivities: ActivityCard[] = [
     requiresApproval: true,
     heroImageUrl:
       "https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&w=1200&q=80",
+    imageFocusX: 50,
+    imageFocusY: 50,
+    imageZoom: 1,
     participantCount: 6,
     maxParticipants: 8,
-    familiarityLabel: "Pensat per a persones que venen per primer cop"
+    familiarityLabel: "Pensat per a persones que venen per primer cop",
+    hostName: "Ariadna Puig",
+    hostAvatarUrl: "/ariadnapuig.jpg"
   },
   {
     id: "cooking-lab",
     title: "Taller de cuina on l'activitat fa facil que la conversa aparegui sola",
     summary:
       "Cuina compartida, equips petits i taula final conjunta per crear complicitat de manera natural.",
+    price: "28 EUR",
     startsAt: "2026-03-29T11:00:00.000Z",
     city: "Girona",
     ageRange: "35-50",
@@ -132,15 +172,21 @@ let baseActivities: ActivityCard[] = [
     requiresApproval: false,
     heroImageUrl:
       "https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=1200&q=80",
+    imageFocusX: 50,
+    imageFocusY: 50,
+    imageZoom: 1,
     participantCount: 9,
     maxParticipants: 10,
-    familiarityLabel: "Hi ha 3 persones que ja han repetit"
+    familiarityLabel: "Hi ha 3 persones que ja han repetit",
+    hostName: "Lucas Moreno",
+    hostAvatarUrl: "https://api.dicebear.com/9.x/lorelei/svg?seed=Lucas"
   },
   {
     id: "creative-club",
     title: "Club creatiu per a qui prefereix plans tranquils amb bona conversa",
     summary:
       "Collage, dinamica lleugera i una atmosfera serena per coneixer gent sense soroll ni presses.",
+    price: "18 EUR",
     startsAt: "2026-03-30T16:30:00.000Z",
     city: "Girona",
     ageRange: "50+",
@@ -148,15 +194,21 @@ let baseActivities: ActivityCard[] = [
     requiresApproval: false,
     heroImageUrl:
       "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1200&q=80",
+    imageFocusX: 50,
+    imageFocusY: 50,
+    imageZoom: 1,
     participantCount: 7,
     maxParticipants: 8,
-    familiarityLabel: "Ambient suau i arribada acompanyada"
+    familiarityLabel: "Ambient suau i arribada acompanyada",
+    hostName: "Elena Vega",
+    hostAvatarUrl: "https://api.dicebear.com/9.x/lorelei/svg?seed=Elena"
   },
   {
     id: "vermut-sunday",
     title: "Vermut de diumenge per reconnectar amb cares que ja et sonen",
     summary:
       "Una trobada de migdia per repetir amb gent coneguda i deixar que la conversa flueixi sense esforc.",
+    price: "16 EUR",
     startsAt: "2026-03-15T12:30:00.000Z",
     city: "Girona",
     ageRange: "35-50",
@@ -164,9 +216,14 @@ let baseActivities: ActivityCard[] = [
     requiresApproval: false,
     heroImageUrl:
       "https://images.unsplash.com/photo-1485871981521-5b1fd3805eee?auto=format&fit=crop&w=1200&q=80",
+    imageFocusX: 50,
+    imageFocusY: 50,
+    imageZoom: 1,
     participantCount: 8,
     maxParticipants: 10,
-    familiarityLabel: "Ideal si et venen de gust cares repetides"
+    familiarityLabel: "Ideal si et venen de gust cares repetides",
+    hostName: "Lucas Moreno",
+    hostAvatarUrl: "https://api.dicebear.com/9.x/lorelei/svg?seed=Lucas"
   }
 ];
 
@@ -188,6 +245,65 @@ let bookings: DemoBooking[] = [
   { userId: "user-elena", activityId: "creative-club", status: "confirmed" },
   { userId: "user-elena", activityId: "vermut-sunday", status: "confirmed" }
 ];
+
+const defaultHomepageContent: HomepageContent = {
+  heroCarouselImages: [
+    "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1600&q=80",
+    "https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=1600&q=80",
+    "https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&w=1600&q=80"
+  ],
+  hosts: [
+    {
+      age: "18-25",
+      name: "Ariadna Puig",
+      role: "Host del grup 18-25",
+      bio: "Fa de pont perquè la gent nova se senti integrada des del primer moment.",
+      avatarUrl: "/ariadnapuig.jpg",
+      videoUrl: "https://www.youtube.com/embed/Scxs7L0vhZ4?rel=0"
+    },
+    {
+      age: "25-35",
+      name: "Sara Renart",
+      role: "Host del grup 25-35",
+      bio: "Cuida l'ambient i ajuda que les converses surtin de manera natural.",
+      avatarUrl: "https://api.dicebear.com/9.x/lorelei/svg?seed=Sara",
+      videoUrl: "https://www.youtube.com/embed/Scxs7L0vhZ4?rel=0"
+    },
+    {
+      age: "35-50",
+      name: "Lucas Moreno",
+      role: "Host del grup 35-50",
+      bio: "Acompanya el grup perquè tothom se senti comode i benvingut.",
+      avatarUrl: "https://api.dicebear.com/9.x/lorelei/svg?seed=Lucas",
+      videoUrl: "https://www.youtube.com/embed/Scxs7L0vhZ4?rel=0"
+    },
+    {
+      age: "50+",
+      name: "Elena Vega",
+      role: "Host del grup +50",
+      bio: "Transmet calma i dona suport si algu necessita un primer punt de referencia.",
+      avatarUrl: "https://api.dicebear.com/9.x/lorelei/svg?seed=Elena",
+      videoUrl: "https://www.youtube.com/embed/Scxs7L0vhZ4?rel=0"
+    }
+  ],
+  memoriesVideoUrl: "https://www.youtube.com/embed/Scxs7L0vhZ4?si=Vv8H7MLegQmCj0xy",
+  memoriesItems: [
+    {
+      title: "Sopars amb conversa facil",
+      imageUrl: "https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=1200&q=80"
+    },
+    {
+      title: "Passejos tranquils amb cafe",
+      imageUrl: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1200&q=80"
+    },
+    {
+      title: "Tallers creatius en grup petit",
+      imageUrl: "https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&w=1200&q=80"
+    }
+  ]
+};
+
+let homepageContent: HomepageContent = structuredClone(defaultHomepageContent);
 
 function getParticipantCount(activityId: string) {
   return bookings.filter(
@@ -269,6 +385,10 @@ export function getDemoHomepageActivities() {
         }
       : undefined
   }));
+}
+
+export function getDemoHomepageContent() {
+  return homepageContent;
 }
 
 export function getDemoProfile(userId = "user-alex") {
@@ -438,11 +558,17 @@ export function upsertDemoActivity(input: {
   id?: string;
   title: string;
   summary: string;
+  price: string;
   startsAt: string;
   city: string;
   ageRange: "18-25" | "25-35" | "35-50" | "50+";
   heroImageUrl: string;
+  imageFocusX?: number;
+  imageFocusY?: number;
+  imageZoom?: number;
   hostUserId?: string;
+  hostName?: string;
+  hostAvatarUrl?: string;
   requiresApproval?: boolean;
   maxParticipants: number;
 }) {
@@ -452,11 +578,17 @@ export function upsertDemoActivity(input: {
     id: activityId,
     title: input.title,
     summary: input.summary,
+    price: input.price,
     startsAt: input.startsAt,
     city: input.city,
     ageRange: input.ageRange,
     heroImageUrl: input.heroImageUrl,
+    imageFocusX: input.imageFocusX ?? existing?.imageFocusX ?? 50,
+    imageFocusY: input.imageFocusY ?? existing?.imageFocusY ?? 50,
+    imageZoom: input.imageZoom ?? existing?.imageZoom ?? 1,
     hostUserId: input.hostUserId,
+    hostName: input.hostName ?? existing?.hostName,
+    hostAvatarUrl: input.hostAvatarUrl ?? existing?.hostAvatarUrl,
     requiresApproval: input.requiresApproval ?? false,
     participantCount: existing?.participantCount || 0,
     maxParticipants: input.maxParticipants,
@@ -477,6 +609,31 @@ export function deleteDemoActivity(activityId: string) {
   bookings = bookings.filter((booking) => booking.activityId !== activityId);
 }
 
+export function updateDemoHeroCarousel(images: string[]) {
+  homepageContent = {
+    ...homepageContent,
+    heroCarouselImages: images.filter(Boolean).slice(0, 3)
+  };
+}
+
+export function updateDemoHosts(hosts: HomepageHostCard[]) {
+  homepageContent = {
+    ...homepageContent,
+    hosts
+  };
+}
+
+export function updateDemoMemories(input: {
+  videoUrl: string;
+  items: HomepageMemoryItem[];
+}) {
+  homepageContent = {
+    ...homepageContent,
+    memoriesVideoUrl: input.videoUrl,
+    memoriesItems: input.items
+  };
+}
+
 export function getDemoAdminDashboard(userId = "user-alex") {
   const profile = getDemoProfile(userId);
   if (profile.role !== "admin") {
@@ -485,6 +642,17 @@ export function getDemoAdminDashboard(userId = "user-alex") {
 
   return {
     profile,
+    users: profiles
+      .map((entry) => ({
+        id: entry.id,
+        name: entry.name,
+        avatarUrl: entry.avatarUrl,
+        role: entry.role || "member",
+        phoneNumber: entry.phoneNumber || "",
+        email: entry.email,
+        createdAt: "2026-03-01T10:00:00.000Z"
+      }))
+      .sort((left, right) => right.createdAt.localeCompare(left.createdAt)),
     hosts: profiles
       .filter((entry) => entry.role === "host" || entry.role === "admin")
       .map((entry) => ({
@@ -506,6 +674,7 @@ export function getDemoAdminDashboard(userId = "user-alex") {
         };
       })
       .sort((left, right) => left.startsAt.localeCompare(right.startsAt)),
-    pendingApprovals: getDemoPendingApprovals(userId)
+    pendingApprovals: getDemoPendingApprovals(userId),
+    homepageContent
   };
 }

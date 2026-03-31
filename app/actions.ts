@@ -12,6 +12,9 @@ import {
   getDemoAdminDashboard,
   requestDemoBooking,
   reviewDemoPendingApproval,
+  updateDemoHeroCarousel,
+  updateDemoHosts,
+  updateDemoMemories,
   upsertDemoActivity
 } from "@/lib/demo-data";
 import { getStoredDemoProfile, setStoredDemoProfile } from "@/lib/demo-profile";
@@ -55,6 +58,33 @@ async function saveDemoActivityImage(file: File, activityId: string) {
   await writeFile(targetPath, Buffer.from(await file.arrayBuffer()));
 
   return `/${relativeDir}/${fileName}`;
+}
+
+async function uploadActivityAsset(
+  supabase: NonNullable<Awaited<ReturnType<typeof createSupabaseServerClient>>>,
+  file: File,
+  folder: string
+) {
+  const extension = file.name.includes(".")
+    ? file.name.split(".").pop()?.toLowerCase() || "jpg"
+    : "jpg";
+  const filePath = `${folder}/${Date.now()}-${crypto.randomUUID()}.${extension}`;
+  const fileBuffer = Buffer.from(await file.arrayBuffer());
+  const { error: uploadError } = await supabase.storage
+    .from("activity-images")
+    .upload(filePath, fileBuffer, {
+      contentType: getAvatarContentType(file),
+      upsert: true
+    });
+
+  if (uploadError) {
+    return null;
+  }
+
+  const { data: publicUrlData } = supabase.storage
+    .from("activity-images")
+    .getPublicUrl(filePath);
+  return publicUrlData.publicUrl;
 }
 
 async function getOrigin() {
@@ -601,6 +631,7 @@ export async function saveActivityAction(formData: FormData) {
   const activityId = String(formData.get("activity_id") || "").trim();
   const title = String(formData.get("title") || "").trim();
   const summary = String(formData.get("summary") || "").trim();
+  const price = String(formData.get("price") || "").trim();
   const startsAt = String(formData.get("starts_at") || "").trim();
   const city = String(formData.get("city") || "Girona").trim() || "Girona";
   const ageRange = String(formData.get("age_range") || "25-35").trim() as
@@ -609,12 +640,17 @@ export async function saveActivityAction(formData: FormData) {
     | "35-50"
     | "50+";
   const hostUserId = String(formData.get("host_user_id") || "").trim();
+  const hostName = String(formData.get("host_name") || "").trim();
+  const hostAvatarUrl = String(formData.get("host_avatar_url") || "").trim();
   const existingImageUrl = String(formData.get("existing_image_url") || "").trim();
   const requiresApproval = String(formData.get("requires_approval") || "") === "on";
   const maxParticipants = Number(formData.get("max_participants") || 8);
+  const imageFocusX = Number(formData.get("image_focus_x") || 50);
+  const imageFocusY = Number(formData.get("image_focus_y") || 50);
+  const imageZoom = Number(formData.get("image_zoom") || 1);
   const imageFile = formData.get("hero_image_file");
 
-  if (!title || !summary || !startsAt) {
+  if (!title || !summary || !price || !startsAt) {
     redirect("/admin?error=activity");
   }
 
@@ -629,13 +665,19 @@ export async function saveActivityAction(formData: FormData) {
       id: activityId || undefined,
       title,
       summary,
+      price,
       startsAt,
       city,
       ageRange,
       heroImageUrl:
         heroImageUrl ||
         "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1200&q=80",
+      imageFocusX: Number.isFinite(imageFocusX) ? Math.max(0, Math.min(100, imageFocusX)) : 50,
+      imageFocusY: Number.isFinite(imageFocusY) ? Math.max(0, Math.min(100, imageFocusY)) : 50,
+      imageZoom: Number.isFinite(imageZoom) ? Math.max(1, Math.min(2, imageZoom)) : 1,
       hostUserId: hostUserId || undefined,
+      hostName: hostName || undefined,
+      hostAvatarUrl: hostAvatarUrl || undefined,
       requiresApproval,
       maxParticipants: Number.isFinite(maxParticipants) ? Math.max(2, maxParticipants) : 8
     });
@@ -673,13 +715,19 @@ export async function saveActivityAction(formData: FormData) {
   const payload = {
     title,
     summary,
+    price,
     starts_at: startsAt,
     city,
     age_range: ageRange,
     hero_image_url:
       heroImageUrl ||
       "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1200&q=80",
+    image_focus_x: Number.isFinite(imageFocusX) ? Math.max(0, Math.min(100, imageFocusX)) : 50,
+    image_focus_y: Number.isFinite(imageFocusY) ? Math.max(0, Math.min(100, imageFocusY)) : 50,
+    image_zoom: Number.isFinite(imageZoom) ? Math.max(1, Math.min(2, imageZoom)) : 1,
     host_user_id: hostUserId || null,
+    host_name: hostName || null,
+    host_avatar_url: hostAvatarUrl || null,
     requires_approval: requiresApproval,
     max_participants: Number.isFinite(maxParticipants) ? Math.max(2, maxParticipants) : 8
   };
@@ -721,4 +769,143 @@ export async function deleteActivityAction(formData: FormData) {
   revalidatePath("/admin");
   revalidatePath("/profile");
   redirect("/admin?deleted=1");
+}
+
+export async function saveHeroCarouselAction(formData: FormData) {
+  const { supabase } = await requireAdminOrRedirect("/admin");
+
+  const imageUrls = await Promise.all(
+    [1, 2, 3].map(async (index) => {
+      const currentValue = String(formData.get(`image_${index}_url`) || "").trim();
+      const file = formData.get(`image_${index}_file`);
+
+      if (!supabase) {
+        if (file instanceof File && file.size > 0) {
+          return saveDemoActivityImage(file, `hero-carousel-${index}`);
+        }
+        return currentValue;
+      }
+
+      if (file instanceof File && file.size > 0) {
+        return uploadActivityAsset(supabase, file, `homepage/hero-${index}`);
+      }
+
+      return currentValue;
+    })
+  );
+
+  const resolvedImages = (await Promise.all(imageUrls)).filter(Boolean) as string[];
+
+  if (!supabase) {
+    updateDemoHeroCarousel(resolvedImages);
+    revalidatePath("/");
+    revalidatePath("/admin");
+    redirect("/admin?saved=1");
+  }
+
+  const db = supabase as any;
+  await db.from("homepage_content").upsert({
+    id: "home",
+    hero_carousel_images: resolvedImages
+  });
+
+  revalidatePath("/");
+  revalidatePath("/admin");
+  redirect("/admin?saved=1");
+}
+
+export async function saveHostsContentAction(formData: FormData) {
+  const { supabase } = await requireAdminOrRedirect("/admin");
+
+  const hosts = await Promise.all(
+    ["18-25", "25-35", "35-50", "50+"].map(async (age, index) => {
+      const slot = index + 1;
+      const currentAvatarUrl = String(formData.get(`host_${slot}_avatar_url`) || "").trim();
+      const avatarFile = formData.get(`host_${slot}_avatar_file`);
+
+      let avatarUrl = currentAvatarUrl;
+      if (!supabase) {
+        if (avatarFile instanceof File && avatarFile.size > 0) {
+          avatarUrl = await saveDemoActivityImage(avatarFile, `host-${slot}`);
+        }
+      } else if (avatarFile instanceof File && avatarFile.size > 0) {
+        avatarUrl =
+          (await uploadActivityAsset(supabase, avatarFile, `homepage/host-${slot}`)) ||
+          currentAvatarUrl;
+      }
+
+      return {
+        age,
+        name: String(formData.get(`host_${slot}_name`) || "").trim(),
+        role: String(formData.get(`host_${slot}_role`) || "").trim(),
+        bio: String(formData.get(`host_${slot}_bio`) || "").trim(),
+        avatarUrl,
+        videoUrl: String(formData.get(`host_${slot}_video_url`) || "").trim()
+      };
+    })
+  );
+
+  if (!supabase) {
+    updateDemoHosts(hosts as any);
+    revalidatePath("/");
+    revalidatePath("/admin");
+    redirect("/admin?saved=1");
+  }
+
+  const db = supabase as any;
+  await db.from("homepage_content").upsert({
+    id: "home",
+    hosts
+  });
+
+  revalidatePath("/");
+  revalidatePath("/admin");
+  redirect("/admin?saved=1");
+}
+
+export async function saveMemoriesContentAction(formData: FormData) {
+  const { supabase } = await requireAdminOrRedirect("/admin");
+
+  const items = await Promise.all(
+    [1, 2, 3].map(async (slot) => {
+      const currentImageUrl = String(formData.get(`memory_${slot}_image_url`) || "").trim();
+      const imageFile = formData.get(`memory_${slot}_image_file`);
+
+      let imageUrl = currentImageUrl;
+      if (!supabase) {
+        if (imageFile instanceof File && imageFile.size > 0) {
+          imageUrl = await saveDemoActivityImage(imageFile, `memory-${slot}`);
+        }
+      } else if (imageFile instanceof File && imageFile.size > 0) {
+        imageUrl =
+          (await uploadActivityAsset(supabase, imageFile, `homepage/memory-${slot}`)) ||
+          currentImageUrl;
+      }
+
+      return {
+        title: String(formData.get(`memory_${slot}_title`) || "").trim(),
+        imageUrl
+      };
+    })
+  );
+
+  const videoUrl = String(formData.get("memories_video_url") || "").trim();
+
+  if (!supabase) {
+    updateDemoMemories({ videoUrl, items });
+    revalidatePath("/");
+    revalidatePath("/admin");
+    redirect("/admin?saved=1");
+  }
+
+  const db = supabase as any;
+  await db.from("homepage_content").upsert({
+    id: "home",
+    memories_video_url: videoUrl,
+    memories_items: items
+  });
+
+  revalidatePath("/");
+  revalidatePath("/admin");
+  redirect("/admin?saved=1");
 }
