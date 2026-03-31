@@ -130,7 +130,11 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
       imageZoomLabel: "Zoom",
       imageHorizontalLabel: "Moure horitzontalment",
       imageVerticalLabel: "Moure verticalment",
-      noImagePreview: "Puja una imatge per veure la previsualitzacio."
+      noImagePreview: "Puja una imatge per veure la previsualitzacio.",
+      saveCarousel: "Desar carrusel",
+      saveHosts: "Desar hosts",
+      saveMemories: "Desar multimedia",
+      hostsSaved: "Els hosts s'han actualitzat correctament."
     },
     es: {
       eyebrow: "Administracion Konexa",
@@ -193,7 +197,11 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
       imageZoomLabel: "Zoom",
       imageHorizontalLabel: "Mover horizontalmente",
       imageVerticalLabel: "Mover verticalmente",
-      noImagePreview: "Sube una imagen para ver la previsualizacion."
+      noImagePreview: "Sube una imagen para ver la previsualizacion.",
+      saveCarousel: "Guardar carrusel",
+      saveHosts: "Guardar hosts",
+      saveMemories: "Guardar multimedia",
+      hostsSaved: "Los hosts se han actualizado correctamente."
     },
     en: {
       eyebrow: "Konexa admin",
@@ -256,7 +264,11 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
       imageZoomLabel: "Zoom",
       imageHorizontalLabel: "Move horizontally",
       imageVerticalLabel: "Move vertically",
-      noImagePreview: "Upload an image to preview it here."
+      noImagePreview: "Upload an image to preview it here.",
+      saveCarousel: "Save carousel",
+      saveHosts: "Save hosts",
+      saveMemories: "Save media",
+      hostsSaved: "Hosts updated successfully."
     }
   }[locale];
 
@@ -469,7 +481,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
             </div>
             <div className="admin-form-actions">
               <button className="button button-primary" type="submit">
-                {copy.save}
+                {copy.saveCarousel}
               </button>
             </div>
           </form>
@@ -524,7 +536,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
             </div>
             <div className="admin-form-actions">
               <button className="button button-primary" type="submit">
-                {copy.save}
+                {copy.saveMemories}
               </button>
             </div>
           </form>
@@ -539,6 +551,9 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
           </div>
           <p className="section-note">{copy.hostsContentText}</p>
         </div>
+        {"hosts_saved" in resolvedSearchParams ? (
+          <p className="status status-success">{copy.hostsSaved}</p>
+        ) : null}
         <form action={saveHostsContentAction} className="admin-activity-form">
           <div className="admin-host-grid">
             {homepageHosts.map((host, index: number) => (
@@ -585,7 +600,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
           </div>
           <div className="admin-form-actions">
             <button className="button button-primary" type="submit">
-              {copy.save}
+              {copy.saveHosts}
             </button>
           </div>
         </form>

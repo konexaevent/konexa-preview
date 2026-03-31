@@ -863,7 +863,7 @@ export async function saveHostsContentAction(formData: FormData) {
     updateDemoHosts(hosts as any);
     revalidatePath("/");
     revalidatePath("/admin");
-    redirect("/admin?saved=1");
+    redirect("/admin?hosts_saved=1");
   }
 
   const db = supabase as any;
@@ -874,7 +874,7 @@ export async function saveHostsContentAction(formData: FormData) {
 
   revalidatePath("/");
   revalidatePath("/admin");
-  redirect("/admin?saved=1");
+  redirect("/admin?hosts_saved=1");
 }
 
 export async function saveMemoriesContentAction(formData: FormData) {
