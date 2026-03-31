@@ -183,6 +183,7 @@ export async function requestActivityJoinAction(formData: FormData) {
   const firstName = String(formData.get("first_name") || "").trim();
   const lastName = String(formData.get("last_name") || "").trim();
   const email = String(formData.get("email") || "").trim().toLowerCase();
+  const password = String(formData.get("password") || "");
   const birthDate = String(formData.get("birth_date") || "").trim();
   const phoneNumber = String(formData.get("phone_number") || "").trim();
   const motivation = String(formData.get("motivation") || "").trim();
@@ -194,6 +195,8 @@ export async function requestActivityJoinAction(formData: FormData) {
 
   const successRedirect = `${redirectTo}${redirectTo.includes("?") ? "&" : "?"}requested=1`;
   const errorRedirect = `${redirectTo}${redirectTo.includes("?") ? "&" : "?"}error=1`;
+  const passwordRedirect = `${redirectTo}${redirectTo.includes("?") ? "&" : "?"}error=password`;
+  const credentialsRedirect = `${redirectTo}${redirectTo.includes("?") ? "&" : "?"}error=credentials`;
 
   const supabase = await createSupabaseServerClient();
   if (!supabase) {
@@ -261,8 +264,21 @@ export async function requestActivityJoinAction(formData: FormData) {
       }
     }
   } else {
-    if (!firstName || !lastName || !email || !birthDate || !phoneNumber || !motivation || !whatsappConsent) {
+    if (
+      !firstName ||
+      !lastName ||
+      !email ||
+      !password ||
+      !birthDate ||
+      !phoneNumber ||
+      !motivation ||
+      !whatsappConsent
+    ) {
       redirect(errorRedirect);
+    }
+
+    if (password.length < 8) {
+      redirect(passwordRedirect);
     }
 
     if (!admin) {
@@ -277,7 +293,7 @@ export async function requestActivityJoinAction(formData: FormData) {
     if (!existingUser) {
       const created = await admin.auth.admin.createUser({
         email,
-        password: crypto.randomUUID(),
+        password,
         email_confirm: true,
         user_metadata: {
           full_name: `${firstName} ${lastName}`.trim(),
@@ -295,10 +311,15 @@ export async function requestActivityJoinAction(formData: FormData) {
       existingUser = created.data.user;
     }
 
-    targetUserId = existingUser.id;
+    const signInResult = await supabase.auth.signInWithPassword({ email, password });
+    if (signInResult.error || !signInResult.data.user) {
+      redirect(credentialsRedirect);
+    }
+
+    targetUserId = signInResult.data.user.id;
 
     const adminProfileUpsert = await (admin as any).from("profiles").upsert({
-      id: existingUser.id,
+      id: targetUserId,
       first_name: firstName || null,
       last_name: lastName || null,
       full_name: `${firstName} ${lastName}`.trim(),
@@ -310,7 +331,7 @@ export async function requestActivityJoinAction(formData: FormData) {
       const errorMessage = String(adminProfileUpsert.error.message || "");
       if (errorMessage.includes("phone_number")) {
         await (admin as any).from("profiles").upsert({
-          id: existingUser.id,
+          id: targetUserId,
           first_name: firstName || null,
           last_name: lastName || null,
           full_name: `${firstName} ${lastName}`.trim(),
@@ -321,13 +342,6 @@ export async function requestActivityJoinAction(formData: FormData) {
       }
     }
 
-    await admin.auth.admin.generateLink({
-      type: "magiclink",
-      email,
-      options: {
-        redirectTo: `${await getOrigin()}/auth/callback?next=${encodeURIComponent("/profile")}`
-      }
-    });
   }
 
   if (!targetUserId) {

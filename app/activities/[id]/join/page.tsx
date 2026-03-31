@@ -51,7 +51,14 @@ export default async function JoinActivityPage({
       loggedInHint:
         "Com que ja tens sessio iniciada, la teva peticio quedara pendent de confirmar.",
       noAccountHint:
-        "Si encara no tens compte, el crearem automaticament amb aquest correu quan enviis la sol.licitud.",
+        "Si encara no tens compte, el crearem amb aquest correu i aquesta contrasenya quan enviis la sol.licitud.",
+      passwordLabel: "Contrasenya",
+      passwordHint:
+        "La necessitaras despres per iniciar sessio i consultar el teu perfil o les teves activitats.",
+      passwordError: "La contrasenya ha de tenir com a minim 8 caracters.",
+      credentialsError:
+        "Aquest correu ja existeix i la contrasenya no coincideix. Inicia sessio amb la correcta o recupera el compte.",
+      genericError: "No hem pogut tramitar la sol.licitud. Revisa les dades i torna-ho a provar.",
       back: "Tornar a l'activitat"
     },
     es: {
@@ -73,7 +80,14 @@ export default async function JoinActivityPage({
       loggedInHint:
         "Como ya tienes la sesión iniciada, tu petición quedará pendiente de confirmar.",
       noAccountHint:
-        "Si todavía no tienes cuenta, la crearemos automáticamente con este correo al enviar la solicitud.",
+        "Si todavía no tienes cuenta, la crearemos con este correo y esta contrasena al enviar la solicitud.",
+      passwordLabel: "Contrasena",
+      passwordHint:
+        "La necesitarás después para iniciar sesión y consultar tu perfil o tus actividades.",
+      passwordError: "La contrasena debe tener al menos 8 caracteres.",
+      credentialsError:
+        "Este correo ya existe y la contrasena no coincide. Inicia sesión con la correcta o recupera la cuenta.",
+      genericError: "No hemos podido tramitar la solicitud. Revisa los datos y vuelve a intentarlo.",
       back: "Volver a la actividad"
     },
     en: {
@@ -95,12 +109,29 @@ export default async function JoinActivityPage({
       loggedInHint:
         "Because you are already signed in, your request will stay pending until it is reviewed.",
       noAccountHint:
-        "If you do not have an account yet, we will automatically create one with this email when you submit the request.",
+        "If you do not have an account yet, we will create it with this email and password when you submit the request.",
+      passwordLabel: "Password",
+      passwordHint:
+        "You will need it later to sign in and check your profile or your activities.",
+      passwordError: "Your password must be at least 8 characters long.",
+      credentialsError:
+        "This email already exists and the password does not match. Sign in with the correct one or recover the account.",
+      genericError: "We could not submit your request. Please review your details and try again.",
       back: "Back to activity"
     }
   }[locale];
 
   const requested = typeof resolvedSearchParams.requested === "string";
+  const errorCode =
+    typeof resolvedSearchParams.error === "string" ? resolvedSearchParams.error : null;
+  const errorMessage =
+    errorCode === "password"
+      ? joinUi.passwordError
+      : errorCode === "credentials"
+        ? joinUi.credentialsError
+        : errorCode
+          ? joinUi.genericError
+          : null;
   const profile = dashboard?.profile;
   const userMetadata = (user?.user_metadata || {}) as Record<string, string | undefined>;
   const fullName =
@@ -162,6 +193,7 @@ export default async function JoinActivityPage({
           <h2>{joinUi.title}</h2>
           <p className="section-note">{joinUi.text}</p>
           {requested ? <p className="status status-success">{joinUi.success}</p> : null}
+          {errorMessage ? <p className="status status-error">{errorMessage}</p> : null}
           <p className="join-request-hint">
             {user ? joinUi.loggedInHint : joinUi.noAccountHint}
           </p>
@@ -188,6 +220,11 @@ export default async function JoinActivityPage({
                 <label className="form-field">
                   <span>{messages.email}</span>
                   <input type="email" name="email" defaultValue={email} required />
+                </label>
+                <label className="form-field">
+                  <span>{joinUi.passwordLabel}</span>
+                  <input type="password" name="password" minLength={8} required />
+                  <small>{joinUi.passwordHint}</small>
                 </label>
                 <label className="form-field">
                   <span>{messages.birthDate}</span>
