@@ -10,9 +10,13 @@ import type { Locale } from "@/lib/i18n";
 type SiteHeaderProps = {
   locale: Locale;
   brandTagline: string;
+  navMenu: string;
+  menuHome: string;
   navDiscover: string;
   navHosts: string;
   navEnergy: string;
+  navHowItWorks: string;
+  navCommunity: string;
   navAdmin: string;
   navProfile: string;
   navLogin: string;
@@ -24,9 +28,13 @@ type SiteHeaderProps = {
 export function SiteHeader({
   locale,
   brandTagline,
+  navMenu,
+  menuHome,
   navDiscover,
   navHosts,
   navEnergy,
+  navHowItWorks,
+  navCommunity,
   navAdmin,
   navProfile,
   navLogin,
@@ -37,6 +45,7 @@ export function SiteHeader({
   const [isCompact, setIsCompact] = useState(false);
   const [isHidden, setIsHidden] = useState(false);
   const [isPeeked, setIsPeeked] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     let lastScrollY = window.scrollY;
@@ -78,6 +87,18 @@ export function SiteHeader({
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, [isHidden]);
+
+  useEffect(() => {
+    function handleWindowClick() {
+      setMenuOpen(false);
+    }
+
+    if (menuOpen) {
+      window.addEventListener("click", handleWindowClick);
+    }
+
+    return () => window.removeEventListener("click", handleWindowClick);
+  }, [menuOpen]);
 
   return (
     <>
@@ -123,9 +144,48 @@ export function SiteHeader({
           </Link>
 
           <nav className="site-nav">
-            <Link href="/#plans" className="nav-link-muted">{navDiscover}</Link>
-            <Link href="/#memories" className="nav-link-muted">{navEnergy}</Link>
-            <Link href="/#hosts" className="nav-link-muted">{navHosts}</Link>
+            <div className="site-menu-wrap">
+              <button
+                type="button"
+                className="site-menu-button"
+                aria-label={navMenu}
+                aria-expanded={menuOpen}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  setMenuOpen((current) => !current);
+                }}
+              >
+                <span />
+                <span />
+                <span />
+              </button>
+              {menuOpen ? (
+                <div
+                  className="site-menu-dropdown"
+                  onClick={(event) => event.stopPropagation()}
+                >
+                  <p className="site-menu-title">{navMenu}</p>
+                  <Link href="/" className="site-menu-link" onClick={() => setMenuOpen(false)}>
+                    {menuHome}
+                  </Link>
+                  <Link href="/#plans" className="site-menu-link" onClick={() => setMenuOpen(false)}>
+                    {navDiscover}
+                  </Link>
+                  <Link href="/com-funciona" className="site-menu-link" onClick={() => setMenuOpen(false)}>
+                    {navHowItWorks}
+                  </Link>
+                  <Link href="/comunitat" className="site-menu-link" onClick={() => setMenuOpen(false)}>
+                    {navCommunity}
+                  </Link>
+                  <Link href="/energia" className="site-menu-link" onClick={() => setMenuOpen(false)}>
+                    {navEnergy}
+                  </Link>
+                  <Link href="/hosts" className="site-menu-link" onClick={() => setMenuOpen(false)}>
+                    {navHosts}
+                  </Link>
+                </div>
+              ) : null}
+            </div>
             {showAdminLink ? (
               <Link href="/admin" className="nav-link-muted">{navAdmin}</Link>
             ) : null}

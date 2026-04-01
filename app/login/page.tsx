@@ -1,4 +1,9 @@
-import { signInWithGoogle, signInWithPassword, signUpWithPassword } from "./actions";
+import {
+  sendPasswordResetEmail,
+  signInWithGoogle,
+  signInWithPassword,
+  signUpWithPassword
+} from "./actions";
 import { getMessages } from "@/lib/i18n";
 import { getLocale } from "@/lib/i18n-server";
 
@@ -116,6 +121,36 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
             </label>
             <button className="button button-secondary" type="submit">
               {messages.signUp}
+            </button>
+          </form>
+
+          <form action={sendPasswordResetEmail} className="form-card form-card-compact">
+            <div className="form-head">
+              <h2>
+                {locale === "ca"
+                  ? "Has oblidat la contrasenya?"
+                  : locale === "es"
+                    ? "Has olvidado tu contrasena?"
+                    : "Forgot your password?"}
+              </h2>
+              <p>
+                {locale === "ca"
+                  ? "T'enviarem un correu per recuperar l'acces al compte."
+                  : locale === "es"
+                    ? "Te enviaremos un correo para recuperar el acceso a tu cuenta."
+                    : "We will send you an email so you can recover access to your account."}
+              </p>
+            </div>
+            <label>
+              {messages.email}
+              <input type="email" name="email" placeholder="you@example.com" required />
+            </label>
+            <button className="button button-ghost" type="submit">
+              {locale === "ca"
+                ? "Enviar correu de recuperacio"
+                : locale === "es"
+                  ? "Enviar correo de recuperacion"
+                  : "Send recovery email"}
             </button>
           </form>
         </div>

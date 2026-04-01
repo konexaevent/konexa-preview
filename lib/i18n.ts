@@ -6,10 +6,14 @@ export const localeCookieName = "konexa-locale";
 
 type Messages = {
   brandTagline: string;
+  navMenu: string;
+  menuHome: string;
   navDiscover: string;
   navActivities: string;
   navHosts: string;
   navEnergy: string;
+  menuHowItWorks: string;
+  menuCommunity: string;
   navLogin: string;
   navLogout: string;
   navAdmin: string;
@@ -120,13 +124,17 @@ type Messages = {
 const messages: Record<Locale, Messages> = {
   ca: {
     brandTagline: "On la vida es viu",
-    navDiscover: "Descobreix",
+    navMenu: "Obrir menú",
+    menuHome: "Inici",
+    navDiscover: "Activitats",
     navActivities: "Activitats",
     navHosts: "Coneix els hosts",
     navEnergy: "Energia Konexa",
-    navLogin: "Inicia sessio",
-    navLogout: "Tanca sessio",
-    navAdmin: "Administracio",
+    menuHowItWorks: "Com funciona",
+    menuCommunity: "Comunitat",
+    navLogin: "Inicia sessió",
+    navLogout: "Tanca sessió",
+    navAdmin: "Administració",
     heroEyebrow: "Grups petits. Converses reals. Zero incomoditat.",
     heroTitle: "No sempre és fàcil quedar, aquí sí.",
     heroText:
@@ -238,15 +246,19 @@ const messages: Record<Locale, Messages> = {
   },
   es: {
     brandTagline: "Donde la vida se vive",
-    navDiscover: "Descubrir",
+    navMenu: "Abrir menú",
+    menuHome: "Inicio",
+    navDiscover: "Actividades",
     navActivities: "Actividades",
-    navHosts: "Conoce los hosts",
-    navEnergy: "Energia Konexa",
-    navLogin: "Iniciar sesion",
-    navLogout: "Cerrar sesion",
-    navAdmin: "Administracion",
+    navHosts: "Conoce a los hosts",
+    navEnergy: "Energía Konexa",
+    menuHowItWorks: "Cómo funciona",
+    menuCommunity: "Comunidad",
+    navLogin: "Iniciar sesión",
+    navLogout: "Cerrar sesión",
+    navAdmin: "Administración",
     heroEyebrow: "Grupos pequenos. Conversaciones reales. Cero incomodidad.",
-    heroTitle: "Descubre actividades y conecta con gente nueva de forma natural.",
+    heroTitle: "No siempre es fácil quedar, aquí sí.",
     heroText:
       "En Konexa, la vida no se explica: se vive.",
     heroCtaPlans: "Ver planes",
@@ -279,7 +291,7 @@ const messages: Record<Locale, Messages> = {
     loginBenefit2: "Perfil personal con planes reservados y completados",
     loginBenefit3: "Visibilidad social sin parecer una red social",
     demoMode: "Modo demo activo hasta que configures las claves de Supabase.",
-    logIn: "Iniciar sesion",
+    logIn: "Iniciar sesión",
     returnDashboard: "Vuelve a tu perfil y a tu historial de actividades.",
     email: "Correo electronico",
     phone: "Telefono",
@@ -333,7 +345,7 @@ const messages: Record<Locale, Messages> = {
     everyoneNew: "Todo el mundo es nuevo para ti en esta actividad",
     alreadyJoinedThisActivity: "Ya te has apuntado a esta actividad",
     joinThisActivity: "Unirme a esta actividad",
-    logInToJoin: "Inicia sesion para apuntarte",
+    logInToJoin: "Inicia sesión para apuntarte",
     participantsTitle: "Personas apuntadas a esta actividad",
     participantsText:
       "Las personas con las que ya has compartido actividades quedan destacadas para reforzar la familiaridad y la confianza.",
@@ -356,17 +368,21 @@ const messages: Record<Locale, Messages> = {
   },
   en: {
     brandTagline: "Where life is lived",
-    navDiscover: "Discover",
+    navMenu: "Open menu",
+    menuHome: "Home",
+    navDiscover: "Activities",
     navActivities: "Activities",
     navHosts: "Meet the hosts",
     navEnergy: "Konexa energy",
+    menuHowItWorks: "How it works",
+    menuCommunity: "Community",
     navLogin: "Log in",
     navLogout: "Log out",
     navAdmin: "Admin",
     heroEyebrow: "Small groups. Real conversation. No awkwardness.",
-    heroTitle: "Discover activities and connect with new people naturally.",
+    heroTitle: "It is not always easy to make plans. Here, it is.",
     heroText:
-      "At Konexa, life is not explained: it is lived.",
+      "At Konexa, life is not explained. It is lived.",
     heroCtaPlans: "See plans",
     heroCtaProfile: "Open profile",
     heroCtaCreate: "Create account",

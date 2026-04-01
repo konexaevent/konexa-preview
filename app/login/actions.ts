@@ -111,3 +111,63 @@ export async function signInWithGoogle(formData: FormData) {
 
   redirect(data.url);
 }
+
+export async function sendPasswordResetEmail(formData: FormData) {
+  const supabase = await createSupabaseServerClient();
+  if (!supabase) {
+    redirect("/login?mode=demo");
+  }
+
+  const email = String(formData.get("email") || "").trim();
+
+  if (!email) {
+    redirect("/login?error=Missing%20email");
+  }
+
+  const origin = await getOrigin();
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${origin}/auth/callback?next=${encodeURIComponent("/reset-password")}`
+  });
+
+  if (error) {
+    redirect(`/login?error=${encodeURIComponent(error.message)}`);
+  }
+
+  redirect(
+    `/login?success=${encodeURIComponent(
+      "Hem enviat un correu per recuperar la contrasenya si el compte existeix."
+    )}`
+  );
+}
+
+export async function updatePasswordAction(formData: FormData) {
+  const supabase = await createSupabaseServerClient();
+  if (!supabase) {
+    redirect("/login?mode=demo");
+  }
+
+  const password = String(formData.get("password") || "");
+  const confirmPassword = String(formData.get("confirm_password") || "");
+
+  if (!password || password.length < 8) {
+    redirect(`/reset-password?error=${encodeURIComponent("La contrasenya ha de tenir almenys 8 caracters.")}`);
+  }
+
+  if (password !== confirmPassword) {
+    redirect(`/reset-password?error=${encodeURIComponent("Les contrasenyes no coincideixen.")}`);
+  }
+
+  const { error } = await supabase.auth.updateUser({
+    password
+  });
+
+  if (error) {
+    redirect(`/reset-password?error=${encodeURIComponent(error.message)}`);
+  }
+
+  redirect(
+    `/login?success=${encodeURIComponent(
+      "Contrasenya actualitzada. Ja pots iniciar sessio amb la nova."
+    )}`
+  );
+}

@@ -1,7 +1,6 @@
 "use client";
 
-import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useFormStatus } from "react-dom";
 
 type ProfileFormProps = {
@@ -40,6 +39,15 @@ export function ProfileForm({ action, messages, values }: ProfileFormProps) {
   const [previewUrl, setPreviewUrl] = useState<string>(values.avatarUrl);
 
   const fallbackPreview = useMemo(() => values.avatarUrl, [values.avatarUrl]);
+  const isObjectPreview = previewUrl.startsWith("blob:");
+
+  useEffect(() => {
+    return () => {
+      if (isObjectPreview) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [isObjectPreview, previewUrl]);
 
   return (
     <form action={action} className="profile-form">
@@ -47,12 +55,10 @@ export function ProfileForm({ action, messages, values }: ProfileFormProps) {
       <div className="avatar-preview-card">
         <div className="avatar-preview-frame">
           {previewUrl || fallbackPreview ? (
-            <Image
+            <img
               src={previewUrl || fallbackPreview}
               alt="Avatar preview"
-              fill
               className="avatar-preview-image"
-              unoptimized
             />
           ) : null}
         </div>

@@ -65,9 +65,13 @@ export default async function RootLayout({
           <SiteHeader
             locale={locale}
             brandTagline={messages.brandTagline}
+            navMenu={messages.navMenu}
+            menuHome={messages.menuHome}
             navDiscover={messages.navActivities}
             navHosts={messages.navHosts}
             navEnergy={messages.navEnergy}
+            navHowItWorks={messages.menuHowItWorks}
+            navCommunity={messages.menuCommunity}
             navAdmin={messages.navAdmin}
             navProfile={messages.myProfile}
             navLogin={messages.navLogin}
