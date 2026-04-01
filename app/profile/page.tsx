@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { updateProfileAction } from "@/app/actions";
@@ -49,7 +48,12 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
       memberSince: "Compte actiu",
       profileStatus: "Perfil preparat per tornar a quedar",
       pendingShort: "pendents",
-      sinceText: "comunitat activa"
+      sinceText: "comunitat activa",
+      rhythmTitle: "El teu ritme a Konexa",
+      rhythmText:
+        "Una mirada rapida al que tens en marxa ara mateix, al que ja has viscut i a la xarxa de familiaritat que vas construint.",
+      confirmedShort: "confirmades",
+      historyShort: "ja viscudes"
     },
     es: {
       nextPlan: "Proximo plan",
@@ -58,7 +62,12 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
       memberSince: "Cuenta activa",
       profileStatus: "Perfil listo para volver a quedar",
       pendingShort: "pendientes",
-      sinceText: "comunidad activa"
+      sinceText: "comunidad activa",
+      rhythmTitle: "Tu ritmo en Konexa",
+      rhythmText:
+        "Una mirada rapida a lo que tienes en marcha ahora mismo, lo que ya has vivido y la red de familiaridad que vas creando.",
+      confirmedShort: "confirmadas",
+      historyShort: "ya vividas"
     },
     en: {
       nextPlan: "Next plan",
@@ -67,7 +76,12 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
       memberSince: "Active account",
       profileStatus: "Profile ready for your next group plan",
       pendingShort: "pending",
-      sinceText: "active community"
+      sinceText: "active community",
+      rhythmTitle: "Your Konexa rhythm",
+      rhythmText:
+        "A quick view of what is happening now, what you have already lived, and the familiarity you are building over time.",
+      confirmedShort: "confirmed",
+      historyShort: "already lived"
     }
   }[locale];
   const nextActivity = dashboard.upcomingActivities[0];
@@ -93,13 +107,12 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
           </div>
         </div>
         <div className="profile-card">
-          <Image
+          <img
             src={dashboard.profile.avatarUrl}
             alt={dashboard.profile.name}
             width={88}
             height={88}
             className="avatar avatar-large"
-            unoptimized
           />
           <div className="profile-card-copy">
             <span className="pill">{profileUi.profileStatus}</span>
@@ -107,6 +120,34 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
             <p>{dashboard.pendingActivities.length} {messages.pendingActivities.toLowerCase()}</p>
             <small>{profileUi.memberSince}: {profileUi.sinceText}</small>
           </div>
+        </div>
+      </section>
+
+      <section className="dashboard-panel profile-rhythm-panel">
+        <div className="panel-head">
+          <div>
+            <p className="eyebrow">{profileUi.rhythmTitle}</p>
+            <h2>{profileUi.rhythmTitle}</h2>
+          </div>
+          <p className="section-note">{profileUi.rhythmText}</p>
+        </div>
+        <div className="profile-rhythm-grid">
+          <article className="profile-rhythm-card">
+            <strong>{dashboard.upcomingActivities.length}</strong>
+            <p>{profileUi.confirmedShort}</p>
+          </article>
+          <article className="profile-rhythm-card">
+            <strong>{dashboard.pendingActivities.length}</strong>
+            <p>{profileUi.pendingShort}</p>
+          </article>
+          <article className="profile-rhythm-card">
+            <strong>{dashboard.pastActivities.length}</strong>
+            <p>{profileUi.historyShort}</p>
+          </article>
+          <article className="profile-rhythm-card">
+            <strong>{dashboard.sharedConnections.length}</strong>
+            <p>{messages.sharedConnections.toLowerCase()}</p>
+          </article>
         </div>
       </section>
 
@@ -265,13 +306,12 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
           {dashboard.sharedConnections.map((connection: SharedConnection) => (
             <article className="connection-card" key={connection.userId}>
               <div className="connection-head">
-                <Image
+                <img
                   src={connection.avatarUrl}
                   alt={connection.name}
                   width={56}
                   height={56}
                   className="avatar"
-                  unoptimized
                 />
                 <div>
                   <h3>{connection.name}</h3>

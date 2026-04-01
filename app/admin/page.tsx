@@ -129,7 +129,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
       hostsContentText: "Actualitza nom, rol, foto, descripcio i video de presentacio de cada host.",
       memoriesTitle: "Moments reals",
       memoriesText: "Edita el video principal i les tres peces visuals de la zona multimedia.",
-      imageUrlLabel: "URL actual",
+      currentImageLabel: "Imatge actual",
       imageFileLabel: "Nova imatge",
       videoUrlLabel: "URL del video",
       roleLabel: "Rol visible",
@@ -144,6 +144,10 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
       saveMemories: "Desar multimedia",
       hostsSaved: "Els hosts s'han actualitzat correctament.",
       hostsError: "No hem pogut desar els hosts. Revisa les dades o la configuracio de Supabase."
+      ,
+      operationsTitle: "Operativa del dia",
+      operationsText:
+        "Des d'aqui tens una lectura rapida del que requereix atencio avui: altes noves, activitats obertes i gestio de participants."
     },
     es: {
       eyebrow: "Administracion Konexa",
@@ -204,7 +208,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
       hostsContentText: "Actualiza nombre, rol, foto, descripcion y video de presentacion de cada host.",
       memoriesTitle: "Momentos reales",
       memoriesText: "Edita el video principal y las tres piezas visuales de la zona multimedia.",
-      imageUrlLabel: "URL actual",
+      currentImageLabel: "Imagen actual",
       imageFileLabel: "Nueva imagen",
       videoUrlLabel: "URL del video",
       roleLabel: "Rol visible",
@@ -219,6 +223,10 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
       saveMemories: "Guardar multimedia",
       hostsSaved: "Los hosts se han actualizado correctamente.",
       hostsError: "No hemos podido guardar los hosts. Revisa los datos o la configuracion de Supabase."
+      ,
+      operationsTitle: "Operativa del dia",
+      operationsText:
+        "Desde aqui tienes una lectura rapida de lo que requiere atencion hoy: altas nuevas, actividades abiertas y gestion de participantes."
     },
     en: {
       eyebrow: "Konexa admin",
@@ -279,7 +287,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
       hostsContentText: "Update each host's name, visible role, photo, bio, and intro video.",
       memoriesTitle: "Real moments",
       memoriesText: "Edit the main video and the three visual pieces in the multimedia section.",
-      imageUrlLabel: "Current URL",
+      currentImageLabel: "Current image",
       imageFileLabel: "New image",
       videoUrlLabel: "Video URL",
       roleLabel: "Visible role",
@@ -294,6 +302,10 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
       saveMemories: "Save media",
       hostsSaved: "Hosts updated successfully.",
       hostsError: "We could not save the hosts. Please review the data or your Supabase setup."
+      ,
+      operationsTitle: "Day-to-day operations",
+      operationsText:
+        "This gives you a quick read on what needs attention today: new users, open activities, and participant coordination."
     }
   }[locale];
 
@@ -323,6 +335,33 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
           <article className="profile-highlight-card">
             <p className="label">{copy.usersTitle}</p>
             <strong>{dashboard.users.length}</strong>
+          </article>
+        </div>
+      </section>
+
+      <section className="dashboard-panel admin-operations-panel">
+        <div className="panel-head">
+          <div>
+            <p className="eyebrow">{copy.operationsTitle}</p>
+            <h2>{copy.operationsTitle}</h2>
+          </div>
+          <p className="section-note">{copy.operationsText}</p>
+        </div>
+        <div className="admin-operations-grid">
+          <article className="admin-operation-card">
+            <strong>{dashboard.users.length}</strong>
+            <p>{copy.usersTitle}</p>
+            <small>{copy.usersText}</small>
+          </article>
+          <article className="admin-operation-card">
+            <strong>{pendingApprovals.length}</strong>
+            <p>{copy.pendingTitle}</p>
+            <small>{copy.pendingText}</small>
+          </article>
+          <article className="admin-operation-card">
+            <strong>{dashboard.activities.reduce((total, activity) => total + activity.attendees.length, 0)}</strong>
+            <p>{copy.attendeesTitle}</p>
+            <small>{copy.whatsappText}</small>
           </article>
         </div>
       </section>
@@ -509,12 +548,11 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
               {heroCarouselImages.map((imageUrl: string, index: number) => (
                 <div className="admin-form-span-2 admin-media-block" key={`hero-${index + 1}`}>
                   <label>
-                    {copy.imageUrlLabel} {index + 1}
-                    <input
-                      type="text"
-                      name={`image_${index + 1}_url`}
-                      defaultValue={imageUrl}
-                    />
+                    {copy.currentImageLabel} {index + 1}
+                    <input type="hidden" name={`image_${index + 1}_current`} value={imageUrl} />
+                    <div className="admin-inline-image-preview">
+                      <Image src={imageUrl} alt={`Carousel ${index + 1}`} fill className="activity-image" unoptimized />
+                    </div>
                   </label>
                   <label>
                     {copy.imageFileLabel} {index + 1}
@@ -564,12 +602,11 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
                     />
                   </label>
                   <label>
-                    {copy.imageUrlLabel} {index + 1}
-                    <input
-                      type="text"
-                      name={`memory_${index + 1}_image_url`}
-                      defaultValue={item.imageUrl}
-                    />
+                    {copy.currentImageLabel} {index + 1}
+                    <input type="hidden" name={`memory_${index + 1}_image_current`} value={item.imageUrl} />
+                    <div className="admin-inline-image-preview">
+                      <Image src={item.imageUrl} alt={item.title} fill className="activity-image" unoptimized />
+                    </div>
                   </label>
                   <label>
                     {copy.imageFileLabel} {index + 1}
@@ -623,12 +660,11 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
                   <textarea name={`host_${index + 1}_bio`} rows={4} defaultValue={host.bio} />
                 </label>
                 <label>
-                  {copy.imageUrlLabel}
-                  <input
-                    type="text"
-                    name={`host_${index + 1}_avatar_url`}
-                    defaultValue={host.avatarUrl}
-                  />
+                  {copy.currentImageLabel}
+                  <input type="hidden" name={`host_${index + 1}_avatar_current`} defaultValue={host.avatarUrl} />
+                  <div className="admin-inline-image-preview admin-inline-avatar-preview">
+                    <Image src={host.avatarUrl} alt={host.name} fill className="activity-image" unoptimized />
+                  </div>
                 </label>
                 <label>
                   {copy.imageFileLabel}

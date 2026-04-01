@@ -1209,6 +1209,36 @@ small {
   margin-top: 0.95rem;
 }
 
+.section-kpis {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+.section-kpi {
+  min-width: 112px;
+  padding: 0.85rem 0.95rem;
+  border-radius: 18px;
+  border: 1px solid rgba(62, 56, 133, 0.08);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(247, 244, 255, 0.86)),
+    radial-gradient(circle at top right, rgba(255, 177, 43, 0.08), transparent 36%);
+  box-shadow: 0 12px 26px rgba(57, 45, 143, 0.05);
+}
+
+.section-kpi strong {
+  display: block;
+  font-size: 1.1rem;
+  line-height: 1.1;
+}
+
+.section-kpi small {
+  display: block;
+  margin-top: 0.3rem;
+  color: var(--ink-soft);
+}
+
 .memory-section {
   display: grid;
   gap: 1rem;
@@ -1854,6 +1884,36 @@ textarea {
   margin-top: 0.4rem;
 }
 
+.profile-rhythm-panel {
+  overflow: hidden;
+}
+
+.profile-rhythm-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+.profile-rhythm-card {
+  padding: 1rem;
+  border-radius: 20px;
+  border: 1px solid rgba(62, 56, 133, 0.08);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(247, 244, 255, 0.88)),
+    radial-gradient(circle at top right, rgba(22, 199, 180, 0.1), transparent 42%);
+}
+
+.profile-rhythm-card strong {
+  display: block;
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.profile-rhythm-card p {
+  margin-top: 0.38rem;
+  color: var(--ink-soft);
+}
+
 .dashboard-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
@@ -1946,9 +2006,46 @@ textarea {
 
 .admin-summary-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 0.9rem;
   margin-top: 1rem;
+}
+
+.admin-operations-panel {
+  overflow: hidden;
+}
+
+.admin-operations-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.9rem;
+}
+
+.admin-operation-card {
+  padding: 1rem;
+  border-radius: 20px;
+  border: 1px solid rgba(62, 56, 133, 0.08);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(247, 244, 255, 0.9)),
+    radial-gradient(circle at top right, rgba(255, 79, 111, 0.08), transparent 38%);
+}
+
+.admin-operation-card strong {
+  display: block;
+  font-size: 1.45rem;
+  line-height: 1;
+}
+
+.admin-operation-card p {
+  margin-top: 0.45rem;
+  font-weight: 700;
+}
+
+.admin-operation-card small {
+  display: block;
+  margin-top: 0.38rem;
+  color: var(--ink-soft);
+  line-height: 1.45;
 }
 
 .admin-grid {
@@ -2335,6 +2432,21 @@ textarea {
   background: rgba(103, 84, 255, 0.04);
 }
 
+.admin-inline-image-preview {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.admin-inline-avatar-preview {
+  aspect-ratio: 1 / 1;
+  max-width: 220px;
+}
+
 .admin-host-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -2498,6 +2610,28 @@ textarea {
   color: rgba(25, 22, 63, 0.62);
 }
 
+.detail-trust-banner {
+  margin-top: 1rem;
+  padding: 1rem 1.05rem;
+  border-radius: 22px;
+  border: 1px solid rgba(22, 199, 180, 0.16);
+  background:
+    linear-gradient(180deg, rgba(247, 255, 252, 0.96), rgba(246, 247, 255, 0.92)),
+    radial-gradient(circle at right, rgba(255, 177, 43, 0.1), transparent 34%);
+  box-shadow: 0 14px 30px rgba(57, 45, 143, 0.05);
+}
+
+.detail-trust-banner strong {
+  display: block;
+  margin-bottom: 0.32rem;
+}
+
+.detail-trust-banner p {
+  margin: 0;
+  color: rgba(25, 22, 63, 0.7);
+  line-height: 1.6;
+}
+
 .detail-expectation-card {
   margin-top: 1.15rem;
   padding: 1.08rem;
@@ -2613,6 +2747,13 @@ textarea {
     grid-template-columns: 1fr;
   }
 
+  .section-kpis,
+  .profile-rhythm-grid,
+  .admin-operations-grid,
+  .admin-summary-grid {
+    grid-template-columns: 1fr;
+  }
+
   .section-header,
   .panel-head,
   .dashboard-hero {
@@ -2651,6 +2792,11 @@ textarea {
   .header-language-slot {
     width: 100%;
     justify-content: flex-end;
+  }
+
+  .section-kpis {
+    width: 100%;
+    justify-content: flex-start;
   }
 
   .detail-cover {

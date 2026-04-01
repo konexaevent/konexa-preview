@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getMessages } from "@/lib/i18n";
@@ -113,13 +112,12 @@ export default async function AdminUserProfilePage({ params }: AdminUserProfileP
           </div>
         </div>
         <div className="profile-card">
-          <Image
+          <img
             src={dashboard.profile.avatarUrl}
             alt={dashboard.profile.name}
             width={88}
             height={88}
             className="avatar avatar-large"
-            unoptimized
           />
           <div className="profile-card-copy">
             <span className="pill">{dashboard.profile.role}</span>
@@ -256,13 +254,12 @@ export default async function AdminUserProfilePage({ params }: AdminUserProfileP
         <div className="connection-grid">
           {dashboard.sharedConnections.map((connection: SharedConnection) => (
             <article className="connection-card" key={connection.userId}>
-              <Image
+              <img
                 src={connection.avatarUrl}
                 alt={connection.name}
                 width={52}
                 height={52}
                 className="avatar"
-                unoptimized
               />
               <div>
                 <h3>{connection.name}</h3>

@@ -802,7 +802,7 @@ export async function saveHeroCarouselAction(formData: FormData) {
 
   const imageUrls = await Promise.all(
     [1, 2, 3].map(async (index) => {
-      const currentValue = String(formData.get(`image_${index}_url`) || "").trim();
+      const currentValue = String(formData.get(`image_${index}_current`) || "").trim();
       const file = formData.get(`image_${index}_file`);
 
       if (!supabase) {
@@ -846,7 +846,7 @@ export async function saveHostsContentAction(formData: FormData) {
   const hosts = await Promise.all(
     ["18-25", "25-35", "35-50", "50+"].map(async (age, index) => {
       const slot = index + 1;
-      const currentAvatarUrl = String(formData.get(`host_${slot}_avatar_url`) || "").trim();
+      const currentAvatarUrl = String(formData.get(`host_${slot}_avatar_current`) || "").trim();
       const avatarFile = formData.get(`host_${slot}_avatar_file`);
 
       let avatarUrl = currentAvatarUrl;
@@ -917,7 +917,7 @@ export async function saveMemoriesContentAction(formData: FormData) {
 
   const items = await Promise.all(
     [1, 2, 3].map(async (slot) => {
-      const currentImageUrl = String(formData.get(`memory_${slot}_image_url`) || "").trim();
+      const currentImageUrl = String(formData.get(`memory_${slot}_image_current`) || "").trim();
       const imageFile = formData.get(`memory_${slot}_image_file`);
 
       let imageUrl = currentImageUrl;
