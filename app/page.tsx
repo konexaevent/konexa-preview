@@ -291,8 +291,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
             joined: messages.joined,
             pending: messages.reservationPending,
             joinActivity: messages.joinActivity,
-            smallHostedGroup: messages.smallHostedGroup,
-            priceLabel: messages.priceLabel
+            smallHostedGroup: messages.smallHostedGroup
           }}
           homeUi={{
             ageEyebrow: homeUi.ageEyebrow,

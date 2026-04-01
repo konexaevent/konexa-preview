@@ -76,6 +76,10 @@ type QueryActivityLite = {
 type QueryParticipantRow = {
   user_id: string;
   status?: "pending" | "confirmed" | "cancelled";
+  activity_id?: string;
+  request_message?: string | null;
+  phone_number?: string | null;
+  whatsapp_opt_in?: boolean;
 };
 
 type DetailParticipant = {
@@ -485,9 +489,31 @@ export const getAdminDashboard = cache(async (userId: string) => {
     ((activitiesResult.data || []) as QueryActivityCard[]).map((activity) => [activity.id, activity])
   );
 
+  const admin = process.env.SUPABASE_SERVICE_ROLE_KEY ? createSupabaseAdminClient() : null;
+  const authUsers =
+    admin
+      ? await admin.auth.admin.listUsers()
+      : null;
+  const emailMap = new Map(
+    (authUsers?.data?.users || []).map((entry) => [entry.id, entry.email || ""])
+  );
+
   const participantCountsByActivity = new Map<
     string,
     { pendingCount: number; confirmedCount: number }
+  >();
+  const attendeesByActivity = new Map<
+    string,
+    Array<{
+      id: string;
+      name: string;
+      email: string;
+      phoneNumber: string;
+      avatarUrl: string;
+      status: "pending" | "confirmed" | "cancelled";
+      whatsappOptIn: boolean;
+      requestMessage: string;
+    }>
   >();
   for (const row of pendingRows) {
     const current = participantCountsByActivity.get(row.activity_id) || {
@@ -501,16 +527,22 @@ export const getAdminDashboard = cache(async (userId: string) => {
       current.confirmedCount += 1;
     }
     participantCountsByActivity.set(row.activity_id, current);
-  }
 
-  const admin = process.env.SUPABASE_SERVICE_ROLE_KEY ? createSupabaseAdminClient() : null;
-  const authUsers =
-    admin
-      ? await admin.auth.admin.listUsers()
-      : null;
-  const emailMap = new Map(
-    (authUsers?.data?.users || []).map((entry) => [entry.id, entry.email || ""])
-  );
+    const attendeeProfile = hostMap.get(row.user_id);
+    const attendeeList = attendeesByActivity.get(row.activity_id) || [];
+    attendeeList.push({
+      id: row.user_id,
+      name: attendeeProfile?.full_name || "User",
+      email: emailMap.get(row.user_id) || "",
+      phoneNumber: row.phone_number || attendeeProfile?.phone_number || "",
+      avatarUrl:
+        attendeeProfile?.avatar_url || "https://api.dicebear.com/9.x/lorelei/svg?seed=Unknown",
+      status: row.status || "pending",
+      whatsappOptIn: Boolean(row.whatsapp_opt_in),
+      requestMessage: row.request_message || ""
+    });
+    attendeesByActivity.set(row.activity_id, attendeeList);
+  }
 
   return {
     profile: profileResult.data,
@@ -561,7 +593,8 @@ export const getAdminDashboard = cache(async (userId: string) => {
         participantCount: activity.participant_count,
         maxParticipants: activity.max_participants,
         pendingCount: counts.pendingCount,
-        confirmedCount: counts.confirmedCount
+        confirmedCount: counts.confirmedCount,
+        attendees: attendeesByActivity.get(activity.id) || []
       };
     }),
     pendingApprovals: pendingRows

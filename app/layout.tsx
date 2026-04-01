@@ -69,6 +69,7 @@ export default async function RootLayout({
             navHosts={messages.navHosts}
             navEnergy={messages.navEnergy}
             navAdmin={messages.navAdmin}
+            navProfile={messages.myProfile}
             navLogin={messages.navLogin}
             navLogout={messages.navLogout}
             showAdminLink={Boolean(

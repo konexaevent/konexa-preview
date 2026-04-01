@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AdminActivityForm } from "@/components/admin-activity-form";
+import { AdminActivityRoster } from "@/components/admin-activity-roster";
 import {
   deleteActivityAction,
   reviewPendingAction,
@@ -97,6 +98,13 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
       usersEmpty: "Encara no hi ha usuaris registrats.",
       viewProfile: "Veure perfil",
       pendingText: "Revisa qui s'ha volgut apuntar, el seu motiu i si ha acceptat entrar al grup temporal de WhatsApp.",
+      attendeesTitle: "Persones inscrites",
+      attendeesEmpty: "Encara no hi ha cap persona inscrita en aquesta activitat.",
+      whatsappTitle: "Grup de WhatsApp",
+      whatsappText: "Copia els telèfons amb consentiment i crea el grup fàcilment des de WhatsApp.",
+      copyPhones: "Copiar telèfons",
+      copiedPhones: "Telèfons copiats",
+      openWhatsapp: "Obrir WhatsApp",
       edit: "Editar",
       delete: "Eliminar",
       noActivities: "Encara no hi ha activitats creades.",
@@ -134,7 +142,8 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
       saveCarousel: "Desar carrusel",
       saveHosts: "Desar hosts",
       saveMemories: "Desar multimedia",
-      hostsSaved: "Els hosts s'han actualitzat correctament."
+      hostsSaved: "Els hosts s'han actualitzat correctament.",
+      hostsError: "No hem pogut desar els hosts. Revisa les dades o la configuracio de Supabase."
     },
     es: {
       eyebrow: "Administracion Konexa",
@@ -164,6 +173,13 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
       usersEmpty: "Todavía no hay usuarios registrados.",
       viewProfile: "Ver perfil",
       pendingText: "Revisa quien ha querido apuntarse, su motivo y si ha aceptado entrar en el grupo temporal de WhatsApp.",
+      attendeesTitle: "Personas inscritas",
+      attendeesEmpty: "Todavía no hay personas inscritas en esta actividad.",
+      whatsappTitle: "Grupo de WhatsApp",
+      whatsappText: "Copia los teléfonos con consentimiento y crea el grupo fácilmente desde WhatsApp.",
+      copyPhones: "Copiar teléfonos",
+      copiedPhones: "Teléfonos copiados",
+      openWhatsapp: "Abrir WhatsApp",
       edit: "Editar",
       delete: "Eliminar",
       noActivities: "Todavia no hay actividades creadas.",
@@ -201,7 +217,8 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
       saveCarousel: "Guardar carrusel",
       saveHosts: "Guardar hosts",
       saveMemories: "Guardar multimedia",
-      hostsSaved: "Los hosts se han actualizado correctamente."
+      hostsSaved: "Los hosts se han actualizado correctamente.",
+      hostsError: "No hemos podido guardar los hosts. Revisa los datos o la configuracion de Supabase."
     },
     en: {
       eyebrow: "Konexa admin",
@@ -231,6 +248,13 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
       usersEmpty: "There are no registered users yet.",
       viewProfile: "View profile",
       pendingText: "Review who asked to join, why they want to come, and whether they agreed to join the temporary WhatsApp group.",
+      attendeesTitle: "Registered people",
+      attendeesEmpty: "There is no one registered for this activity yet.",
+      whatsappTitle: "WhatsApp group",
+      whatsappText: "Copy the consented phone numbers and create the group quickly from WhatsApp.",
+      copyPhones: "Copy phones",
+      copiedPhones: "Phones copied",
+      openWhatsapp: "Open WhatsApp",
       edit: "Edit",
       delete: "Delete",
       noActivities: "There are no activities yet.",
@@ -268,7 +292,8 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
       saveCarousel: "Save carousel",
       saveHosts: "Save hosts",
       saveMemories: "Save media",
-      hostsSaved: "Hosts updated successfully."
+      hostsSaved: "Hosts updated successfully.",
+      hostsError: "We could not save the hosts. Please review the data or your Supabase setup."
     }
   }[locale];
 
@@ -378,7 +403,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
                     {activity.city} · {activity.ageRange} · {activity.hostName}
                   </small>
                   <p className="admin-activity-price">{activity.price}</p>
-                  <div className="admin-badge-row">
+              <div className="admin-badge-row">
                     <span className="signal-tag">
                       {activity.pendingCount} {copy.pendingBadge}
                     </span>
@@ -397,6 +422,29 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
                       {copy.delete}
                     </button>
                   </form>
+                </div>
+                <div className="admin-activity-roster-wrap">
+                  <AdminActivityRoster
+                    activityTitle={activity.title}
+                    attendees={activity.attendees}
+                    copy={{
+                      attendeesTitle: copy.attendeesTitle,
+                      attendeesEmpty: copy.attendeesEmpty,
+                      whatsappTitle: copy.whatsappTitle,
+                      whatsappText: copy.whatsappText,
+                      copyPhones: copy.copyPhones,
+                      copiedPhones: copy.copiedPhones,
+                      openWhatsapp: copy.openWhatsapp,
+                      pendingBadge: copy.pendingBadge,
+                      confirmedBadge: copy.confirmedBadge,
+                      emailLabel: copy.applicantEmail,
+                      phoneLabel: copy.applicantPhone,
+                      whatsappLabel: copy.applicantWhatsapp,
+                      reasonLabel: copy.applicantReason,
+                      yes: copy.yes,
+                      no: copy.no
+                    }}
+                  />
                 </div>
               </article>
             ))}
@@ -553,6 +601,9 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
         </div>
         {"hosts_saved" in resolvedSearchParams ? (
           <p className="status status-success">{copy.hostsSaved}</p>
+        ) : null}
+        {"hosts_error" in resolvedSearchParams ? (
+          <p className="status status-error">{copy.hostsError}</p>
         ) : null}
         <form action={saveHostsContentAction} className="admin-activity-form">
           <div className="admin-host-grid">

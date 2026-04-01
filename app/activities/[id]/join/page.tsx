@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { requestActivityJoinAction } from "@/app/actions";
+import { JoinRequestForm } from "@/components/join-request-form";
 import { getMessages } from "@/lib/i18n";
 import { getLocale } from "@/lib/i18n-server";
 import { getActivityDetail, getCurrentUser, getProfileDashboard } from "@/lib/queries";
@@ -59,6 +59,11 @@ export default async function JoinActivityPage({
       credentialsError:
         "Aquest correu ja existeix i la contrasenya no coincideix. Inicia sessio amb la correcta o recupera el compte.",
       genericError: "No hem pogut tramitar la sol.licitud. Revisa les dades i torna-ho a provar.",
+      chooseAccountState: "Ja tens compte a Konexa?",
+      registeredChoice: "Si, ja estic registrat/da",
+      newChoice: "No, vull crear el compte ara",
+      existingAccountHint:
+        "Introdueix el teu correu i la teva contrasenya per validar el compte abans d'enviar la sol.licitud.",
       back: "Tornar a l'activitat"
     },
     es: {
@@ -88,6 +93,11 @@ export default async function JoinActivityPage({
       credentialsError:
         "Este correo ya existe y la contrasena no coincide. Inicia sesión con la correcta o recupera la cuenta.",
       genericError: "No hemos podido tramitar la solicitud. Revisa los datos y vuelve a intentarlo.",
+      chooseAccountState: "¿Ya tienes cuenta en Konexa?",
+      registeredChoice: "Sí, ya estoy registrado/a",
+      newChoice: "No, quiero crear la cuenta ahora",
+      existingAccountHint:
+        "Introduce tu correo y tu contrasena para validar la cuenta antes de enviar la solicitud.",
       back: "Volver a la actividad"
     },
     en: {
@@ -117,21 +127,17 @@ export default async function JoinActivityPage({
       credentialsError:
         "This email already exists and the password does not match. Sign in with the correct one or recover the account.",
       genericError: "We could not submit your request. Please review your details and try again.",
+      chooseAccountState: "Do you already have a Konexa account?",
+      registeredChoice: "Yes, I am already registered",
+      newChoice: "No, I want to create it now",
+      existingAccountHint:
+        "Enter your email and password so we can validate your account before sending the request.",
       back: "Back to activity"
     }
   }[locale];
 
   const requested = typeof resolvedSearchParams.requested === "string";
-  const errorCode =
-    typeof resolvedSearchParams.error === "string" ? resolvedSearchParams.error : null;
-  const errorMessage =
-    errorCode === "password"
-      ? joinUi.passwordError
-      : errorCode === "credentials"
-        ? joinUi.credentialsError
-        : errorCode
-          ? joinUi.genericError
-          : null;
+  const errorCode = typeof resolvedSearchParams.error === "string" ? resolvedSearchParams.error : null;
   const profile = dashboard?.profile;
   const userMetadata = (user?.user_metadata || {}) as Record<string, string | undefined>;
   const fullName =
@@ -189,94 +195,28 @@ export default async function JoinActivityPage({
         </article>
 
         <article className="join-request-form-card">
-          <p className="eyebrow">{joinUi.eyebrow}</p>
-          <h2>{joinUi.title}</h2>
-          <p className="section-note">{joinUi.text}</p>
-          {requested ? <p className="status status-success">{joinUi.success}</p> : null}
-          {errorMessage ? <p className="status status-error">{errorMessage}</p> : null}
-          <p className="join-request-hint">
-            {user ? joinUi.loggedInHint : joinUi.noAccountHint}
-          </p>
-          <form action={requestActivityJoinAction} className="profile-form join-request-form">
-            <input type="hidden" name="activity_id" value={detail.id} />
-            <input type="hidden" name="redirect_to" value={`/activities/${detail.id}/join`} />
-
-            <div className="panel-head panel-head-form">
-              <div>
-                <p className="eyebrow">{joinUi.aboutYou}</p>
-              </div>
-            </div>
-
-            {!user ? (
-              <>
-                <label className="form-field">
-                  <span>{messages.firstName}</span>
-                  <input type="text" name="first_name" defaultValue={firstName} required />
-                </label>
-                <label className="form-field">
-                  <span>{messages.lastName}</span>
-                  <input type="text" name="last_name" defaultValue={lastName} required />
-                </label>
-                <label className="form-field">
-                  <span>{messages.email}</span>
-                  <input type="email" name="email" defaultValue={email} required />
-                </label>
-                <label className="form-field">
-                  <span>{joinUi.passwordLabel}</span>
-                  <input type="password" name="password" minLength={8} required />
-                  <small>{joinUi.passwordHint}</small>
-                </label>
-                <label className="form-field">
-                  <span>{messages.birthDate}</span>
-                  <input type="date" name="birth_date" defaultValue={birthDate} required />
-                </label>
-                <label className="form-field">
-                  <span>{messages.phone}</span>
-                  <input type="tel" name="phone_number" defaultValue={phoneNumber} required />
-                  <small>{joinUi.phoneHint}</small>
-                </label>
-              </>
-            ) : (
-              <div className="join-request-identity">
-                <div className="info-item">
-                  <p className="label">{messages.firstName}</p>
-                  <p className="value">{firstName || "-"}</p>
-                </div>
-                <div className="info-item">
-                  <p className="label">{messages.lastName}</p>
-                  <p className="value">{lastName || "-"}</p>
-                </div>
-                <div className="info-item">
-                  <p className="label">{messages.email}</p>
-                  <p className="value">{email || "-"}</p>
-                </div>
-                <label className="form-field">
-                  <span>{messages.phone}</span>
-                  <input type="tel" name="phone_number" defaultValue={phoneNumber} required />
-                  <small>{joinUi.phoneHint}</small>
-                </label>
-              </div>
-            )}
-
-            <label className="form-field">
-              <span>{joinUi.motivation}</span>
-              <textarea
-                name="motivation"
-                rows={5}
-                placeholder={joinUi.motivationPlaceholder}
-                required
-              />
-            </label>
-
-            <label className="checkbox-field">
-              <input type="checkbox" name="whatsapp_consent" required />
-              <span>{joinUi.whatsappConsent}</span>
-            </label>
-
-            <button type="submit" className="button button-primary">
-              {joinUi.submit}
-            </button>
-          </form>
+          <JoinRequestForm
+            activityId={detail.id}
+            redirectTo={`/activities/${detail.id}/join`}
+            isLoggedIn={Boolean(user)}
+            requested={requested}
+            errorCode={errorCode}
+            joinUi={joinUi}
+            messages={{
+              firstName: messages.firstName,
+              lastName: messages.lastName,
+              email: messages.email,
+              birthDate: messages.birthDate,
+              phone: messages.phone
+            }}
+            defaults={{
+              firstName,
+              lastName,
+              email,
+              birthDate,
+              phoneNumber
+            }}
+          />
         </article>
       </section>
     </div>

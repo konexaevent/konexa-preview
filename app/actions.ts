@@ -180,6 +180,7 @@ export async function joinActivityAction(formData: FormData) {
 export async function requestActivityJoinAction(formData: FormData) {
   const activityId = String(formData.get("activity_id") || "");
   const redirectTo = String(formData.get("redirect_to") || `/activities/${activityId}/join`);
+  const accountStatus = String(formData.get("account_status") || "new");
   const firstName = String(formData.get("first_name") || "").trim();
   const lastName = String(formData.get("last_name") || "").trim();
   const email = String(formData.get("email") || "").trim().toLowerCase();
@@ -232,6 +233,7 @@ export async function requestActivityJoinAction(formData: FormData) {
   const db = supabase as any;
 
   let targetUserId = user?.id || null;
+  let requestPhoneNumber = phoneNumber;
   const admin = createSupabaseAdminClient();
 
   if (user) {
@@ -264,16 +266,7 @@ export async function requestActivityJoinAction(formData: FormData) {
       }
     }
   } else {
-    if (
-      !firstName ||
-      !lastName ||
-      !email ||
-      !password ||
-      !birthDate ||
-      !phoneNumber ||
-      !motivation ||
-      !whatsappConsent
-    ) {
+    if (!email || !password || !motivation || !whatsappConsent) {
       redirect(errorRedirect);
     }
 
@@ -285,30 +278,38 @@ export async function requestActivityJoinAction(formData: FormData) {
       redirect(successRedirect);
     }
 
-    const existingUsers = await admin.auth.admin.listUsers();
-    let existingUser = existingUsers.data.users.find(
-      (candidate) => candidate.email?.toLowerCase() === email
-    );
+    const isExistingAccount = accountStatus === "existing";
 
-    if (!existingUser) {
-      const created = await admin.auth.admin.createUser({
-        email,
-        password,
-        email_confirm: true,
-        user_metadata: {
-          full_name: `${firstName} ${lastName}`.trim(),
-          first_name: firstName,
-          last_name: lastName,
-          birth_date: birthDate,
-          phone_number: phoneNumber
+    if (!isExistingAccount && (!firstName || !lastName || !birthDate || !phoneNumber)) {
+      redirect(errorRedirect);
+    }
+
+    if (!isExistingAccount) {
+      const existingUsers = await admin.auth.admin.listUsers();
+      let existingUser = existingUsers.data.users.find(
+        (candidate) => candidate.email?.toLowerCase() === email
+      );
+
+      if (!existingUser) {
+        const created = await admin.auth.admin.createUser({
+          email,
+          password,
+          email_confirm: true,
+          user_metadata: {
+            full_name: `${firstName} ${lastName}`.trim(),
+            first_name: firstName,
+            last_name: lastName,
+            birth_date: birthDate,
+            phone_number: phoneNumber
+          }
+        });
+
+        if (created.error || !created.data.user) {
+          redirect(errorRedirect);
         }
-      });
 
-      if (created.error || !created.data.user) {
-        redirect(errorRedirect);
+        existingUser = created.data.user;
       }
-
-      existingUser = created.data.user;
     }
 
     const signInResult = await supabase.auth.signInWithPassword({ email, password });
@@ -318,30 +319,41 @@ export async function requestActivityJoinAction(formData: FormData) {
 
     targetUserId = signInResult.data.user.id;
 
-    const adminProfileUpsert = await (admin as any).from("profiles").upsert({
-      id: targetUserId,
-      first_name: firstName || null,
-      last_name: lastName || null,
-      full_name: `${firstName} ${lastName}`.trim(),
-      birth_date: birthDate || null,
-      phone_number: phoneNumber || null
-    });
+    if (isExistingAccount) {
+      const existingProfileResult = await db
+        .from("profiles")
+        .select("phone_number")
+        .eq("id", targetUserId)
+        .maybeSingle();
 
-    if (adminProfileUpsert?.error) {
-      const errorMessage = String(adminProfileUpsert.error.message || "");
-      if (errorMessage.includes("phone_number")) {
-        await (admin as any).from("profiles").upsert({
-          id: targetUserId,
-          first_name: firstName || null,
-          last_name: lastName || null,
-          full_name: `${firstName} ${lastName}`.trim(),
-          birth_date: birthDate || null
-        });
-      } else {
-        redirect(errorRedirect);
+      if (existingProfileResult.data?.phone_number) {
+        requestPhoneNumber = existingProfileResult.data.phone_number;
+      }
+    } else {
+      const adminProfileUpsert = await (admin as any).from("profiles").upsert({
+        id: targetUserId,
+        first_name: firstName || null,
+        last_name: lastName || null,
+        full_name: `${firstName} ${lastName}`.trim(),
+        birth_date: birthDate || null,
+        phone_number: phoneNumber || null
+      });
+
+      if (adminProfileUpsert?.error) {
+        const errorMessage = String(adminProfileUpsert.error.message || "");
+        if (errorMessage.includes("phone_number")) {
+          await (admin as any).from("profiles").upsert({
+            id: targetUserId,
+            first_name: firstName || null,
+            last_name: lastName || null,
+            full_name: `${firstName} ${lastName}`.trim(),
+            birth_date: birthDate || null
+          });
+        } else {
+          redirect(errorRedirect);
+        }
       }
     }
-
   }
 
   if (!targetUserId) {
@@ -370,7 +382,7 @@ export async function requestActivityJoinAction(formData: FormData) {
       user_id: targetUserId,
       status: "pending",
       request_message: motivation || null,
-      phone_number: phoneNumber || null,
+      phone_number: requestPhoneNumber || null,
       whatsapp_opt_in: whatsappConsent
     });
 
@@ -390,12 +402,12 @@ export async function requestActivityJoinAction(formData: FormData) {
   } else {
     const updateResult = await requestDb
       .from("activity_participants")
-      .update({
-        status: "pending",
-        request_message: motivation || null,
-        phone_number: phoneNumber || null,
-        whatsapp_opt_in: whatsappConsent
-      })
+        .update({
+          status: "pending",
+          request_message: motivation || null,
+          phone_number: requestPhoneNumber || null,
+          whatsapp_opt_in: whatsappConsent
+        })
       .eq("activity_id", activityId)
       .eq("user_id", targetUserId);
 
@@ -867,10 +879,33 @@ export async function saveHostsContentAction(formData: FormData) {
   }
 
   const db = supabase as any;
-  await db.from("homepage_content").upsert({
+  const { data: existingRow, error: existingError } = await db
+    .from("homepage_content")
+    .select("id")
+    .eq("id", "home")
+    .maybeSingle();
+
+  if (existingError) {
+    redirect("/admin?hosts_error=1");
+  }
+
+  const payload = {
     id: "home",
-    hosts
-  });
+    hosts,
+    updated_at: new Date().toISOString()
+  };
+
+  const saveResult = existingRow
+    ? await db.from("homepage_content").update(payload).eq("id", "home")
+    : await db.from("homepage_content").insert({
+        ...payload,
+        hero_carousel_images: [],
+        memories_items: []
+      });
+
+  if (saveResult?.error) {
+    redirect("/admin?hosts_error=1");
+  }
 
   revalidatePath("/");
   revalidatePath("/admin");

@@ -17,7 +17,6 @@ type HomeActivityFeedProps = {
     pending: string;
     joinActivity: string;
     smallHostedGroup: string;
-    priceLabel: string;
   };
   homeUi: {
     ageEyebrow: string;
@@ -155,9 +154,6 @@ export function HomeActivityFeed({
               <h3>{activity.title}</h3>
               <p className="card-date">{formatLocalDate(activity.startsAt)}</p>
               <p className="card-copy">{activity.summary}</p>
-              <p className="card-price">
-                {messages.priceLabel}: {activity.price}
-              </p>
               <div className="known-row">
                 <span className="known-badge">
                   {activity.familiarityLabel || messages.smallHostedGroup}

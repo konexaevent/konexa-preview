@@ -666,11 +666,25 @@ export function getDemoAdminDashboard(userId = "user-alex") {
         const activityBookings = bookings.filter(
           (booking) => booking.activityId === activity.id && booking.status !== "cancelled"
         );
+        const attendees = activityBookings.map((booking) => {
+          const attendee = getDemoProfile(booking.userId);
+          return {
+            id: attendee.id,
+            name: attendee.name,
+            email: attendee.email,
+            phoneNumber: booking.phoneNumber || attendee.phoneNumber || "",
+            avatarUrl: attendee.avatarUrl,
+            status: booking.status,
+            whatsappOptIn: Boolean(booking.whatsappOptIn),
+            requestMessage: booking.requestMessage || ""
+          };
+        });
         return {
           ...withDynamicParticipantCount(activity),
           pendingCount: activityBookings.filter((booking) => booking.status === "pending").length,
           confirmedCount: activityBookings.filter((booking) => booking.status === "confirmed").length,
-          hostName: activity.hostUserId ? getDemoProfile(activity.hostUserId).name : "Sense host"
+          hostName: activity.hostUserId ? getDemoProfile(activity.hostUserId).name : "Sense host",
+          attendees
         };
       })
       .sort((left, right) => left.startsAt.localeCompare(right.startsAt)),

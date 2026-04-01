@@ -436,6 +436,26 @@ button {
   transition: padding 180ms ease, transform 180ms ease, opacity 180ms ease;
 }
 
+.user-chip-profile {
+  display: grid;
+  gap: 0.08rem;
+  justify-items: start;
+  min-width: 10.5rem;
+  line-height: 1.1;
+}
+
+.user-chip-title {
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.user-chip-subtitle {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: rgba(25, 22, 63, 0.7);
+}
+
 .nav-plain-button {
   padding: 0.68rem 0.92rem;
   border-radius: 999px;
@@ -474,7 +494,7 @@ button {
 
 .page-stack {
   display: grid;
-  gap: 1.95rem;
+  gap: 2.35rem;
   padding-top: 1.2rem;
 }
 
@@ -587,6 +607,8 @@ button {
 .activity-section,
 .memory-section {
   position: relative;
+  display: grid;
+  gap: 1.45rem;
   padding: 1.2rem;
   border-radius: var(--radius-lg);
   border: 1px solid var(--line);
@@ -594,6 +616,13 @@ button {
     linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(246, 245, 255, 0.92)),
     radial-gradient(circle at top right, rgba(103, 84, 255, 0.09), transparent 34%);
   box-shadow: var(--shadow);
+}
+
+.trust-panel,
+.hosts-panel,
+.steps-panel {
+  display: grid;
+  gap: 1.35rem;
 }
 
 .activity-section::before,
@@ -1086,8 +1115,8 @@ small {
 .trust-panel > .section-header,
 .trust-panel > div:first-child {
   position: relative;
-  padding-bottom: 0.95rem;
-  margin-bottom: 0.2rem;
+  padding-bottom: 1.1rem;
+  margin-bottom: 0.45rem;
   border-bottom: 1px solid rgba(62, 56, 133, 0.08);
 }
 
@@ -1101,6 +1130,10 @@ small {
 .connection-grid,
 .participant-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.activity-section .activity-grid {
+  margin-top: 0.95rem;
 }
 
 .memory-section {
@@ -1118,6 +1151,7 @@ small {
     linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(246, 245, 255, 0.88)),
     radial-gradient(circle at top right, rgba(93, 185, 255, 0.08), transparent 42%);
   box-shadow: 0 12px 34px rgba(57, 45, 143, 0.08);
+  margin-bottom: 0.5rem;
 }
 
 .age-filter-row {
@@ -1575,6 +1609,70 @@ textarea {
   margin-top: 0.8rem;
 }
 
+.join-request-account-switch {
+  display: grid;
+  gap: 0.8rem;
+  margin-bottom: 0.85rem;
+}
+
+.join-request-switch-label {
+  margin: 0;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: rgba(25, 22, 63, 0.72);
+}
+
+.join-request-switch-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.join-request-switch-option {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3.4rem;
+  padding: 0.9rem 1rem;
+  border-radius: 20px;
+  border: 1px solid rgba(62, 56, 133, 0.1);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(246, 243, 255, 0.9)),
+    radial-gradient(circle at top right, rgba(103, 84, 255, 0.08), transparent 40%);
+  color: var(--primary-deep);
+  font-weight: 700;
+  text-align: center;
+  cursor: pointer;
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    border-color 180ms ease;
+}
+
+.join-request-switch-option input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.join-request-switch-option.is-active {
+  border-color: rgba(103, 84, 255, 0.3);
+  box-shadow: 0 18px 36px rgba(57, 45, 143, 0.12);
+  transform: translateY(-1px);
+}
+
+.join-request-existing-hint {
+  margin: 0 0 0.85rem;
+  padding: 0.95rem 1rem;
+  border-radius: 18px;
+  border: 1px solid rgba(62, 56, 133, 0.08);
+  background: rgba(255, 255, 255, 0.72);
+  color: rgba(25, 22, 63, 0.72);
+  line-height: 1.6;
+}
+
 .checkbox-field {
   display: flex;
   align-items: flex-start;
@@ -2001,6 +2099,123 @@ textarea {
   margin-top: 0.4rem;
 }
 
+.admin-activity-roster-wrap {
+  grid-column: 1 / -1;
+  margin-top: 0.35rem;
+}
+
+.admin-roster {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 22px;
+  border: 1px solid rgba(62, 56, 133, 0.1);
+  background:
+    linear-gradient(180deg, rgba(247, 245, 255, 0.85), rgba(255, 255, 255, 0.96));
+}
+
+.admin-roster-head {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 0.85rem;
+}
+
+.admin-roster-head h4 {
+  margin: 0.1rem 0 0;
+  font-size: 1.1rem;
+}
+
+.admin-roster-list {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.admin-roster-card {
+  display: grid;
+  gap: 0.8rem;
+  padding: 0.95rem 1rem;
+  border-radius: 18px;
+  border: 1px solid rgba(62, 56, 133, 0.08);
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.admin-roster-main {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.admin-roster-main .avatar {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid rgba(62, 56, 133, 0.1);
+}
+
+.admin-roster-copy {
+  display: grid;
+  gap: 0.18rem;
+  min-width: 0;
+}
+
+.admin-roster-copy strong {
+  font-size: 1rem;
+}
+
+.admin-roster-copy span {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  padding: 0.28rem 0.62rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--primary-deep);
+  background: rgba(103, 84, 255, 0.12);
+}
+
+.admin-roster-meta {
+  display: grid;
+  gap: 0.34rem;
+}
+
+.admin-roster-meta p {
+  margin: 0;
+  color: var(--ink-soft);
+  overflow-wrap: anywhere;
+}
+
+.admin-roster-meta strong {
+  color: var(--ink);
+}
+
+.admin-whatsapp-box {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.05rem;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 184, 120, 0.22);
+  background:
+    linear-gradient(135deg, rgba(255, 244, 232, 0.98), rgba(245, 247, 255, 0.96));
+}
+
+.admin-whatsapp-box p {
+  margin: 0.12rem 0 0;
+  color: var(--ink-soft);
+}
+
+.admin-whatsapp-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
 .admin-approval-card {
   align-items: start;
 }
@@ -2359,6 +2574,10 @@ textarea {
     grid-template-columns: 1fr;
   }
 
+  .join-request-switch-options {
+    grid-template-columns: 1fr;
+  }
+
   .host-card-top,
   .detail-host-card {
     align-items: flex-start;
@@ -2370,6 +2589,15 @@ textarea {
 
   .admin-activity-card {
     grid-template-columns: 1fr;
+  }
+
+  .admin-whatsapp-box {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .admin-whatsapp-actions {
+    justify-content: flex-start;
   }
 
   .admin-user-card {
@@ -2448,12 +2676,22 @@ textarea {
     gap: 0.34rem;
   }
 
-  .nav-user-area .user-chip {
-    display: none;
-  }
-
   .nav-user-area {
     width: auto;
+  }
+
+  .nav-user-area .user-chip {
+    display: grid;
+    min-width: 0;
+    padding-inline: 0.58rem;
+  }
+
+  .user-chip-title {
+    font-size: 0.64rem;
+  }
+
+  .user-chip-subtitle {
+    font-size: 0.7rem;
   }
 
   .nav-user-area .nav-plain-button {

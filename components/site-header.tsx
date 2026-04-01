@@ -14,6 +14,7 @@ type SiteHeaderProps = {
   navHosts: string;
   navEnergy: string;
   navAdmin: string;
+  navProfile: string;
   navLogin: string;
   navLogout: string;
   showAdminLink: boolean;
@@ -27,6 +28,7 @@ export function SiteHeader({
   navHosts,
   navEnergy,
   navAdmin,
+  navProfile,
   navLogin,
   navLogout,
   showAdminLink,
@@ -129,8 +131,9 @@ export function SiteHeader({
             ) : null}
             {userDisplayName ? (
               <div className="nav-user-area">
-                <Link href="/profile" className="user-chip">
-                  {userDisplayName}
+                <Link href="/profile" className="user-chip user-chip-profile">
+                  <span className="user-chip-title">{navProfile}</span>
+                  <span className="user-chip-subtitle">{userDisplayName}</span>
                 </Link>
                 <form action={signOutAction}>
                   <button type="submit" className="nav-plain-button">
