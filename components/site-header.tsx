@@ -183,29 +183,33 @@ export function SiteHeader({
                   <Link href="/hosts" className="site-menu-link" onClick={() => setMenuOpen(false)}>
                     {navHosts}
                   </Link>
+                  {showAdminLink ? (
+                    <Link href="/admin" className="site-menu-link" onClick={() => setMenuOpen(false)}>
+                      {navAdmin}
+                    </Link>
+                  ) : null}
+                  {userDisplayName ? (
+                    <form action={signOutAction} className="site-menu-form">
+                      <button type="submit" className="site-menu-action">
+                        {navLogout}
+                      </button>
+                    </form>
+                  ) : (
+                    <Link href="/login" className="site-menu-link" onClick={() => setMenuOpen(false)}>
+                      {navLogin}
+                    </Link>
+                  )}
                 </div>
               ) : null}
             </div>
-            {showAdminLink ? (
-              <Link href="/admin" className="nav-link-muted">{navAdmin}</Link>
-            ) : null}
             {userDisplayName ? (
               <div className="nav-user-area">
                 <Link href="/profile" className="user-chip user-chip-profile">
                   <span className="user-chip-title">{navProfile}</span>
                   <span className="user-chip-subtitle">{userDisplayName}</span>
                 </Link>
-                <form action={signOutAction}>
-                  <button type="submit" className="nav-plain-button">
-                    {navLogout}
-                  </button>
-                </form>
               </div>
-            ) : (
-              <Link href="/login" className="nav-cta">
-                {navLogin}
-              </Link>
-            )}
+            ) : null}
           </nav>
         </div>
 

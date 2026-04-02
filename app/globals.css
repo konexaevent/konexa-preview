@@ -458,6 +458,23 @@ button {
   background: rgba(103, 84, 255, 0.08);
 }
 
+.site-menu-form {
+  margin: 0;
+}
+
+.site-menu-action {
+  display: block;
+  width: 100%;
+  padding: 0.82rem 0.9rem;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(255, 177, 43, 0.16), rgba(255, 93, 100, 0.08));
+  color: #9f4a1b;
+  font-weight: 700;
+  font-size: 0.96rem;
+  line-height: 1.25;
+  text-align: left;
+}
+
 .header-language-slot {
   display: inline-flex;
   align-items: center;
@@ -3171,6 +3188,11 @@ textarea {
   }
 
   .site-menu-link {
+    padding: 0.88rem 0.9rem;
+    font-size: 0.94rem;
+  }
+
+  .site-menu-action {
     padding: 0.88rem 0.9rem;
     font-size: 0.94rem;
   }
