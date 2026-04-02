@@ -745,6 +745,14 @@ button {
   color: rgba(25, 22, 63, 0.74);
 }
 
+.hero-support {
+  max-width: 34rem;
+  margin: 0.15rem 0 0;
+  font-size: clamp(0.98rem, 1.2vw, 1.08rem);
+  line-height: 1.7;
+  color: rgba(25, 22, 63, 0.84);
+}
+
 .hero-carousel {
   position: absolute;
   inset: 0;

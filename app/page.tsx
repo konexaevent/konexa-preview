@@ -21,12 +21,16 @@ export default async function HomePage({ searchParams }: HomePageProps) {
     typeof resolvedSearchParams.age === "string" ? resolvedSearchParams.age : "all";
   const homeUi = {
     ca: {
-      heroStats: ["Reserva en menys d'1 minut", "Ambients cuidats i naturals"],
-      trustStrip: ["Gent nova i repetidora", "Grups petits amb host", "Experiencies pensades per connectar"],
+      heroSupport: "Els plans que recordes comencen així. Quan ningú pot, Konexa sí.",
+      activityLead:
+        "Activitats cuidades, grups reduits i prou context per decidir rapid si aquest pla encaixa amb tu.",
       energy: ["Ambient tranquil", "Ambient social", "Ambient actiu"],
       instantJoin: "Reserva immediata",
       hostApproval: "Amb aprovacio",
       spotsLeft: "places lliures",
+      availableNow: "obertes ara",
+      hostedByAge: "franges actives",
+      approvalCount: "amb validacio previa",
       ageEyebrow: "Rang d'edat",
       ageTitle: "Troba plans pensats per al teu moment vital",
       ageAll: "Totes les edats",
@@ -39,12 +43,16 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       plansAnchorHint: "Plans seleccionats per aquesta setmana"
     },
     es: {
-      heroStats: ["Reserva en menos de 1 minuto", "Ambientes cuidados y naturales"],
-      trustStrip: ["Gente nueva y repetidora", "Grupos pequenos con host", "Experiencias pensadas para conectar"],
+      heroSupport: "Los planes que recuerdas empiezan así. Cuando nadie puede, Konexa sí.",
+      activityLead:
+        "Actividades cuidadas, grupos reducidos y suficiente contexto para decidir rapido si este plan encaja contigo.",
       energy: ["Ambiente tranquilo", "Ambiente social", "Ambiente activo"],
       instantJoin: "Reserva inmediata",
       hostApproval: "Con aprobacion",
       spotsLeft: "plazas libres",
+      availableNow: "abiertas ahora",
+      hostedByAge: "franjas activas",
+      approvalCount: "con validacion previa",
       ageEyebrow: "Rango de edad",
       ageTitle: "Encuentra planes pensados para tu momento vital",
       ageAll: "Todas las edades",
@@ -57,12 +65,16 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       plansAnchorHint: "Planes seleccionados para esta semana"
     },
     en: {
-      heroStats: ["Reserve in under 1 minute", "Curated, natural atmospheres"],
-      trustStrip: ["New and returning people", "Small hosted groups", "Experiences designed to connect"],
+      heroSupport: "The plans you remember start like this. When no one can make it, Konexa can.",
+      activityLead:
+        "Carefully hosted activities, small groups, and enough context to quickly tell if a plan feels right for you.",
       energy: ["Calm mood", "Social mood", "Active mood"],
       instantJoin: "Instant booking",
       hostApproval: "Approval needed",
       spotsLeft: "spots left",
+      availableNow: "open now",
+      hostedByAge: "active age ranges",
+      approvalCount: "with prior approval",
       ageEyebrow: "Age range",
       ageTitle: "Find plans that fit your life stage",
       ageAll: "All ages",
@@ -80,6 +92,8 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       ? selectedAge
       : "all";
   const heroCarouselImages = homepageContent.heroCarouselImages as string[];
+  const approvalActivities = activities.filter((activity: (typeof activities)[number]) => activity.requiresApproval).length;
+  const activeAgeRanges = new Set(activities.map((activity: (typeof activities)[number]) => activity.ageRange)).size;
 
   return (
     <div className="page-stack">
@@ -95,29 +109,11 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         <div className="hero-copy">
           <h1>{messages.heroTitle}</h1>
           <p className="lede">{messages.heroText}</p>
+          <p className="hero-support">{homeUi.heroSupport}</p>
           <div className="hero-actions">
             <Link href="#plans" className="button button-primary">
               {messages.heroCtaPlans}
             </Link>
-          </div>
-          <ul className="hero-benefits">
-            <li>{messages.heroBenefit1}</li>
-            <li>{messages.heroBenefit2}</li>
-            <li>{messages.heroBenefit3}</li>
-          </ul>
-          <div className="hero-stats">
-            {homeUi.heroStats.map((stat) => (
-              <div className="hero-stat" key={stat}>
-                <strong>{stat}</strong>
-              </div>
-            ))}
-          </div>
-          <div className="hero-trust-strip" aria-label={homeUi.plansAnchorHint}>
-            {homeUi.trustStrip.map((item) => (
-              <span className="hero-trust-pill" key={item}>
-                {item}
-              </span>
-            ))}
           </div>
         </div>
       </section>
@@ -127,6 +123,21 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           <div>
             {messages.feedEyebrow ? <p className="eyebrow">{messages.feedEyebrow}</p> : null}
             <h2>{messages.feedTitle}</h2>
+            <p className="section-anchor-copy">{homeUi.activityLead}</p>
+          </div>
+          <div className="section-kpis">
+            <span className="section-kpi">
+              <strong>{activities.length}</strong>
+              <small>{homeUi.availableNow}</small>
+            </span>
+            <span className="section-kpi">
+              <strong>{activeAgeRanges}</strong>
+              <small>{homeUi.hostedByAge}</small>
+            </span>
+            <span className="section-kpi">
+              <strong>{approvalActivities}</strong>
+              <small>{homeUi.approvalCount}</small>
+            </span>
           </div>
         </div>
 
