@@ -79,7 +79,11 @@ export default async function RootLayout({
             showAdminLink={Boolean(
               dashboard && dashboard.profile.role === "admin"
             )}
-            userDisplayName={user ? user.user_metadata.full_name || user.email || null : null}
+            userDisplayName={
+              user
+                ? dashboard?.profile.name || user.email || null
+                : null
+            }
           />
 
           <main>{children}</main>

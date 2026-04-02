@@ -532,26 +532,7 @@ export async function updateProfileAction(formData: FormData) {
 
   if (email && email !== user.email) {
     await supabase.auth.updateUser({
-      email,
-      data: {
-        ...user.user_metadata,
-        full_name: fullName,
-        first_name: firstName,
-        last_name: lastName,
-        birth_date: birthDate,
-        phone_number: phoneNumber
-      }
-    });
-  } else {
-    await supabase.auth.updateUser({
-      data: {
-        ...user.user_metadata,
-        full_name: fullName,
-        first_name: firstName,
-        last_name: lastName,
-        birth_date: birthDate,
-        phone_number: phoneNumber
-      }
+      email
     });
   }
 
