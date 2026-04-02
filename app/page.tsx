@@ -122,7 +122,6 @@ export default async function HomePage({ searchParams }: HomePageProps) {
             <div>
               {messages.feedEyebrow ? <p className="eyebrow">{messages.feedEyebrow}</p> : null}
               <h2>{messages.feedTitle}</h2>
-              <p className="section-anchor-copy">{homeUi.activityLead}</p>
             </div>
           </div>
           <HomeActivityFeed
