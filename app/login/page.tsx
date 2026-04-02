@@ -116,6 +116,14 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
               <input type="email" name="email" placeholder="alex@example.com" required />
             </label>
             <label>
+              {messages.phone}
+              <input type="tel" name="phone_number" placeholder="+34 600 000 000" required />
+            </label>
+            <label>
+              {messages.birthDate}
+              <input type="date" name="birth_date" required />
+            </label>
+            <label>
               {messages.password}
               <input type="password" name="password" placeholder="At least 8 characters" required />
             </label>

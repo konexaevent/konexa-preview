@@ -40,6 +40,8 @@ export async function signUpWithPassword(formData: FormData) {
   const email = String(formData.get("email") || "");
   const password = String(formData.get("password") || "");
   const fullName = String(formData.get("full_name") || "");
+  const phoneNumber = String(formData.get("phone_number") || "").trim();
+  const birthDate = String(formData.get("birth_date") || "").trim();
   const admin = createSupabaseAdminClient();
   let error: { message: string } | null = null;
 
@@ -57,7 +59,9 @@ export async function signUpWithPassword(formData: FormData) {
         password,
         email_confirm: true,
         user_metadata: {
-          full_name: fullName
+          full_name: fullName,
+          birth_date: birthDate,
+          phone_number: phoneNumber
         }
       });
 
@@ -67,6 +71,21 @@ export async function signUpWithPassword(formData: FormData) {
         const signInResult = await supabase.auth.signInWithPassword({ email, password });
         if (signInResult.error) {
           error = { message: signInResult.error.message };
+        } else if (signInResult.data.user) {
+          const nameParts = fullName.trim().split(/\s+/).filter(Boolean);
+          const firstName = nameParts[0] || null;
+          const lastName = nameParts.slice(1).join(" ") || null;
+          await (admin as any).from("profiles").upsert(
+            {
+              id: signInResult.data.user.id,
+              first_name: firstName,
+              last_name: lastName,
+              full_name: fullName.trim() || email,
+              birth_date: birthDate || null,
+              phone_number: phoneNumber || null
+            },
+            { onConflict: "id" }
+          );
         }
       }
     }
@@ -76,7 +95,11 @@ export async function signUpWithPassword(formData: FormData) {
       email,
       password,
       options: {
-        data: { full_name: fullName },
+        data: {
+          full_name: fullName,
+          birth_date: birthDate,
+          phone_number: phoneNumber
+        },
         emailRedirectTo: `${origin}/auth/callback`
       }
     });
