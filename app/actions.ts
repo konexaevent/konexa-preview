@@ -482,13 +482,20 @@ export async function updateProfileAction(formData: FormData) {
 
     const existingProfileResult = await db
       .from("profiles")
-      .select("avatar_url")
+      .select("first_name,last_name,full_name,birth_date,phone_number,avatar_url")
       .eq("id", user.id)
       .maybeSingle();
 
-    const fullName = [firstName, lastName].filter(Boolean).join(" ").trim() || user.email || "User";
+    const existingProfile = existingProfileResult.data;
+    const nextFirstName = firstName || existingProfile?.first_name || null;
+    const nextLastName = lastName || existingProfile?.last_name || null;
+    const fullName =
+      [nextFirstName, nextLastName].filter(Boolean).join(" ").trim() ||
+      existingProfile?.full_name ||
+      user.email ||
+      "User";
     let resolvedAvatarUrl =
-      existingProfileResult.data?.avatar_url ||
+      existingProfile?.avatar_url ||
       `https://api.dicebear.com/9.x/lorelei/svg?seed=${encodeURIComponent(fullName)}`;
 
     if (avatarFile instanceof File && avatarFile.size > 0) {
@@ -518,15 +525,15 @@ export async function updateProfileAction(formData: FormData) {
 
     const profilePayload = {
       id: user.id,
-      first_name: firstName || null,
-      last_name: lastName || null,
+      first_name: nextFirstName,
+      last_name: nextLastName,
       full_name: fullName,
-      birth_date: birthDate || null,
-      phone_number: phoneNumber || null,
+      birth_date: birthDate || existingProfile?.birth_date || null,
+      phone_number: phoneNumber || existingProfile?.phone_number || null,
       avatar_url: resolvedAvatarUrl
     };
 
-    const profileUpsert = await db.from("profiles").upsert(profilePayload);
+    const profileUpsert = await db.from("profiles").upsert(profilePayload, { onConflict: "id" });
     const admin = createSupabaseAdminClient();
 
     if (profileUpsert?.error) {
@@ -534,17 +541,19 @@ export async function updateProfileAction(formData: FormData) {
       if (errorMessage.includes("phone_number")) {
         const fallbackPayload = {
           id: user.id,
-          first_name: firstName || null,
-          last_name: lastName || null,
+          first_name: nextFirstName,
+          last_name: nextLastName,
           full_name: fullName,
-          birth_date: birthDate || null,
+          birth_date: birthDate || existingProfile?.birth_date || null,
           avatar_url: resolvedAvatarUrl
         };
-        const fallbackUpsert = await db.from("profiles").upsert(fallbackPayload);
+        const fallbackUpsert = await db.from("profiles").upsert(fallbackPayload, { onConflict: "id" });
 
         if (fallbackUpsert?.error) {
           if (admin) {
-            const adminFallbackUpsert = await (admin as any).from("profiles").upsert(fallbackPayload);
+            const adminFallbackUpsert = await (admin as any)
+              .from("profiles")
+              .upsert(fallbackPayload, { onConflict: "id" });
             if (adminFallbackUpsert?.error) {
               console.error("Profile fallback upsert failed", adminFallbackUpsert.error);
               redirect(addRedirectFlag("error=profile"));
@@ -556,7 +565,9 @@ export async function updateProfileAction(formData: FormData) {
         }
       } else {
         if (admin) {
-          const adminUpsert = await (admin as any).from("profiles").upsert(profilePayload);
+          const adminUpsert = await (admin as any)
+            .from("profiles")
+            .upsert(profilePayload, { onConflict: "id" });
           if (adminUpsert?.error) {
             console.error("Profile upsert failed", adminUpsert.error);
             redirect(addRedirectFlag("error=profile"));
