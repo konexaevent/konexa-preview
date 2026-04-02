@@ -43,6 +43,12 @@ export default async function ActivityDetailPage({ params, searchParams }: Activ
       trustTitle: "Per que aquest pla se sent facil d'entrar",
       trustText:
         "Tot esta pensat perquè la gent arribi amb referencies clares, un grup reduit i una sensacio de context abans de venir.",
+      rhythmTitle: "Lectura rapida del pla",
+      rhythmCards: [
+        { label: "Format", value: "Grup reduit", note: "Pensat per entrar-hi amb facilitat" },
+        { label: "Host", value: "Acompanyament real", note: "Tindrareu una figura de referencia" },
+        { label: "Ambient", value: "Converses naturals", note: "L'activitat ajuda a que el contacte flueixi" }
+      ],
       guidanceTitle: "Abans de venir",
       guidance: [
         {
@@ -76,6 +82,12 @@ export default async function ActivityDetailPage({ params, searchParams }: Activ
       trustTitle: "Por que este plan se siente facil de entrar",
       trustText:
         "Todo esta pensado para que la gente llegue con referencias claras, un grupo reducido y una sensacion de contexto antes de venir.",
+      rhythmTitle: "Lectura rapida del plan",
+      rhythmCards: [
+        { label: "Formato", value: "Grupo reducido", note: "Pensado para entrar con facilidad" },
+        { label: "Host", value: "Acompanamiento real", note: "Tendreis una figura de referencia" },
+        { label: "Ambiente", value: "Conversaciones naturales", note: "La actividad ayuda a que el contacto fluya" }
+      ],
       guidanceTitle: "Antes de venir",
       guidance: [
         {
@@ -109,6 +121,12 @@ export default async function ActivityDetailPage({ params, searchParams }: Activ
       trustTitle: "Why this plan feels easy to join",
       trustText:
         "Everything is designed so people arrive with clear references, a small group, and enough context before showing up.",
+      rhythmTitle: "Quick read of the plan",
+      rhythmCards: [
+        { label: "Format", value: "Small group", note: "Built to feel easy to step into" },
+        { label: "Host", value: "Real guidance", note: "You will have someone to anchor the group" },
+        { label: "Atmosphere", value: "Natural conversation", note: "The activity creates momentum for connection" }
+      ],
       guidanceTitle: "Before you come",
       guidance: [
         {
@@ -209,6 +227,18 @@ export default async function ActivityDetailPage({ params, searchParams }: Activ
           <div className="detail-trust-banner">
             <strong>{detailUi.trustTitle}</strong>
             <p>{detailUi.trustText}</p>
+          </div>
+          <div className="detail-rhythm-strip">
+            <strong>{detailUi.rhythmTitle}</strong>
+            <div className="detail-rhythm-grid">
+              {detailUi.rhythmCards.map((item) => (
+                <article key={item.label}>
+                  <small>{item.label}</small>
+                  <p>{item.value}</p>
+                  <span>{item.note}</span>
+                </article>
+              ))}
+            </div>
           </div>
           <div className="detail-cta-row">
             {cancelled ? (

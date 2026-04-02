@@ -148,6 +148,12 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
       operationsTitle: "Operativa del dia",
       operationsText:
         "Des d'aqui tens una lectura rapida del que requereix atencio avui: altes noves, activitats obertes i gestio de participants."
+      ,
+      navCreate: "Crear o editar",
+      navActivities: "Activitats",
+      navUsers: "Usuaris",
+      navContent: "Contingut",
+      navPending: "Pendents"
     },
     es: {
       eyebrow: "Administracion Konexa",
@@ -227,6 +233,12 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
       operationsTitle: "Operativa del dia",
       operationsText:
         "Desde aqui tienes una lectura rapida de lo que requiere atencion hoy: altas nuevas, actividades abiertas y gestion de participantes."
+      ,
+      navCreate: "Crear o editar",
+      navActivities: "Actividades",
+      navUsers: "Usuarios",
+      navContent: "Contenido",
+      navPending: "Pendientes"
     },
     en: {
       eyebrow: "Konexa admin",
@@ -306,6 +318,12 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
       operationsTitle: "Day-to-day operations",
       operationsText:
         "This gives you a quick read on what needs attention today: new users, open activities, and participant coordination."
+      ,
+      navCreate: "Create or edit",
+      navActivities: "Activities",
+      navUsers: "Users",
+      navContent: "Content",
+      navPending: "Pending"
     }
   }[locale];
 
@@ -366,7 +384,17 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
         </div>
       </section>
 
-      <section className="dashboard-grid admin-grid">
+      <section className="dashboard-panel admin-jump-panel">
+        <div className="admin-jump-nav" aria-label="Admin sections">
+          <a href="#admin-create" className="admin-jump-link">{copy.navCreate}</a>
+          <a href="#admin-activities" className="admin-jump-link">{copy.navActivities}</a>
+          <a href="#admin-users" className="admin-jump-link">{copy.navUsers}</a>
+          <a href="#admin-content" className="admin-jump-link">{copy.navContent}</a>
+          <a href="#admin-pending" className="admin-jump-link">{copy.navPending}</a>
+        </div>
+      </section>
+
+      <section className="dashboard-grid admin-grid" id="admin-create">
         <article className="dashboard-panel admin-form-panel">
           <div className="panel-head">
             <div>
@@ -412,7 +440,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
           />
         </article>
 
-        <article className="dashboard-panel">
+        <article className="dashboard-panel" id="admin-activities">
           <div className="panel-head">
             <div>
               <p className="eyebrow">{copy.activityList}</p>
@@ -494,7 +522,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
         </article>
       </section>
 
-      <section className="dashboard-panel">
+      <section className="dashboard-panel" id="admin-users">
         <div className="panel-head">
           <div>
             <p className="eyebrow">{copy.usersTitle}</p>
@@ -533,7 +561,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
         </div>
       </section>
 
-      <section className="dashboard-grid admin-grid">
+      <section className="dashboard-grid admin-grid" id="admin-content">
         <article className="dashboard-panel">
           <div className="panel-head">
             <div>
@@ -627,7 +655,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
         </article>
       </section>
 
-      <section className="dashboard-panel">
+      <section className="dashboard-panel" id="admin-pending">
         <div className="panel-head">
           <div>
             <p className="eyebrow">{copy.hostsContentTitle}</p>

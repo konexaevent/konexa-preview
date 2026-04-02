@@ -563,7 +563,8 @@ button {
 .subpage-intro {
   display: grid;
   gap: 0.7rem;
-  padding: 0.2rem 0 0.2rem;
+  padding: 1.1rem 0 0.35rem;
+  margin-top: 0.85rem;
 }
 
 .subpage-intro h1,
@@ -825,8 +826,33 @@ button {
   text-transform: uppercase;
   letter-spacing: 0.16em;
   font-size: 0.73rem;
+  line-height: 1.45;
   color: var(--primary-deep);
   font-weight: 800;
+}
+
+.subpage-intro .eyebrow {
+  margin-bottom: 0.55rem;
+  padding-top: 0.18rem;
+}
+
+.activity-section-shell {
+  display: grid;
+  gap: 1.35rem;
+  padding: 1.1rem;
+  border-radius: 30px;
+  border: 1px solid rgba(62, 56, 133, 0.08);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.97), rgba(247, 244, 255, 0.94)),
+    radial-gradient(circle at top left, rgba(103, 84, 255, 0.08), transparent 44%);
+  box-shadow:
+    0 18px 42px rgba(57, 45, 143, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.section-header-stage {
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid rgba(62, 56, 133, 0.08);
 }
 
 h1,
@@ -1372,6 +1398,17 @@ small {
   border-color: rgba(103, 84, 255, 0.15);
 }
 
+.activity-card::after {
+  content: "";
+  position: absolute;
+  left: 18px;
+  right: 18px;
+  bottom: 18px;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(62, 56, 133, 0), rgba(62, 56, 133, 0.12), rgba(62, 56, 133, 0));
+  pointer-events: none;
+}
+
 .activity-cover {
   position: relative;
   min-height: 220px;
@@ -1390,6 +1427,12 @@ small {
 .activity-content {
   display: grid;
   gap: 0.78rem;
+}
+
+.activity-card-head,
+.activity-card-body {
+  display: grid;
+  gap: 0.72rem;
 }
 
 .activity-card-accent {
@@ -1437,9 +1480,28 @@ small {
   opacity: 0.88;
 }
 
+.card-host-line {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: -0.08rem 0 0;
+  color: rgba(25, 22, 63, 0.72);
+  font-size: 0.9rem;
+}
+
+.card-host-line span {
+  font-weight: 700;
+  color: rgba(25, 22, 63, 0.55);
+}
+
+.card-host-line strong {
+  color: var(--primary-deep);
+}
+
 .card-copy {
   min-height: 3.5rem;
   color: rgba(25, 22, 63, 0.7);
+  line-height: 1.62;
 }
 
 .card-price {
@@ -1452,6 +1514,10 @@ small {
   margin-top: 0.2rem;
   padding-top: 0.9rem;
   border-top: 1px solid rgba(62, 56, 133, 0.08);
+}
+
+.activity-card-footer {
+  align-items: end;
 }
 
 .inline-actions {
@@ -1621,6 +1687,40 @@ small {
 .dashboard-panel {
   padding: 1.1rem;
   border-radius: var(--radius-lg);
+}
+
+.profile-compass-panel {
+  overflow: hidden;
+}
+
+.profile-compass-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.95rem;
+}
+
+.profile-compass-card {
+  display: grid;
+  gap: 0.35rem;
+  padding: 1rem 1.05rem;
+  border-radius: 22px;
+  border: 1px solid rgba(62, 56, 133, 0.08);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(247, 244, 255, 0.92)),
+    radial-gradient(circle at top right, rgba(255, 177, 43, 0.08), transparent 40%);
+  box-shadow: 0 12px 28px rgba(57, 45, 143, 0.05);
+}
+
+.profile-compass-card strong {
+  font-size: 1.05rem;
+  line-height: 1.35;
+  color: var(--primary-deep);
+}
+
+.profile-compass-card p {
+  margin: 0;
+  color: var(--ink-soft);
+  line-height: 1.55;
 }
 
 .auth-card {
@@ -2023,6 +2123,30 @@ textarea {
   overflow: hidden;
 }
 
+.admin-jump-panel {
+  overflow: hidden;
+}
+
+.admin-jump-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.admin-jump-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.6rem;
+  padding: 0 1rem;
+  border-radius: 999px;
+  border: 1px solid rgba(62, 56, 133, 0.08);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(247, 244, 255, 0.92));
+  color: var(--primary-deep);
+  font-weight: 800;
+  box-shadow: 0 10px 24px rgba(57, 45, 143, 0.05);
+}
+
 .admin-operations-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -2275,7 +2399,7 @@ textarea {
 
 .admin-activity-copy {
   display: grid;
-  gap: 0.3rem;
+  gap: 0.38rem;
 }
 
 .admin-activity-copy h3 {
@@ -2640,6 +2764,58 @@ textarea {
   line-height: 1.6;
 }
 
+.detail-rhythm-strip {
+  display: grid;
+  gap: 0.95rem;
+  margin-top: 1rem;
+  padding: 1rem 1.05rem;
+  border-radius: 24px;
+  border: 1px solid rgba(62, 56, 133, 0.08);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(247, 244, 255, 0.92)),
+    radial-gradient(circle at top left, rgba(103, 84, 255, 0.08), transparent 40%);
+  box-shadow: 0 14px 30px rgba(57, 45, 143, 0.05);
+}
+
+.detail-rhythm-strip strong {
+  display: block;
+  font-size: 1rem;
+}
+
+.detail-rhythm-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+.detail-rhythm-grid article {
+  display: grid;
+  gap: 0.28rem;
+  padding: 0.9rem;
+  border-radius: 18px;
+  border: 1px solid rgba(62, 56, 133, 0.08);
+  background: rgba(255, 255, 255, 0.82);
+}
+
+.detail-rhythm-grid small {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: rgba(25, 22, 63, 0.52);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.detail-rhythm-grid p {
+  margin: 0;
+  font-weight: 800;
+  color: var(--primary-deep);
+}
+
+.detail-rhythm-grid span {
+  color: var(--ink-soft);
+  line-height: 1.5;
+}
+
 .detail-expectation-card {
   margin-top: 1.15rem;
   padding: 1.08rem;
@@ -2756,9 +2932,11 @@ textarea {
   }
 
   .section-kpis,
+  .profile-compass-grid,
   .profile-rhythm-grid,
   .admin-operations-grid,
-  .admin-summary-grid {
+  .admin-summary-grid,
+  .detail-rhythm-grid {
     grid-template-columns: 1fr;
   }
 
@@ -2817,6 +2995,10 @@ textarea {
 
   .hero-card {
     min-height: 430px;
+    padding: 1rem;
+  }
+
+  .activity-section-shell {
     padding: 1rem;
   }
 

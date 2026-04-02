@@ -136,25 +136,35 @@ export function HomeActivityFeed({
             </div>
             <div className="activity-content">
               <div className="activity-card-accent" aria-hidden="true" />
-              <div className="meta-row">
-                <span className="pill">{activity.city}</span>
-                <span className="pill pill-soft">
-                  {activity.maxParticipants - activity.participantCount} {homeUi.spotsLeft}
-                </span>
+              <div className="activity-card-head">
+                <div className="meta-row">
+                  <span className="pill">{activity.city}</span>
+                  <span className="pill pill-soft">
+                    {activity.maxParticipants - activity.participantCount} {homeUi.spotsLeft}
+                  </span>
+                </div>
+                <div className="activity-signal-row">
+                  <span className={`signal-tag signal-tag-age ${getAgeToneClass(activity.ageRange)}`}>
+                    {homeUi.ageLabels[activity.ageRange]}
+                  </span>
+                  <span className="signal-tag">{homeUi.energy[index % homeUi.energy.length]}</span>
+                  <span className="signal-tag signal-tag-muted">
+                    {activity.requiresApproval ? homeUi.hostApproval : homeUi.instantJoin}
+                  </span>
+                </div>
               </div>
-              <div className="activity-signal-row">
-                <span className={`signal-tag signal-tag-age ${getAgeToneClass(activity.ageRange)}`}>
-                  {homeUi.ageLabels[activity.ageRange]}
-                </span>
-                <span className="signal-tag">{homeUi.energy[index % homeUi.energy.length]}</span>
-                <span className="signal-tag signal-tag-muted">
-                  {activity.requiresApproval ? homeUi.hostApproval : homeUi.instantJoin}
-                </span>
+              <div className="activity-card-body">
+                <h3>{activity.title}</h3>
+                {activity.host ? (
+                  <p className="card-host-line">
+                    <span>{messages.host}</span>
+                    <strong>{activity.host.name}</strong>
+                  </p>
+                ) : null}
+                <p className="card-date">{formatLocalDate(activity.startsAt)}</p>
+                <p className="card-copy">{activity.summary}</p>
               </div>
-              <h3>{activity.title}</h3>
-              <p className="card-date">{formatLocalDate(activity.startsAt)}</p>
-              <p className="card-copy">{activity.summary}</p>
-              <div className="known-row">
+              <div className="known-row activity-card-footer">
                 <span className="known-badge">
                   {activity.familiarityLabel || messages.smallHostedGroup}
                 </span>

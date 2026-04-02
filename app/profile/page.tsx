@@ -56,6 +56,9 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
         "Una mirada rapida al que tens en marxa ara mateix, al que ja has viscut i a la xarxa de familiaritat que vas construint.",
       confirmedShort: "confirmades",
       historyShort: "ja viscudes",
+      profileCompassTitle: "On ets ara dins de Konexa",
+      profileCompassText:
+        "Un resum clar del teu moment actual: el que tens en marxa, el que esta pendent de confirmar i la familiaritat que ja has construit.",
       avatarError: "No hem pogut desar la foto de perfil. Torna-ho a provar amb una altra imatge.",
       profileError: "No hem pogut desar els canvis del perfil. Torna-ho a provar en un moment.",
       emailError: "Hem desat el perfil, pero no hem pogut actualitzar el correu del compte.",
@@ -74,6 +77,9 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
         "Una mirada rapida a lo que tienes en marcha ahora mismo, lo que ya has vivido y la red de familiaridad que vas creando.",
       confirmedShort: "confirmadas",
       historyShort: "ya vividas",
+      profileCompassTitle: "Donde estas ahora dentro de Konexa",
+      profileCompassText:
+        "Un resumen claro de tu momento actual: lo que tienes en marcha, lo que sigue pendiente y la familiaridad que ya has construido.",
       avatarError: "No hemos podido guardar la foto de perfil. Prueba otra vez con otra imagen.",
       profileError: "No hemos podido guardar los cambios del perfil. Vuelve a intentarlo en un momento.",
       emailError: "Hemos guardado el perfil, pero no hemos podido actualizar el correo de la cuenta.",
@@ -92,6 +98,9 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
         "A quick view of what is happening now, what you have already lived, and the familiarity you are building over time.",
       confirmedShort: "confirmed",
       historyShort: "already lived",
+      profileCompassTitle: "Where you are right now in Konexa",
+      profileCompassText:
+        "A clear snapshot of where things stand: what is moving, what is still pending, and the familiarity you have already built.",
       avatarError: "We could not save your profile photo. Please try again with a different image.",
       profileError: "We could not save your profile changes. Please try again in a moment.",
       emailError: "Your profile was saved, but we could not update your account email.",
@@ -144,6 +153,37 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
             <p>{dashboard.pendingActivities.length} {messages.pendingActivities.toLowerCase()}</p>
             <small>{profileUi.memberSince}: {profileUi.sinceText}</small>
           </div>
+        </div>
+      </section>
+
+      <section className="dashboard-panel profile-compass-panel">
+        <div className="panel-head">
+          <div>
+            <p className="eyebrow">{profileUi.profileCompassTitle}</p>
+            <h2>{profileUi.profileCompassTitle}</h2>
+          </div>
+          <p className="section-note">{profileUi.profileCompassText}</p>
+        </div>
+        <div className="profile-compass-grid">
+          <article className="profile-compass-card">
+            <span className="label">{profileUi.nextPlan}</span>
+            <strong>{nextActivity ? nextActivity.title : profileUi.nextPlanEmpty}</strong>
+            <p>
+              {nextActivity
+                ? formatActivityDate(nextActivity.startsAt, locale)
+                : messages.noUpcoming}
+            </p>
+          </article>
+          <article className="profile-compass-card">
+            <span className="label">{messages.pendingActivities}</span>
+            <strong>{dashboard.pendingActivities.length}</strong>
+            <p>{messages.pendingPlans}</p>
+          </article>
+          <article className="profile-compass-card">
+            <span className="label">{messages.sharedConnections}</span>
+            <strong>{dashboard.sharedConnections.length}</strong>
+            <p>{messages.sharedConnections.toLowerCase()}</p>
+          </article>
         </div>
       </section>
 

@@ -119,51 +119,52 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       </section>
 
       <section className="activity-section" id="plans">
-        <div className="section-header">
-          <div>
-            {messages.feedEyebrow ? <p className="eyebrow">{messages.feedEyebrow}</p> : null}
-            <h2>{messages.feedTitle}</h2>
-            <p className="section-anchor-copy">{homeUi.activityLead}</p>
+        <div className="activity-section-shell">
+          <div className="section-header section-header-stage">
+            <div>
+              {messages.feedEyebrow ? <p className="eyebrow">{messages.feedEyebrow}</p> : null}
+              <h2>{messages.feedTitle}</h2>
+              <p className="section-anchor-copy">{homeUi.activityLead}</p>
+            </div>
+            <div className="section-kpis">
+              <span className="section-kpi">
+                <strong>{activities.length}</strong>
+                <small>{homeUi.availableNow}</small>
+              </span>
+              <span className="section-kpi">
+                <strong>{activeAgeRanges}</strong>
+                <small>{homeUi.hostedByAge}</small>
+              </span>
+              <span className="section-kpi">
+                <strong>{approvalActivities}</strong>
+                <small>{homeUi.approvalCount}</small>
+              </span>
+            </div>
           </div>
-          <div className="section-kpis">
-            <span className="section-kpi">
-              <strong>{activities.length}</strong>
-              <small>{homeUi.availableNow}</small>
-            </span>
-            <span className="section-kpi">
-              <strong>{activeAgeRanges}</strong>
-              <small>{homeUi.hostedByAge}</small>
-            </span>
-            <span className="section-kpi">
-              <strong>{approvalActivities}</strong>
-              <small>{homeUi.approvalCount}</small>
-            </span>
-          </div>
+          <HomeActivityFeed
+            activities={activities}
+            initialSelectedAge={selectedAgeValue}
+            messages={{
+              viewActivity: messages.viewActivity,
+              host: "Host",
+              joined: messages.joined,
+              pending: messages.reservationPending,
+              joinActivity: messages.joinActivity,
+              smallHostedGroup: messages.smallHostedGroup
+            }}
+            homeUi={{
+              ageEyebrow: homeUi.ageEyebrow,
+              ageTitle: homeUi.ageTitle,
+              ageAll: homeUi.ageAll,
+              ageLabels: homeUi.ageLabels,
+              energy: homeUi.energy,
+              hostApproval: homeUi.hostApproval,
+              instantJoin: homeUi.instantJoin,
+              spotsLeft: homeUi.spotsLeft
+            }}
+            locale={locale}
+          />
         </div>
-
-        <HomeActivityFeed
-          activities={activities}
-          initialSelectedAge={selectedAgeValue}
-          messages={{
-            viewActivity: messages.viewActivity,
-            host: "Host",
-            joined: messages.joined,
-            pending: messages.reservationPending,
-            joinActivity: messages.joinActivity,
-            smallHostedGroup: messages.smallHostedGroup
-          }}
-          homeUi={{
-            ageEyebrow: homeUi.ageEyebrow,
-            ageTitle: homeUi.ageTitle,
-            ageAll: homeUi.ageAll,
-            ageLabels: homeUi.ageLabels,
-            energy: homeUi.energy,
-            hostApproval: homeUi.hostApproval,
-            instantJoin: homeUi.instantJoin,
-            spotsLeft: homeUi.spotsLeft
-          }}
-          locale={locale}
-        />
       </section>
     </div>
   );
