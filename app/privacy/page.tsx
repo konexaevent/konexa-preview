@@ -6,93 +6,175 @@ export default async function PrivacyPage() {
   const copy = {
     ca: {
       eyebrow: "Legal",
-      title: "Politica de privacitat",
+      title: "Política de privacitat",
       intro:
-        "Aquesta politica explica com Konexa tracta les dades personals de les persones que naveguen pel lloc web, creen un compte, sol.liciten assistir a activitats o participen en experiències organitzades a traves de la plataforma.",
-      note:
-        "Abans de publicar la versio definitiva, convé afegir-hi les dades reals del responsable del tractament, un correu de contacte legal i, si escau, les dades fiscals de l'entitat o persona titular del projecte.",
+        "Aquesta política explica com Konexa tracta les dades personals de les persones que visiten el lloc web, creen un compte, editen el seu perfil, sol·liciten plaça a una activitat o interaccionen amb els serveis disponibles a la plataforma.",
+      updateLabel: "Última actualització",
+      updateValue: "3 d’abril de 2026",
       sections: [
         {
-          title: "Responsable del tractament",
-          text: "El responsable del tractament de les dades es Konexa o la persona o entitat titular del projecte. En la versio final d'aquesta politica s'hauria d'indicar el nom legal complet, l'adreca de contacte i el correu electronic habilitat per a consultes de privacitat."
+          title: "1. Responsable del tractament",
+          paragraphs: [
+            "Responsable: Konexa, projecte operat des d’Espanya.",
+            "Correu de contacte: konexaevents@gmail.com.",
+            "De conformitat amb el Reglament (UE) 2016/679 (RGPD) i la normativa espanyola aplicable, Konexa tracta les dades personals per gestionar l’accés a la plataforma, l’organització d’activitats i la relació amb les persones usuàries."
+          ]
         },
         {
-          title: "Dades que podem recollir",
-          text: "Konexa pot tractar dades identificatives i de contacte, com ara nom, cognoms, correu electronic, data de naixement, foto de perfil, dades del compte, dades relacionades amb activitats reservades o sol.licitades i, si l'usuari les facilita, informacio addicional inclosa als formularis d'inscripcio."
+          title: "2. Dades que recollim",
+          paragraphs: [
+            "Podem recollir dades identificatives i de contacte com ara nom, cognoms, correu electrònic, telèfon, data de naixement i foto de perfil.",
+            "També podem tractar dades relacionades amb el compte i l’ús del servei: idioma, sessions, reserves, sol·licituds d’assistència, estat de confirmació, activitats compartides i missatges enviats als formularis.",
+            "Quan una persona sol·licita una activitat, també es poden tractar dades necessàries per gestionar la plaça, la comunicació prèvia i, si escau, la coordinació per WhatsApp."
+          ]
         },
         {
-          title: "Finalitats del tractament",
-          text: "Aquestes dades es fan servir per gestionar el registre i l'autenticacio, permetre l'acces al perfil personal, tramitar sol.licituds d'assistencia a activitats, mostrar connexions socials derivades d'activitats compartides, moderar l'aforament, donar suport a la seguretat del servei i comunicar informacions essencials relacionades amb el compte o les activitats."
+          title: "3. Finalitats del tractament",
+          paragraphs: [
+            "Fem servir les dades per crear i administrar comptes d’usuari, permetre l’inici de sessió, mantenir el perfil i guardar preferències bàsiques com l’idioma.",
+            "També les fem servir per gestionar activitats: rebre sol·licituds, revisar aforament, confirmar o rebutjar reserves, mostrar activitat futura o passada, coordinar l’assistència i facilitar l’operativa interna de Konexa.",
+            "Això inclou respondre consultes, atendre incidències, enviar comunicacions estrictament vinculades al compte o a l’activitat reservada i, si la persona usuària ho autoritza, facilitar la coordinació mitjançant grups temporals de WhatsApp.",
+            "Konexa no utilitza actualment les dades personals per enviar comunicacions comercials o publicitàries."
+          ]
         },
         {
-          title: "Base juridica",
-          text: "La base legal per al tractament es, principalment, l'execucio de la relacio precontractual o contractual amb l'usuari quan crea un compte o sol.licita participar en una activitat. En determinats casos, tambe es pot tractar informacio per interes legitim relacionat amb la seguretat, la prevencio d'abusos, la gestio interna del servei i la proteccio de la comunitat."
+          title: "4. Base jurídica",
+          paragraphs: [
+            "La base principal del tractament és l’execució de la relació precontractual o contractual quan una persona crea un compte, inicia sessió, edita el seu perfil o demana participar en una activitat.",
+            "Determinats tractaments es basen en l’interès legítim de Konexa per garantir la seguretat del servei, moderar l’accés a activitats, gestionar incidències i protegir la comunitat.",
+            "Quan calgui consentiment, com en la coordinació per canals concrets o en eventuals cookies no essencials, aquest consentiment es pot retirar en qualsevol moment sense afectar la licitud del tractament anterior."
+          ]
         },
         {
-          title: "Conservacio de les dades",
-          text: "Les dades personals es conserven mentre siguin necessaries per prestar el servei, gestionar el compte de l'usuari i mantenir la traçabilitat basica de les activitats i sol.licituds. Posteriorment es poden conservar bloquejades durant els terminis exigits per obligacions legals o per atendre possibles responsabilitats."
+          title: "5. Conservació de les dades",
+          paragraphs: [
+            "Les dades es conserven mentre el compte estigui actiu o mentre siguin necessàries per prestar el servei i gestionar activitats o incidències associades.",
+            "Posteriorment es poden conservar bloquejades durant el temps necessari per complir obligacions legals, resoldre reclamacions o defensar possibles responsabilitats derivades de la relació amb la persona usuària."
+          ]
         },
         {
-          title: "Destinataris i proveidors",
-          text: "Konexa no ven dades personals a tercers. Les dades nomes es poden comunicar a proveidors tecnics necessaris per al funcionament del servei, com plataformes d'allotjament, autenticacio, base de dades, correu transactional o eines estrictament necessaries per operar el lloc web, sempre sota les garanties adequades."
+          title: "6. Destinataris i encarregats de tractament",
+          paragraphs: [
+            "Konexa no ven dades personals a tercers.",
+            "Per prestar el servei utilitza proveïdors tecnològics que poden accedir a dades en qualitat d’encarregats del tractament, com ara serveis d’allotjament, base de dades, autenticació, emmagatzematge d’imatges, enviament de correus i desplegament web.",
+            "Actualment la plataforma pot recolzar-se en serveis com Supabase, Vercel, Google i WhatsApp, exclusivament per a la gestió tècnica de la plataforma, les comunicacions necessàries i la coordinació de determinades activitats quan correspongui."
+          ]
         },
         {
-          title: "Drets de les persones usuaries",
-          text: "Les persones usuaries poden sol.licitar l'acces, la rectificacio, la supressio, l'oposicio, la limitacio del tractament i, quan sigui aplicable, la portabilitat de les dades. Tambe poden retirar el consentiment quan el tractament es basi en aquest. Per exercir aquests drets, caldra habilitar un correu de contacte legal a la versio definitiva."
+          title: "7. Drets de les persones usuàries",
+          paragraphs: [
+            "Pots sol·licitar l’accés, la rectificació, la supressió, la limitació del tractament, l’oposició i, quan sigui aplicable, la portabilitat de les teves dades.",
+            "També pots retirar el consentiment per als tractaments basats en consentiment sense que això afecti la licitud del tractament anterior.",
+            "Per exercir aquests drets pots escriure a konexaevents@gmail.com.",
+            "Si consideres que els teus drets no han estat atesos adequadament, pots presentar una reclamació davant l’Agència Espanyola de Protecció de Dades (AEPD)."
+          ]
         },
         {
-          title: "Seguretat i confidencialitat",
-          text: "Konexa adopta mesures tecniques i organitzatives raonables per protegir les dades personals davant perdua, acces no autoritzat, alteracio o divulgacio indeguda. Tot i aixi, cap entorn tecnologic pot garantir una seguretat absoluta."
+          title: "8. Menors d’edat",
+          paragraphs: [
+            "Konexa està orientada exclusivament a persones majors de 18 anys o amb capacitat legal suficient per utilitzar el servei i apuntar-se a activitats.",
+            "Si detectem que s’han facilitat dades d’una persona que no compleix aquests requisits, podrem eliminar-les o limitar l’accés al servei."
+          ]
         },
         {
-          title: "Menors d'edat",
-          text: "La plataforma esta pensada per a persones majors d'edat o, en tot cas, per a persones amb capacitat legal suficient segons la normativa aplicable. Si el projecte s'adreca exclusivament a adults, aquesta limitacio s'ha d'indicar de forma expressa a la versio definitiva."
+          title: "9. Seguretat",
+          paragraphs: [
+            "Konexa adopta mesures tècniques i organitzatives raonables per protegir les dades personals davant accessos no autoritzats, pèrdues, alteracions o divulgacions indegudes.",
+            "Tot i això, cap sistema és completament invulnerable i per això es recomana fer servir contrasenyes robustes i no compartir les credencials d’accés."
+          ]
+        },
+        {
+          title: "10. Contacte",
+          paragraphs: [
+            "Si tens dubtes sobre aquesta política o sobre com es tracten les teves dades, pots escriure a konexaevents@gmail.com."
+          ]
         }
       ]
     },
     es: {
       eyebrow: "Legal",
-      title: "Politica de privacidad",
+      title: "Política de privacidad",
       intro:
-        "Esta politica explica como Konexa trata los datos personales de las personas que navegan por la web, crean una cuenta, solicitan asistir a actividades o participan en experiencias organizadas a traves de la plataforma.",
-      note:
-        "Antes de publicar la version definitiva, conviene añadir los datos reales del responsable del tratamiento, un correo legal de contacto y, en su caso, los datos fiscales de la persona o entidad titular del proyecto.",
+        "Esta política explica cómo Konexa trata los datos personales de las personas que visitan la web, crean una cuenta, editan su perfil, solicitan plaza en una actividad o interactúan con los servicios disponibles en la plataforma.",
+      updateLabel: "Última actualización",
+      updateValue: "3 de abril de 2026",
       sections: [
         {
-          title: "Responsable del tratamiento",
-          text: "El responsable del tratamiento de los datos es Konexa o la persona o entidad titular del proyecto. En la version final de esta politica deberia indicarse el nombre legal completo, la direccion de contacto y el correo electronico habilitado para consultas de privacidad."
+          title: "1. Responsable del tratamiento",
+          paragraphs: [
+            "Responsable: Konexa, proyecto operado desde España.",
+            "Correo de contacto: konexaevents@gmail.com.",
+            "De conformidad con el Reglamento (UE) 2016/679 (RGPD) y la normativa española aplicable, Konexa trata datos personales para gestionar el acceso a la plataforma, la organización de actividades y la relación con las personas usuarias."
+          ]
         },
         {
-          title: "Datos que podemos recoger",
-          text: "Konexa puede tratar datos identificativos y de contacto, como nombre, apellidos, correo electronico, fecha de nacimiento, foto de perfil, datos de cuenta, datos relacionados con actividades reservadas o solicitadas y, si la persona usuaria los facilita, informacion adicional incluida en formularios de inscripcion."
+          title: "2. Datos que recopilamos",
+          paragraphs: [
+            "Podemos recopilar datos identificativos y de contacto como nombre, apellidos, correo electrónico, teléfono, fecha de nacimiento y foto de perfil.",
+            "También podemos tratar datos relacionados con la cuenta y con el uso del servicio: idioma, sesiones, reservas, solicitudes de asistencia, estado de confirmación, actividades compartidas y mensajes enviados en formularios.",
+            "Cuando una persona solicita una actividad, también pueden tratarse datos necesarios para gestionar la plaza, la comunicación previa y, en su caso, la coordinación por WhatsApp."
+          ]
         },
         {
-          title: "Finalidades del tratamiento",
-          text: "Estos datos se usan para gestionar el registro y la autenticacion, permitir el acceso al perfil personal, tramitar solicitudes de asistencia a actividades, mostrar conexiones sociales derivadas de actividades compartidas, moderar el aforo, dar soporte a la seguridad del servicio y comunicar informacion esencial relacionada con la cuenta o las actividades."
+          title: "3. Finalidades del tratamiento",
+          paragraphs: [
+            "Usamos los datos para crear y administrar cuentas de usuario, permitir el inicio de sesión, mantener el perfil y guardar preferencias básicas como el idioma.",
+            "También los utilizamos para gestionar actividades: recibir solicitudes, revisar aforo, confirmar o rechazar reservas, mostrar actividad futura o pasada, coordinar la asistencia y facilitar la operativa interna de Konexa.",
+            "Esto incluye responder consultas, atender incidencias, enviar comunicaciones estrictamente vinculadas a la cuenta o a la actividad reservada y, si la persona usuaria lo autoriza, facilitar la coordinación mediante grupos temporales de WhatsApp.",
+            "Konexa no utiliza actualmente los datos personales para enviar comunicaciones comerciales o publicitarias."
+          ]
         },
         {
-          title: "Base juridica",
-          text: "La base legal del tratamiento es, principalmente, la ejecucion de la relacion precontractual o contractual con la persona usuaria cuando crea una cuenta o solicita participar en una actividad. En determinados casos tambien puede tratarse informacion por interes legitimo relacionado con la seguridad, la prevencion de abusos, la gestion interna del servicio y la proteccion de la comunidad."
+          title: "4. Base jurídica",
+          paragraphs: [
+            "La base principal del tratamiento es la ejecución de la relación precontractual o contractual cuando una persona crea una cuenta, inicia sesión, edita su perfil o solicita participar en una actividad.",
+            "Determinados tratamientos se basan en el interés legítimo de Konexa para garantizar la seguridad del servicio, moderar el acceso a actividades, gestionar incidencias y proteger la comunidad.",
+            "Cuando sea necesario consentimiento, como en coordinaciones por canales concretos o en eventuales cookies no esenciales, este podrá retirarse en cualquier momento sin afectar a la licitud del tratamiento previo."
+          ]
         },
         {
-          title: "Conservacion de los datos",
-          text: "Los datos personales se conservaran mientras sean necesarios para prestar el servicio, gestionar la cuenta de la persona usuaria y mantener la trazabilidad basica de actividades y solicitudes. Despues podran conservarse bloqueados durante los plazos exigidos por obligaciones legales o para atender posibles responsabilidades."
+          title: "5. Conservación de los datos",
+          paragraphs: [
+            "Los datos se conservan mientras la cuenta permanezca activa o mientras sean necesarios para prestar el servicio y gestionar actividades o incidencias asociadas.",
+            "Posteriormente pueden conservarse bloqueados durante el tiempo necesario para cumplir obligaciones legales, resolver reclamaciones o defender posibles responsabilidades derivadas de la relación con la persona usuaria."
+          ]
         },
         {
-          title: "Destinatarios y proveedores",
-          text: "Konexa no vende datos personales a terceros. La informacion solo puede comunicarse a proveedores tecnicos necesarios para el funcionamiento del servicio, como plataformas de hosting, autenticacion, base de datos, correo transaccional o herramientas estrictamente necesarias para operar la web, siempre bajo garantias adecuadas."
+          title: "6. Destinatarios y encargados del tratamiento",
+          paragraphs: [
+            "Konexa no vende datos personales a terceros.",
+            "Para prestar el servicio utiliza proveedores tecnológicos que pueden acceder a datos en calidad de encargados del tratamiento, como servicios de alojamiento, base de datos, autenticación, almacenamiento de imágenes, envío de correos y despliegue web.",
+            "Actualmente la plataforma puede apoyarse en servicios como Supabase, Vercel, Google y WhatsApp, exclusivamente para la gestión técnica de la plataforma, las comunicaciones necesarias y la coordinación de determinadas actividades cuando corresponda."
+          ]
         },
         {
-          title: "Derechos de las personas usuarias",
-          text: "Las personas usuarias pueden solicitar acceso, rectificacion, supresion, oposicion, limitacion del tratamiento y, cuando proceda, portabilidad de sus datos. Tambien pueden retirar el consentimiento cuando el tratamiento se base en el mismo. Para ejercer estos derechos, debera habilitarse un correo legal de contacto en la version definitiva."
+          title: "7. Derechos de las personas usuarias",
+          paragraphs: [
+            "Puedes solicitar acceso, rectificación, supresión, limitación del tratamiento, oposición y, cuando sea aplicable, portabilidad de tus datos.",
+            "También puedes retirar el consentimiento para los tratamientos basados en consentimiento sin que ello afecte a la licitud del tratamiento previo.",
+            "Para ejercer estos derechos puedes escribir a konexaevents@gmail.com.",
+            "Si consideras que tus derechos no han sido atendidos adecuadamente, puedes presentar una reclamación ante la Agencia Española de Protección de Datos (AEPD)."
+          ]
         },
         {
-          title: "Seguridad y confidencialidad",
-          text: "Konexa adopta medidas tecnicas y organizativas razonables para proteger los datos personales frente a perdida, acceso no autorizado, alteracion o divulgacion indebida. Aun asi, ningun entorno tecnologico puede garantizar una seguridad absoluta."
+          title: "8. Menores de edad",
+          paragraphs: [
+            "Konexa está orientada exclusivamente a personas mayores de 18 años o con capacidad legal suficiente para usar el servicio y apuntarse a actividades.",
+            "Si detectamos que se han facilitado datos de una persona que no cumple estos requisitos, podremos eliminarlos o limitar el acceso al servicio."
+          ]
         },
         {
-          title: "Menores de edad",
-          text: "La plataforma esta pensada para personas mayores de edad o, en todo caso, con capacidad legal suficiente segun la normativa aplicable. Si el proyecto se dirige exclusivamente a adultos, esta limitacion deberia indicarse expresamente en la version definitiva."
+          title: "9. Seguridad",
+          paragraphs: [
+            "Konexa adopta medidas técnicas y organizativas razonables para proteger los datos personales frente a accesos no autorizados, pérdidas, alteraciones o divulgaciones indebidas.",
+            "Aun así, ningún sistema es completamente invulnerable y por ello se recomienda utilizar contraseñas robustas y no compartir las credenciales de acceso."
+          ]
+        },
+        {
+          title: "10. Contacto",
+          paragraphs: [
+            "Si tienes dudas sobre esta política o sobre cómo se tratan tus datos, puedes escribir a konexaevents@gmail.com."
+          ]
         }
       ]
     },
@@ -100,45 +182,86 @@ export default async function PrivacyPage() {
       eyebrow: "Legal",
       title: "Privacy policy",
       intro:
-        "This policy explains how Konexa handles personal data when people browse the website, create an account, request access to activities, or participate in experiences organized through the platform.",
-      note:
-        "Before publishing the final version, it is advisable to add the real identity of the data controller, a legal contact email address, and, where applicable, the tax or company details of the project owner.",
+        "This policy explains how Konexa processes personal data when people visit the website, create an account, edit their profile, request a place in an activity, or interact with services available through the platform.",
+      updateLabel: "Last updated",
+      updateValue: "April 3, 2026",
       sections: [
         {
-          title: "Data controller",
-          text: "The data controller is Konexa or the individual or legal entity that owns the project. In the final version of this policy, the full legal name, contact address, and privacy contact email should be clearly identified."
+          title: "1. Data controller",
+          paragraphs: [
+            "Controller: Konexa, a project operated from Spain.",
+            "Contact email: konexaevents@gmail.com.",
+            "In accordance with Regulation (EU) 2016/679 (GDPR) and applicable Spanish data protection rules, Konexa processes personal data in order to manage access to the platform, organize activities, and maintain its relationship with users."
+          ]
         },
         {
-          title: "Data we may collect",
-          text: "Konexa may process identification and contact data such as first name, last name, email address, birth date, profile photo, account information, booking or attendance request data, and any additional information voluntarily provided in activity request forms."
+          title: "2. Data we collect",
+          paragraphs: [
+            "We may collect identification and contact data such as first name, last name, email address, phone number, birth date, and profile photo.",
+            "We may also process account and service-use data such as language, sessions, bookings, attendance requests, confirmation status, shared activities, and messages submitted through forms.",
+            "When someone requests access to an activity, we may also process information necessary to manage the place, prior communication, and, where applicable, WhatsApp coordination."
+          ]
         },
         {
-          title: "Purposes of processing",
-          text: "We use this information to manage registration and authentication, provide access to personal profiles, process activity attendance requests, show social familiarity signals based on shared activities, moderate capacity, maintain service security, and communicate essential information related to accounts or activities."
+          title: "3. Purposes of processing",
+          paragraphs: [
+            "We use data to create and manage user accounts, allow sign-in, maintain user profiles, and store basic preferences such as language.",
+            "We also use it to manage activities: receive requests, review capacity, confirm or reject reservations, show upcoming and past activity, coordinate attendance, and support Konexa's internal operations.",
+            "This includes answering questions, handling incidents, sending communications strictly related to the account or booked activity and, where authorized by the user, helping coordinate temporary WhatsApp groups.",
+            "Konexa does not currently use personal data to send marketing or advertising communications."
+          ]
         },
         {
-          title: "Legal basis",
-          text: "The main legal basis for processing is the performance of a pre-contractual or contractual relationship with the user when they create an account or request to join an activity. In certain cases, information may also be processed based on legitimate interest related to security, abuse prevention, internal service management, and protection of the community."
+          title: "4. Legal basis",
+          paragraphs: [
+            "The main legal basis is the performance of a pre-contractual or contractual relationship when a person creates an account, signs in, edits their profile, or requests to join an activity.",
+            "Certain processing may also rely on Konexa's legitimate interest in ensuring service security, moderating access to activities, handling incidents, and protecting the community.",
+            "Where consent is required, such as for specific communication channels or possible future non-essential cookies, that consent may be withdrawn at any time without affecting the lawfulness of prior processing."
+          ]
         },
         {
-          title: "Retention period",
-          text: "Personal data is retained for as long as necessary to provide the service, manage the user account, and keep a basic record of activities and requests. It may then be kept in a restricted form for as long as required by law or to address potential liabilities."
+          title: "5. Retention period",
+          paragraphs: [
+            "Data is kept while the account remains active or for as long as necessary to provide the service and manage related activities or incidents.",
+            "After that, it may be retained in a restricted form for as long as required to comply with legal obligations, resolve claims, or defend against potential liabilities arising from the relationship with the user."
+          ]
         },
         {
-          title: "Recipients and service providers",
-          text: "Konexa does not sell personal data to third parties. Information may only be shared with technical providers strictly necessary to operate the service, such as hosting, authentication, database, transactional email, or similar infrastructure providers, always subject to appropriate safeguards."
+          title: "6. Recipients and processors",
+          paragraphs: [
+            "Konexa does not sell personal data to third parties.",
+            "To operate the service, Konexa uses technology providers acting as processors, such as hosting, database, authentication, image storage, email, and deployment providers.",
+            "The platform currently relies on services such as Supabase, Vercel, Google, and WhatsApp exclusively for the technical operation of the platform, necessary communications, and the coordination of certain activities where applicable."
+          ]
         },
         {
-          title: "User rights",
-          text: "Users may request access, rectification, deletion, objection, restriction of processing, and, where applicable, data portability. They may also withdraw consent whenever processing is based on consent. A legal privacy contact email should be added before the final public launch."
+          title: "7. User rights",
+          paragraphs: [
+            "You may request access, rectification, deletion, restriction of processing, objection, and, where applicable, portability of your data.",
+            "You may also withdraw consent for any processing based on consent, without affecting the lawfulness of prior processing.",
+            "To exercise these rights, contact konexaevents@gmail.com.",
+            "If you believe your rights have not been properly addressed, you may lodge a complaint with the Spanish Data Protection Agency (AEPD)."
+          ]
         },
         {
-          title: "Security and confidentiality",
-          text: "Konexa applies reasonable technical and organizational measures to protect personal data against loss, unauthorized access, improper disclosure, or alteration. However, no technological environment can guarantee absolute security."
+          title: "8. Minors",
+          paragraphs: [
+            "Konexa is intended exclusively for people aged 18 or over, or at minimum for people with sufficient legal capacity to use the service and join activities.",
+            "If we detect that data has been provided by someone who does not meet these requirements, we may delete that information or restrict access to the service."
+          ]
         },
         {
-          title: "Minors",
-          text: "The platform is intended for adults or, at minimum, people with sufficient legal capacity under applicable law. If the project is strictly intended for adults, that restriction should be expressly stated in the final version."
+          title: "9. Security",
+          paragraphs: [
+            "Konexa applies reasonable technical and organizational measures to protect personal data against unauthorized access, loss, alteration, or improper disclosure.",
+            "However, no system is completely invulnerable, so users are encouraged to use strong passwords and avoid sharing login credentials."
+          ]
+        },
+        {
+          title: "10. Contact",
+          paragraphs: [
+            "If you have questions about this policy or how your data is processed, you can write to konexaevents@gmail.com."
+          ]
         }
       ]
     }
@@ -150,12 +273,16 @@ export default async function PrivacyPage() {
         <p className="eyebrow">{copy.eyebrow}</p>
         <h1>{copy.title}</h1>
         <p className="lede">{copy.intro}</p>
-        <p className="status">{copy.note}</p>
+        <p className="status">
+          {copy.updateLabel}: {copy.updateValue}
+        </p>
         <div className="legal-sections">
           {copy.sections.map((section) => (
             <article className="legal-card" key={section.title}>
               <h2>{section.title}</h2>
-              <p>{section.text}</p>
+              {section.paragraphs.map((paragraph) => (
+                <p key={paragraph}>{paragraph}</p>
+              ))}
             </article>
           ))}
         </div>
