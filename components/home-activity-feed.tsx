@@ -169,13 +169,12 @@ export function HomeActivityFeed({
                       title={activity.host.name}
                     >
                       <span className="host-chip-label">{messages.host}</span>
-                      <Image
+                      <img
                         src={activity.host.avatarUrl}
                         alt={activity.host.name}
                         width={28}
                         height={28}
                         className="host-chip-avatar"
-                        unoptimized
                       />
                     </Link>
                   ) : null}

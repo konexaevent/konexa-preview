@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { getMessages } from "@/lib/i18n";
 import { getLocale } from "@/lib/i18n-server";
 import { getHomepageContent } from "@/lib/queries";
@@ -33,13 +32,12 @@ export default async function HostsPage() {
           {page.hosts.map((host, index) => (
             <article className={`host-card ${hostToneClasses[index]}`} key={host.name}>
               <div className="host-card-top">
-                <Image
+                <img
                   src={host.avatarUrl}
                   alt={host.name}
                   width={68}
                   height={68}
                   className="avatar avatar-large"
-                  unoptimized
                 />
                 <div>
                   <span className={`signal-tag signal-tag-age ${hostToneClasses[index]}`}>

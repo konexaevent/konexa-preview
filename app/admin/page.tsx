@@ -506,13 +506,12 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
           {dashboard.users.map((entry) => (
             <article className="admin-user-card" key={entry.id}>
               <div className="admin-user-main">
-                <Image
+                <img
                   src={entry.avatarUrl}
                   alt={entry.name}
                   width={56}
                   height={56}
                   className="avatar"
-                  unoptimized
                 />
                 <div className="admin-user-copy">
                   <h3>{entry.name}</h3>
@@ -705,13 +704,12 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
           {pendingApprovals.map((approval) => (
             <article className="approval-card admin-approval-card" key={`${approval.activityId}-${approval.attendeeId}`}>
               <div className="connection-head">
-                <Image
+                <img
                   src={approval.attendeeAvatarUrl}
                   alt={approval.attendeeName}
                   width={56}
                   height={56}
                   className="avatar"
-                  unoptimized
                 />
                 <div>
                   <h3>{approval.attendeeName}</h3>

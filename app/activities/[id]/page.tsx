@@ -40,6 +40,9 @@ export default async function ActivityDetailPage({ params, searchParams }: Activ
       easyArrival: "Arribada facil",
       socialMood: "Ambient social cuidat",
       available: "places disponibles",
+      trustTitle: "Per que aquest pla se sent facil d'entrar",
+      trustText:
+        "Tot esta pensat perquè la gent arribi amb referencies clares, un grup reduit i una sensacio de context abans de venir.",
       guidanceTitle: "Abans de venir",
       guidance: [
         {
@@ -70,6 +73,9 @@ export default async function ActivityDetailPage({ params, searchParams }: Activ
       easyArrival: "Llegada facil",
       socialMood: "Ambiente social cuidado",
       available: "plazas disponibles",
+      trustTitle: "Por que este plan se siente facil de entrar",
+      trustText:
+        "Todo esta pensado para que la gente llegue con referencias claras, un grupo reducido y una sensacion de contexto antes de venir.",
       guidanceTitle: "Antes de venir",
       guidance: [
         {
@@ -100,6 +106,9 @@ export default async function ActivityDetailPage({ params, searchParams }: Activ
       easyArrival: "Easy arrival",
       socialMood: "Carefully hosted social vibe",
       available: "spots available",
+      trustTitle: "Why this plan feels easy to join",
+      trustText:
+        "Everything is designed so people arrive with clear references, a small group, and enough context before showing up.",
       guidanceTitle: "Before you come",
       guidance: [
         {
@@ -160,13 +169,12 @@ export default async function ActivityDetailPage({ params, searchParams }: Activ
           </div>
           {detail.host ? (
             <div className="detail-host-card">
-              <Image
+              <img
                 src={detail.host.avatarUrl}
                 alt={detail.host.name}
                 width={52}
                 height={52}
                 className="avatar"
-                unoptimized
               />
               <div>
                 <p className="label">{detailUi.hostLabel}</p>
@@ -197,6 +205,10 @@ export default async function ActivityDetailPage({ params, searchParams }: Activ
                   : messages.everyoneNew}
               </p>
             </article>
+          </div>
+          <div className="detail-trust-banner">
+            <strong>{detailUi.trustTitle}</strong>
+            <p>{detailUi.trustText}</p>
           </div>
           <div className="detail-cta-row">
             {cancelled ? (
@@ -270,13 +282,12 @@ export default async function ActivityDetailPage({ params, searchParams }: Activ
               key={participant.id}
             >
               <div className="connection-head">
-                <Image
+                <img
                   src={participant.avatarUrl}
                   alt={participant.name}
                   width={52}
                   height={52}
                   className="avatar"
-                  unoptimized
                 />
                 <div>
                   <h3>{participant.name}</h3>
