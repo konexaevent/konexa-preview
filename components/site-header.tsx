@@ -159,6 +159,11 @@ export function SiteHeader({
                   <Link href="/hosts" className="site-menu-link" onClick={() => setMenuOpen(false)}>
                     {navHosts}
                   </Link>
+                  {userDisplayName ? (
+                    <Link href="/profile" className="site-menu-link" onClick={() => setMenuOpen(false)}>
+                      {navProfile}
+                    </Link>
+                  ) : null}
                   {showAdminLink ? (
                     <Link href="/admin" className="site-menu-link" onClick={() => setMenuOpen(false)}>
                       {navAdmin}
