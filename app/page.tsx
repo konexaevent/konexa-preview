@@ -92,8 +92,6 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       ? selectedAge
       : "all";
   const heroCarouselImages = homepageContent.heroCarouselImages as string[];
-  const approvalActivities = activities.filter((activity: (typeof activities)[number]) => activity.requiresApproval).length;
-  const activeAgeRanges = new Set(activities.map((activity: (typeof activities)[number]) => activity.ageRange)).size;
 
   return (
     <div className="page-stack">
@@ -125,20 +123,6 @@ export default async function HomePage({ searchParams }: HomePageProps) {
               {messages.feedEyebrow ? <p className="eyebrow">{messages.feedEyebrow}</p> : null}
               <h2>{messages.feedTitle}</h2>
               <p className="section-anchor-copy">{homeUi.activityLead}</p>
-            </div>
-            <div className="section-kpis">
-              <span className="section-kpi">
-                <strong>{activities.length}</strong>
-                <small>{homeUi.availableNow}</small>
-              </span>
-              <span className="section-kpi">
-                <strong>{activeAgeRanges}</strong>
-                <small>{homeUi.hostedByAge}</small>
-              </span>
-              <span className="section-kpi">
-                <strong>{approvalActivities}</strong>
-                <small>{homeUi.approvalCount}</small>
-              </span>
             </div>
           </div>
           <HomeActivityFeed
