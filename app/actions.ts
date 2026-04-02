@@ -527,26 +527,44 @@ export async function updateProfileAction(formData: FormData) {
     };
 
     const profileUpsert = await db.from("profiles").upsert(profilePayload);
+    const admin = createSupabaseAdminClient();
 
     if (profileUpsert?.error) {
       const errorMessage = String(profileUpsert.error.message || "");
       if (errorMessage.includes("phone_number")) {
-        const fallbackUpsert = await db.from("profiles").upsert({
+        const fallbackPayload = {
           id: user.id,
           first_name: firstName || null,
           last_name: lastName || null,
           full_name: fullName,
           birth_date: birthDate || null,
           avatar_url: resolvedAvatarUrl
-        });
+        };
+        const fallbackUpsert = await db.from("profiles").upsert(fallbackPayload);
 
         if (fallbackUpsert?.error) {
-          console.error("Profile fallback upsert failed", fallbackUpsert.error);
-          redirect(addRedirectFlag("error=profile"));
+          if (admin) {
+            const adminFallbackUpsert = await (admin as any).from("profiles").upsert(fallbackPayload);
+            if (adminFallbackUpsert?.error) {
+              console.error("Profile fallback upsert failed", adminFallbackUpsert.error);
+              redirect(addRedirectFlag("error=profile"));
+            }
+          } else {
+            console.error("Profile fallback upsert failed", fallbackUpsert.error);
+            redirect(addRedirectFlag("error=profile"));
+          }
         }
       } else {
-        console.error("Profile upsert failed", profileUpsert.error);
-        redirect(addRedirectFlag("error=profile"));
+        if (admin) {
+          const adminUpsert = await (admin as any).from("profiles").upsert(profilePayload);
+          if (adminUpsert?.error) {
+            console.error("Profile upsert failed", adminUpsert.error);
+            redirect(addRedirectFlag("error=profile"));
+          }
+        } else {
+          console.error("Profile upsert failed", profileUpsert.error);
+          redirect(addRedirectFlag("error=profile"));
+        }
       }
     }
 
