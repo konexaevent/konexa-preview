@@ -38,8 +38,8 @@ export function getExploreContent(
         "Una manera clara d'entendre com funciona Konexa abans d'apuntar-te a una activitat.",
       steps: [
         {
-          title: "Vine sola o acompanyada",
-          text: "Et pots apuntar tant si vens pel teu compte com si prefereixes venir amb algu."
+          title: "Vine sola, acompanyat/ada o amb parella",
+          text: "Et pots apuntar si vens pel teu compte, amb amistats, amb parella o amb algu amb qui et vingui de gust compartir el pla."
         },
         {
           title: "Fes activitats amb gent",
@@ -71,8 +71,8 @@ export function getExploreContent(
         "Una forma clara de entender cómo funciona Konexa antes de apuntarte a una actividad.",
       steps: [
         {
-          title: "Ven sola o acompanada",
-          text: "Puedes apuntarte tanto si vienes por tu cuenta como si prefieres venir con alguien."
+          title: "Ven sola, acompanada o en pareja",
+          text: "Puedes apuntarte si vienes por tu cuenta, con amistades, en pareja o con alguien con quien te apetezca compartir el plan."
         },
         {
           title: "Haz actividades con gente",
@@ -104,8 +104,8 @@ export function getExploreContent(
         "A clear way to understand how Konexa works before joining any activity.",
       steps: [
         {
-          title: "Come alone or with someone",
-          text: "You can join on your own or come accompanied if that feels better for you."
+          title: "Come alone, with friends, or with a partner",
+          text: "You can join on your own, with friends, with a partner, or with anyone you would like to share the plan with."
         },
         {
           title: "Join activities with people",
