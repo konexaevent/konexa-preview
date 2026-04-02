@@ -119,30 +119,6 @@ export function SiteHeader({
       >
       <div className="site-header-main">
         <div className="site-header-shell">
-          <Link href="/" className="brand">
-            <span className="brand-mark">
-              <Image
-                src="/logo-sense-lletra-1.png"
-                alt="Konexa icon"
-                width={438}
-                height={351}
-                className="brand-logo-image"
-                priority
-              />
-            </span>
-            <span className="brand-copy">
-              <Image
-                src="/logo-wordmark.png"
-                alt="Konexa"
-                width={453}
-                height={153}
-                className="brand-wordmark-image"
-                priority
-              />
-              <small>{brandTagline}</small>
-            </span>
-          </Link>
-
           <nav className="site-nav">
             <div className="site-menu-wrap">
               <button
@@ -199,6 +175,32 @@ export function SiteHeader({
                       {navLogin}
                     </Link>
                   )}
+                  <div className="site-menu-socials">
+                    <a
+                      href="https://www.instagram.com/konexa.events?igsh=NmV1cjZlczRvZ285&utm_source=qr"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="site-menu-social"
+                      aria-label="Instagram"
+                    >
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <rect x="3.5" y="3.5" width="17" height="17" rx="5" />
+                        <circle cx="12" cy="12" r="4.2" />
+                        <circle cx="17.4" cy="6.7" r="1.1" className="site-menu-social-fill" />
+                      </svg>
+                    </a>
+                    <a
+                      href="https://www.tiktok.com/@konexa.on.la.vida?_r=1&_t=ZN-95CVreumUr8"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="site-menu-social"
+                      aria-label="TikTok"
+                    >
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M14.7 3c.5 1.7 1.9 3 3.6 3.4v3a6.4 6.4 0 0 1-3.6-1.1v5.9a5.6 5.6 0 1 1-5.6-5.5c.5 0 .9 0 1.3.1v3.1a2.6 2.6 0 1 0 1.3 2.3V3h3z" />
+                      </svg>
+                    </a>
+                  </div>
                 </div>
               ) : null}
             </div>
@@ -211,6 +213,30 @@ export function SiteHeader({
               </div>
             ) : null}
           </nav>
+
+          <Link href="/" className="brand">
+            <span className="brand-mark">
+              <Image
+                src="/logo-sense-lletra-1.png"
+                alt="Konexa icon"
+                width={438}
+                height={351}
+                className="brand-logo-image"
+                priority
+              />
+            </span>
+            <span className="brand-copy">
+              <Image
+                src="/logo-wordmark.png"
+                alt="Konexa"
+                width={453}
+                height={153}
+                className="brand-wordmark-image"
+                priority
+              />
+              <small>{brandTagline}</small>
+            </span>
+          </Link>
         </div>
 
         <div className="header-language-slot">
