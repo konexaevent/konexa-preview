@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 import { useFormStatus } from "react-dom";
 
 type ProfileFormProps = {
@@ -37,17 +37,7 @@ function SubmitButton({ label }: { label: string }) {
 
 export function ProfileForm({ action, messages, values }: ProfileFormProps) {
   const [previewUrl, setPreviewUrl] = useState<string>(values.avatarUrl);
-
-  const fallbackPreview = useMemo(() => values.avatarUrl, [values.avatarUrl]);
-  const isObjectPreview = previewUrl.startsWith("blob:");
-
-  useEffect(() => {
-    return () => {
-      if (isObjectPreview) {
-        URL.revokeObjectURL(previewUrl);
-      }
-    };
-  }, [isObjectPreview, previewUrl]);
+  const fallbackPreview = values.avatarUrl;
 
   return (
     <form action={action} className="profile-form">
