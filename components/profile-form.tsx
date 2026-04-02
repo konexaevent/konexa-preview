@@ -88,7 +88,7 @@ export function ProfileForm({ action, messages, values }: ProfileFormProps) {
         <input
           type="file"
           name="avatar_file"
-          accept="image/png,image/jpeg,image/webp,image/svg+xml"
+          accept="image/png,image/jpeg,image/webp,image/svg+xml,image/heic,image/heif"
           onChange={(event) => {
             const file = event.target.files?.[0];
             if (!file) {

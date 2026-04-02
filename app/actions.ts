@@ -6,6 +6,7 @@ import crypto from "node:crypto";
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { isRedirectError } from "next/dist/client/components/redirect-error";
 import {
   cancelDemoBooking,
   deleteDemoActivity,
@@ -445,99 +446,131 @@ export async function updateProfileAction(formData: FormData) {
   const phoneNumber = String(formData.get("phone_number") || "").trim();
   const avatarFile = formData.get("avatar_file");
 
-  const supabase = await createSupabaseServerClient();
-  if (!supabase) {
-    const existingProfile = await getStoredDemoProfile();
-    const avatarUrl =
-      avatarFile instanceof File && avatarFile.size > 0
-        ? await saveDemoAvatar(avatarFile, existingProfile.id)
-        : existingProfile.avatarUrl;
+  const addRedirectFlag = (value: string) =>
+    `${redirectTo}${redirectTo.includes("?") ? "&" : "?"}${value}`;
 
-    await setStoredDemoProfile({
-      firstName,
-      lastName,
-      email,
-      birthDate,
-      phoneNumber,
-      avatarUrl
-    });
-    revalidatePath("/");
-    revalidatePath("/profile");
-    redirect(`${redirectTo}${redirectTo.includes("?") ? "&" : "?"}saved=1`);
-  }
+  try {
+    const supabase = await createSupabaseServerClient();
+    if (!supabase) {
+      const existingProfile = await getStoredDemoProfile();
+      const avatarUrl =
+        avatarFile instanceof File && avatarFile.size > 0
+          ? await saveDemoAvatar(avatarFile, existingProfile.id)
+          : existingProfile.avatarUrl;
 
-  const {
-    data: { user }
-  } = await supabase.auth.getUser();
-  const db = supabase as any;
-
-  if (!user) {
-    redirect(`/login?next=${encodeURIComponent(redirectTo)}`);
-  }
-
-  const fullName = [firstName, lastName].filter(Boolean).join(" ").trim() || user.email || "User";
-  let resolvedAvatarUrl =
-    user.user_metadata.avatar_url ||
-    `https://api.dicebear.com/9.x/lorelei/svg?seed=${encodeURIComponent(fullName)}`;
-
-  if (avatarFile instanceof File && avatarFile.size > 0) {
-    const extension = avatarFile.name.includes(".")
-      ? avatarFile.name.split(".").pop()?.toLowerCase() || "png"
-      : "png";
-    const filePath = `${user.id}/avatar-${Date.now()}.${extension}`;
-    const fileBuffer = Buffer.from(await avatarFile.arrayBuffer());
-
-    const { error: uploadError } = await supabase.storage
-      .from("avatars")
-      .upload(filePath, fileBuffer, {
-        contentType: getAvatarContentType(avatarFile),
-        upsert: true
+      await setStoredDemoProfile({
+        firstName,
+        lastName,
+        email,
+        birthDate,
+        phoneNumber,
+        avatarUrl
       });
+      revalidatePath("/");
+      revalidatePath("/profile");
+      redirect(addRedirectFlag("saved=1"));
+    }
 
-    if (!uploadError) {
+    const {
+      data: { user }
+    } = await supabase.auth.getUser();
+    const db = supabase as any;
+
+    if (!user) {
+      redirect(`/login?next=${encodeURIComponent(redirectTo)}`);
+    }
+
+    const existingProfileResult = await db
+      .from("profiles")
+      .select("avatar_url")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    const fullName = [firstName, lastName].filter(Boolean).join(" ").trim() || user.email || "User";
+    let resolvedAvatarUrl =
+      existingProfileResult.data?.avatar_url ||
+      `https://api.dicebear.com/9.x/lorelei/svg?seed=${encodeURIComponent(fullName)}`;
+
+    if (avatarFile instanceof File && avatarFile.size > 0) {
+      const extension = avatarFile.name.includes(".")
+        ? avatarFile.name.split(".").pop()?.toLowerCase() || "jpg"
+        : "jpg";
+      const filePath = `${user.id}/avatar-${Date.now()}.${extension}`;
+      const fileBuffer = Buffer.from(await avatarFile.arrayBuffer());
+
+      const { error: uploadError } = await supabase.storage
+        .from("avatars")
+        .upload(filePath, fileBuffer, {
+          contentType: getAvatarContentType(avatarFile),
+          upsert: true
+        });
+
+      if (uploadError) {
+        console.error("Avatar upload failed", uploadError);
+        redirect(addRedirectFlag("error=avatar"));
+      }
+
       const { data: publicUrlData } = supabase.storage
         .from("avatars")
         .getPublicUrl(filePath);
       resolvedAvatarUrl = publicUrlData.publicUrl;
     }
-  }
 
-  const profilePayload = {
-    id: user.id,
-    first_name: firstName || null,
-    last_name: lastName || null,
-    full_name: fullName,
-    birth_date: birthDate || null,
-    phone_number: phoneNumber || null,
-    avatar_url: resolvedAvatarUrl
-  };
+    const profilePayload = {
+      id: user.id,
+      first_name: firstName || null,
+      last_name: lastName || null,
+      full_name: fullName,
+      birth_date: birthDate || null,
+      phone_number: phoneNumber || null,
+      avatar_url: resolvedAvatarUrl
+    };
 
-  const profileUpsert = await db.from("profiles").upsert(profilePayload);
+    const profileUpsert = await db.from("profiles").upsert(profilePayload);
 
-  if (profileUpsert?.error) {
-    const errorMessage = String(profileUpsert.error.message || "");
-    if (errorMessage.includes("phone_number")) {
-      await db.from("profiles").upsert({
-        id: user.id,
-        first_name: firstName || null,
-        last_name: lastName || null,
-        full_name: fullName,
-        birth_date: birthDate || null,
-        avatar_url: resolvedAvatarUrl
-      });
-    } else {
-      redirect(`${redirectTo}${redirectTo.includes("?") ? "&" : "?"}error=1`);
+    if (profileUpsert?.error) {
+      const errorMessage = String(profileUpsert.error.message || "");
+      if (errorMessage.includes("phone_number")) {
+        const fallbackUpsert = await db.from("profiles").upsert({
+          id: user.id,
+          first_name: firstName || null,
+          last_name: lastName || null,
+          full_name: fullName,
+          birth_date: birthDate || null,
+          avatar_url: resolvedAvatarUrl
+        });
+
+        if (fallbackUpsert?.error) {
+          console.error("Profile fallback upsert failed", fallbackUpsert.error);
+          redirect(addRedirectFlag("error=profile"));
+        }
+      } else {
+        console.error("Profile upsert failed", profileUpsert.error);
+        redirect(addRedirectFlag("error=profile"));
+      }
     }
-  }
 
-  if (email && email !== user.email) {
-    await supabase.auth.updateUser({
-      email
-    });
-  }
+    if (email && email !== user.email) {
+      const authUpdate = await supabase.auth.updateUser({
+        email
+      });
 
-  revalidatePath("/profile");
-  redirect(`${redirectTo}${redirectTo.includes("?") ? "&" : "?"}saved=1`);
+      if (authUpdate.error) {
+        console.error("Auth email update failed", authUpdate.error);
+        redirect(addRedirectFlag("error=email"));
+      }
+    }
+
+    revalidatePath("/profile");
+    redirect(addRedirectFlag("saved=1"));
+  } catch (error) {
+    if (isRedirectError(error)) {
+      throw error;
+    }
+
+    console.error("Unexpected profile update failure", error);
+    redirect(addRedirectFlag("error=unexpected"));
+  }
 }
 
 export async function signOutAction() {

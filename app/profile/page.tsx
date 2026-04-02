@@ -34,6 +34,8 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
   ]);
   const resolvedSearchParams = searchParams ? await searchParams : {};
   const saved = resolvedSearchParams.saved;
+  const error =
+    typeof resolvedSearchParams.error === "string" ? resolvedSearchParams.error : undefined;
 
   if (!user) {
     redirect("/login");
@@ -53,7 +55,11 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
       rhythmText:
         "Una mirada rapida al que tens en marxa ara mateix, al que ja has viscut i a la xarxa de familiaritat que vas construint.",
       confirmedShort: "confirmades",
-      historyShort: "ja viscudes"
+      historyShort: "ja viscudes",
+      avatarError: "No hem pogut desar la foto de perfil. Torna-ho a provar amb una altra imatge.",
+      profileError: "No hem pogut desar els canvis del perfil. Torna-ho a provar en un moment.",
+      emailError: "Hem desat el perfil, pero no hem pogut actualitzar el correu del compte.",
+      unexpectedError: "S'ha produit un error inesperat en desar el perfil."
     },
     es: {
       nextPlan: "Proximo plan",
@@ -67,7 +73,11 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
       rhythmText:
         "Una mirada rapida a lo que tienes en marcha ahora mismo, lo que ya has vivido y la red de familiaridad que vas creando.",
       confirmedShort: "confirmadas",
-      historyShort: "ya vividas"
+      historyShort: "ya vividas",
+      avatarError: "No hemos podido guardar la foto de perfil. Prueba otra vez con otra imagen.",
+      profileError: "No hemos podido guardar los cambios del perfil. Vuelve a intentarlo en un momento.",
+      emailError: "Hemos guardado el perfil, pero no hemos podido actualizar el correo de la cuenta.",
+      unexpectedError: "Se ha producido un error inesperado al guardar el perfil."
     },
     en: {
       nextPlan: "Next plan",
@@ -81,9 +91,23 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
       rhythmText:
         "A quick view of what is happening now, what you have already lived, and the familiarity you are building over time.",
       confirmedShort: "confirmed",
-      historyShort: "already lived"
+      historyShort: "already lived",
+      avatarError: "We could not save your profile photo. Please try again with a different image.",
+      profileError: "We could not save your profile changes. Please try again in a moment.",
+      emailError: "Your profile was saved, but we could not update your account email.",
+      unexpectedError: "An unexpected error happened while saving your profile."
     }
   }[locale];
+  const errorMessage =
+    error === "avatar"
+      ? profileUi.avatarError
+      : error === "profile"
+        ? profileUi.profileError
+        : error === "email"
+          ? profileUi.emailError
+          : error === "unexpected"
+            ? profileUi.unexpectedError
+            : null;
   const nextActivity = dashboard.upcomingActivities[0];
 
   return (
@@ -216,6 +240,7 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
           {typeof saved === "string" ? (
             <p className="status status-success">{messages.profileSaved}</p>
           ) : null}
+          {errorMessage ? <p className="status status-error">{errorMessage}</p> : null}
           <div className="info-grid">
             <div className="info-item">
               <p className="label">{messages.firstName}</p>
