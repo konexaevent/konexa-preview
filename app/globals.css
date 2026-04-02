@@ -355,7 +355,8 @@ button {
 .brand-copy {
   display: grid;
   gap: 0.26rem;
-  max-width: 13.5rem;
+  max-width: none;
+  min-width: 0;
   transition: opacity 160ms ease, transform 160ms ease;
 }
 
@@ -373,7 +374,7 @@ button {
   color: rgba(25, 22, 63, 0.78);
   line-height: 1.22;
   opacity: 1;
-  text-wrap: balance;
+  white-space: nowrap;
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.55);
 }
 
@@ -3112,10 +3113,11 @@ textarea {
 
   .brand small {
     display: block;
-    max-width: 9rem;
+    max-width: none;
     font-size: 0.8rem;
     line-height: 1.18;
     color: rgba(25, 22, 63, 0.8);
+    white-space: nowrap;
   }
 
   .brand-wordmark-image {
