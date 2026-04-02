@@ -3162,6 +3162,7 @@ textarea {
     gap: 1.65rem;
     padding: 0.68rem 1.16rem;
     border-radius: 18px;
+    width: 100%;
   }
 
   .site-header.site-header-compact .site-header-shell {
@@ -3225,10 +3226,7 @@ textarea {
   }
 
   .header-language-slot {
-    width: auto;
-    margin-top: 0;
-    margin-left: 0;
-    justify-content: flex-end;
+    display: none;
   }
 
   .language-switcher {
