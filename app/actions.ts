@@ -539,8 +539,7 @@ export async function updateProfileAction(formData: FormData) {
         first_name: firstName,
         last_name: lastName,
         birth_date: birthDate,
-        phone_number: phoneNumber,
-        avatar_url: resolvedAvatarUrl
+        phone_number: phoneNumber
       }
     });
   } else {
@@ -551,8 +550,7 @@ export async function updateProfileAction(formData: FormData) {
         first_name: firstName,
         last_name: lastName,
         birth_date: birthDate,
-        phone_number: phoneNumber,
-        avatar_url: resolvedAvatarUrl
+        phone_number: phoneNumber
       }
     });
   }
