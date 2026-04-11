@@ -68,6 +68,23 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
     title: string;
     imageUrl: string;
   }>;
+  const now = new Date();
+  const nextWeek = new Date(now);
+  nextWeek.setDate(nextWeek.getDate() + 7);
+  const activitiesThisWeek = dashboard.activities.filter((activity) => {
+    const startsAt = new Date(activity.startsAt);
+    return startsAt >= now && startsAt <= nextWeek;
+  });
+  const attentionActivities = dashboard.activities.filter((activity) => {
+    const occupied = activity.confirmedCount + activity.pendingCount;
+    const remaining = Math.max(activity.maxParticipants - occupied, 0);
+    return remaining > 0 && activity.confirmedCount <= Math.ceil(activity.maxParticipants / 2);
+  });
+  const totalOpenSeats = dashboard.activities.reduce((total, activity) => {
+    const occupied = activity.confirmedCount + activity.pendingCount;
+    return total + Math.max(activity.maxParticipants - occupied, 0);
+  }, 0);
+  const latestUsers = dashboard.users.slice(0, 4);
 
   const copy = {
     ca: {
@@ -149,6 +166,24 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
       operationsText:
         "Des d'aqui tens una lectura rapida del que requereix atencio avui: altes noves, activitats obertes i gestio de participants."
       ,
+      executiveTitle: "Panell executiu",
+      executiveText:
+        "Una visio rapida del ritme de Konexa: el que tens aquesta setmana, el que encara necessita empenta i el que demana resposta.",
+      weekAhead: "Aquesta setmana",
+      openSeats: "Places per omplir",
+      latestUsersTitle: "Ultims registres",
+      attentionTitle: "Atencio immediata",
+      attentionText:
+        "Aquests blocs t'ajuden a veure en un moment quines activitats has de seguir de prop i quines persones necessiten resposta.",
+      activityPulseTitle: "Activitats que necessiten impuls",
+      activityPulseText: "Plans amb places lliures i marge per acabar d'omplir el grup.",
+      upcomingTitle: "Properes activitats",
+      upcomingText: "El que tens en marxa durant els proxims dies.",
+      noUpcoming: "No tens activitats previstes aquesta setmana.",
+      noAttention: "Ara mateix no hi ha activitats que necessitin un impuls extra.",
+      attendeesLabel: "inscrites",
+      seatsLabelShort: "places lliures",
+      latestUsersEmpty: "Quan hi hagi registres nous, els veuras aqui.",
       navCreate: "Crear o editar",
       navActivities: "Activitats",
       navUsers: "Usuaris",
@@ -234,6 +269,24 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
       operationsText:
         "Desde aqui tienes una lectura rapida de lo que requiere atencion hoy: altas nuevas, actividades abiertas y gestion de participantes."
       ,
+      executiveTitle: "Panel ejecutivo",
+      executiveText:
+        "Una vista rapida del ritmo de Konexa: lo que tienes esta semana, lo que aun necesita impulso y lo que pide respuesta.",
+      weekAhead: "Esta semana",
+      openSeats: "Plazas por llenar",
+      latestUsersTitle: "Ultimos registros",
+      attentionTitle: "Atencion inmediata",
+      attentionText:
+        "Estos bloques te ayudan a ver de un vistazo que actividades debes seguir de cerca y que personas necesitan respuesta.",
+      activityPulseTitle: "Actividades que necesitan impulso",
+      activityPulseText: "Planes con plazas libres y margen para terminar de llenar el grupo.",
+      upcomingTitle: "Proximas actividades",
+      upcomingText: "Lo que tienes en marcha durante los proximos dias.",
+      noUpcoming: "No tienes actividades previstas esta semana.",
+      noAttention: "Ahora mismo no hay actividades que necesiten un impulso extra.",
+      attendeesLabel: "inscritas",
+      seatsLabelShort: "plazas libres",
+      latestUsersEmpty: "Cuando haya nuevos registros, los veras aqui.",
       navCreate: "Crear o editar",
       navActivities: "Actividades",
       navUsers: "Usuarios",
@@ -319,6 +372,24 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
       operationsText:
         "This gives you a quick read on what needs attention today: new users, open activities, and participant coordination."
       ,
+      executiveTitle: "Executive panel",
+      executiveText:
+        "A quick view of Konexa's current rhythm: what is happening this week, what still needs momentum, and what needs your reply.",
+      weekAhead: "This week",
+      openSeats: "Open seats",
+      latestUsersTitle: "Latest signups",
+      attentionTitle: "Immediate attention",
+      attentionText:
+        "These blocks help you spot at a glance which activities need a closer follow-up and which people are waiting for an answer.",
+      activityPulseTitle: "Activities that need momentum",
+      activityPulseText: "Plans with open seats and room to complete the group.",
+      upcomingTitle: "Upcoming activities",
+      upcomingText: "What is happening over the next few days.",
+      noUpcoming: "You have no activities scheduled this week.",
+      noAttention: "There are no activities needing an extra push right now.",
+      attendeesLabel: "registered",
+      seatsLabelShort: "open seats",
+      latestUsersEmpty: "When new signups appear, you will see them here.",
       navCreate: "Create or edit",
       navActivities: "Activities",
       navUsers: "Users",
@@ -382,6 +453,109 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
             <small>{copy.whatsappText}</small>
           </article>
         </div>
+      </section>
+
+      <section className="dashboard-panel admin-executive-panel">
+        <div className="panel-head">
+          <div>
+            <p className="eyebrow">{copy.executiveTitle}</p>
+            <h2>{copy.executiveTitle}</h2>
+          </div>
+          <p className="section-note">{copy.executiveText}</p>
+        </div>
+        <div className="admin-executive-grid">
+          <article className="admin-executive-card">
+            <span className="label">{copy.weekAhead}</span>
+            <strong>{activitiesThisWeek.length}</strong>
+            <p>{copy.upcomingText}</p>
+          </article>
+          <article className="admin-executive-card">
+            <span className="label">{copy.openSeats}</span>
+            <strong>{totalOpenSeats}</strong>
+            <p>{copy.activityPulseText}</p>
+          </article>
+          <article className="admin-executive-card">
+            <span className="label">{copy.latestUsersTitle}</span>
+            <strong>{latestUsers.length}</strong>
+            <p>{copy.usersText}</p>
+          </article>
+        </div>
+      </section>
+
+      <section className="dashboard-grid admin-focus-grid">
+        <article className="dashboard-panel admin-focus-panel">
+          <div className="panel-head">
+            <div>
+              <p className="eyebrow">{copy.upcomingTitle}</p>
+              <h2>{copy.upcomingTitle}</h2>
+            </div>
+            <p className="section-note">{copy.upcomingText}</p>
+          </div>
+          <div className="stack-list admin-focus-list">
+            {activitiesThisWeek.map((activity) => {
+              const occupied = activity.confirmedCount + activity.pendingCount;
+              const remaining = Math.max(activity.maxParticipants - occupied, 0);
+              return (
+                <article className="admin-focus-card" key={`week-${activity.id}`}>
+                  <div>
+                    <strong>{activity.title}</strong>
+                    <p>{formatActivityDate(activity.startsAt, locale)}</p>
+                    <small>
+                      {activity.hostName} · {activity.city}
+                    </small>
+                  </div>
+                  <div className="admin-focus-metrics">
+                    <span className="signal-tag">
+                      {activity.confirmedCount} {copy.attendeesLabel}
+                    </span>
+                    <span className="signal-tag">
+                      {remaining} {copy.seatsLabelShort}
+                    </span>
+                  </div>
+                </article>
+              );
+            })}
+            {activitiesThisWeek.length === 0 ? (
+              <p className="empty-state">{copy.noUpcoming}</p>
+            ) : null}
+          </div>
+        </article>
+
+        <article className="dashboard-panel admin-focus-panel">
+          <div className="panel-head">
+            <div>
+              <p className="eyebrow">{copy.activityPulseTitle}</p>
+              <h2>{copy.activityPulseTitle}</h2>
+            </div>
+            <p className="section-note">{copy.activityPulseText}</p>
+          </div>
+          <div className="stack-list admin-focus-list">
+            {attentionActivities.slice(0, 5).map((activity) => {
+              const occupied = activity.confirmedCount + activity.pendingCount;
+              const remaining = Math.max(activity.maxParticipants - occupied, 0);
+              return (
+                <article className="admin-focus-card" key={`attention-${activity.id}`}>
+                  <div>
+                    <strong>{activity.title}</strong>
+                    <p>{activity.ageRange}</p>
+                    <small>{activity.hostName}</small>
+                  </div>
+                  <div className="admin-focus-metrics">
+                    <span className="signal-tag">
+                      {activity.pendingCount} {copy.pendingBadge}
+                    </span>
+                    <span className="signal-tag">
+                      {remaining} {copy.seatsLabelShort}
+                    </span>
+                  </div>
+                </article>
+              );
+            })}
+            {attentionActivities.length === 0 ? (
+              <p className="empty-state">{copy.noAttention}</p>
+            ) : null}
+          </div>
+        </article>
       </section>
 
       <section className="dashboard-panel admin-jump-panel">
@@ -529,6 +703,26 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
             <h2>{copy.usersTitle}</h2>
           </div>
           <p className="section-note">{copy.usersText}</p>
+        </div>
+        <div className="admin-latest-users">
+          {latestUsers.map((entry) => (
+            <article className="admin-latest-user-card" key={`latest-${entry.id}`}>
+              <img
+                src={entry.avatarUrl}
+                alt={entry.name}
+                width={48}
+                height={48}
+                className="avatar"
+              />
+              <div>
+                <strong>{entry.name}</strong>
+                <p>{entry.email || "-"}</p>
+              </div>
+            </article>
+          ))}
+          {latestUsers.length === 0 ? (
+            <p className="empty-state">{copy.latestUsersEmpty}</p>
+          ) : null}
         </div>
         <div className="stack-list">
           {dashboard.users.map((entry) => (
@@ -723,10 +917,10 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
       <section className="dashboard-panel">
         <div className="panel-head">
           <div>
-            <p className="eyebrow">{copy.pendingTitle}</p>
+            <p className="eyebrow">{copy.attentionTitle}</p>
             <h2>{copy.pendingTitle}</h2>
           </div>
-          <p className="section-note">{copy.pendingText}</p>
+          <p className="section-note">{copy.attentionText}</p>
         </div>
         <div className="stack-list">
           {pendingApprovals.map((approval) => (
