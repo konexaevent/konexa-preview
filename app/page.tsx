@@ -140,6 +140,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
               ageTitle: homeUi.ageTitle,
               ageAll: homeUi.ageAll,
               ageLabels: homeUi.ageLabels,
+              sharedAvailable: messages.sharedAvailable,
               energy: homeUi.energy,
               hostApproval: homeUi.hostApproval,
               instantJoin: homeUi.instantJoin,

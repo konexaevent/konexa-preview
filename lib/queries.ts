@@ -183,7 +183,7 @@ export const getHomepageActivities = cache(async () => {
     imageZoom: activity.image_zoom ?? 1,
     participantCount: activity.participant_count,
     maxParticipants: activity.max_participants,
-    familiarityLabel: "Shared connections available after login",
+    familiarityLabel: "",
     joined: bookingStatusByActivity.get(activity.id) === "confirmed",
     bookingStatus: bookingStatusByActivity.get(activity.id) || null,
     host: activity.host_user_id

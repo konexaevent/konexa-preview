@@ -31,6 +31,17 @@ function getAvatarContentType(file: File) {
   return file.type || "application/octet-stream";
 }
 
+function isSupportedAvatarFile(file: File) {
+  return new Set([
+    "image/png",
+    "image/jpeg",
+    "image/webp",
+    "image/svg+xml",
+    "image/heic",
+    "image/heif"
+  ]).has(file.type);
+}
+
 async function saveDemoAvatar(file: File, userId: string) {
   const extension = file.name.includes(".")
     ? file.name.split(".").pop()?.toLowerCase() || "png"
@@ -499,6 +510,10 @@ export async function updateProfileAction(formData: FormData) {
       `https://api.dicebear.com/9.x/lorelei/svg?seed=${encodeURIComponent(fullName)}`;
 
     if (avatarFile instanceof File && avatarFile.size > 0) {
+      if (!isSupportedAvatarFile(avatarFile)) {
+        redirect(addRedirectFlag("error=avatar_format"));
+      }
+
       const extension = avatarFile.name.includes(".")
         ? avatarFile.name.split(".").pop()?.toLowerCase() || "jpg"
         : "jpg";

@@ -6,6 +6,8 @@ import {
 } from "./actions";
 import { getMessages } from "@/lib/i18n";
 import { getLocale } from "@/lib/i18n-server";
+import { getCurrentUser } from "@/lib/queries";
+import { redirect } from "next/navigation";
 
 type LoginPageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
@@ -13,13 +15,18 @@ type LoginPageProps = {
 
 export default async function LoginPage({ searchParams }: LoginPageProps) {
   const resolvedSearchParams = searchParams ? await searchParams : {};
-  const locale = await getLocale();
+  const [locale, currentUser] = await Promise.all([getLocale(), getCurrentUser()]);
   const messages = getMessages(locale);
   const error = resolvedSearchParams.error;
   const success = resolvedSearchParams.success;
   const mode = resolvedSearchParams.mode;
   const next =
     typeof resolvedSearchParams.next === "string" ? resolvedSearchParams.next : "/profile";
+
+  if (currentUser) {
+    redirect(next);
+  }
+
   const loginUi = {
     ca: {
       badge: "Acces privat",

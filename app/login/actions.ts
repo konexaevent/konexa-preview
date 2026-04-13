@@ -2,6 +2,7 @@
 
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { getCurrentUser } from "@/lib/queries";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -44,49 +45,56 @@ export async function signUpWithPassword(formData: FormData) {
   const birthDate = String(formData.get("birth_date") || "").trim();
   const admin = createSupabaseAdminClient();
   let error: { message: string } | null = null;
+  const syncProfileAfterLogin = async (userId: string) => {
+    const nameParts = fullName.trim().split(/\s+/).filter(Boolean);
+    const firstName = nameParts[0] || null;
+    const lastName = nameParts.slice(1).join(" ") || null;
+
+    if (!admin) return;
+
+    await (admin as any).from("profiles").upsert(
+      {
+        id: userId,
+        first_name: firstName,
+        last_name: lastName,
+        full_name: fullName.trim() || email,
+        birth_date: birthDate || null,
+        phone_number: phoneNumber || null
+      },
+      { onConflict: "id" }
+    );
+  };
 
   if (admin) {
-    const existingUsers = await admin.auth.admin.listUsers();
-    const existingUser = existingUsers.data.users.find(
-      (candidate) => candidate.email?.toLowerCase() === email.toLowerCase()
-    );
+    const created = await admin.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: true,
+      user_metadata: {
+        full_name: fullName,
+        birth_date: birthDate,
+        phone_number: phoneNumber
+      }
+    });
 
-    if (existingUser) {
-      error = { message: "Aquest correu ja esta registrat" };
-    } else {
-      const created = await admin.auth.admin.createUser({
-        email,
-        password,
-        email_confirm: true,
-        user_metadata: {
-          full_name: fullName,
-          birth_date: birthDate,
-          phone_number: phoneNumber
-        }
-      });
-
-      if (created.error) {
-        error = { message: created.error.message };
-      } else {
+    if (created.error) {
+      const errorMessage = String(created.error.message || "");
+      if (/already|registered|exists/i.test(errorMessage)) {
         const signInResult = await supabase.auth.signInWithPassword({ email, password });
         if (signInResult.error) {
-          error = { message: signInResult.error.message };
+          error = { message: "Aquest correu ja esta registrat" };
         } else if (signInResult.data.user) {
-          const nameParts = fullName.trim().split(/\s+/).filter(Boolean);
-          const firstName = nameParts[0] || null;
-          const lastName = nameParts.slice(1).join(" ") || null;
-          await (admin as any).from("profiles").upsert(
-            {
-              id: signInResult.data.user.id,
-              first_name: firstName,
-              last_name: lastName,
-              full_name: fullName.trim() || email,
-              birth_date: birthDate || null,
-              phone_number: phoneNumber || null
-            },
-            { onConflict: "id" }
-          );
+          await syncProfileAfterLogin(signInResult.data.user.id);
         }
+      } else {
+        error = { message: errorMessage };
+      }
+    } else {
+      const signInResult = await supabase.auth.signInWithPassword({ email, password });
+      if (signInResult.error) {
+        error = { message: signInResult.error.message };
+      } else if (signInResult.data.user) {
+        await syncProfileAfterLogin(signInResult.data.user.id);
       }
     }
   } else {
@@ -108,6 +116,11 @@ export async function signUpWithPassword(formData: FormData) {
 
   if (error) {
     redirect(`/login?error=${encodeURIComponent(error.message)}`);
+  }
+
+  const currentUser = await getCurrentUser();
+  if (!currentUser) {
+    redirect(`/login?error=${encodeURIComponent("No hem pogut iniciar la sessio automaticament. Prova d'entrar amb el teu correu i contrasenya.")}`);
   }
 
   redirect(next);

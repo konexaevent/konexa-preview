@@ -11,6 +11,7 @@ export default async function HostsPage() {
   ]);
   const page = getExploreContent(locale, messages, homepageContent);
   const hostToneClasses = ["age-tone-18-25", "age-tone-25-35", "age-tone-35-50", "age-tone-50-plus"];
+  const hostAnchorIds = ["host-18-25", "host-25-35", "host-35-50", "host-50-plus"];
 
   return (
     <div className="page-stack">
@@ -30,7 +31,11 @@ export default async function HostsPage() {
         </div>
         <div className="hosts-grid">
           {page.hosts.map((host, index) => (
-            <article className={`host-card ${hostToneClasses[index]}`} key={host.name}>
+            <article
+              className={`host-card ${hostToneClasses[index]}`}
+              key={host.name}
+              id={hostAnchorIds[index]}
+            >
               <div className="host-card-top">
                 <img
                   src={host.avatarUrl}

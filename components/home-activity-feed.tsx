@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ActivityCard } from "@/lib/demo-data";
 
 type AgeOption = "all" | "18-25" | "25-35" | "35-50" | "50+";
@@ -23,6 +23,7 @@ type HomeActivityFeedProps = {
     ageTitle: string;
     ageAll: string;
     ageLabels: Record<Exclude<AgeOption, "all">, string>;
+    sharedAvailable: string;
     energy: string[];
     hostApproval: string;
     instantJoin: string;
@@ -69,6 +70,9 @@ export function HomeActivityFeed({
   locale
 }: HomeActivityFeedProps) {
   const [selectedAge, setSelectedAge] = useState<AgeOption>(initialSelectedAge);
+  const sliderRef = useRef<HTMLDivElement | null>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
 
   useEffect(() => {
     setSelectedAge(initialSelectedAge);
@@ -79,10 +83,35 @@ export function HomeActivityFeed({
       ? activities
       : activities.filter((activity) => activity.ageRange === selectedAge);
 
+  useEffect(() => {
+    const slider = sliderRef.current;
+    if (!slider) {
+      return;
+    }
+
+    const updateScrollState = () => {
+      const maxScrollLeft = slider.scrollWidth - slider.clientWidth;
+      setCanScrollLeft(slider.scrollLeft > 8);
+      setCanScrollRight(maxScrollLeft - slider.scrollLeft > 8);
+    };
+
+    updateScrollState();
+    slider.addEventListener("scroll", updateScrollState, { passive: true });
+    window.addEventListener("resize", updateScrollState);
+
+    return () => {
+      slider.removeEventListener("scroll", updateScrollState);
+      window.removeEventListener("resize", updateScrollState);
+    };
+  }, [filteredActivities.length]);
+
   function handleAgeChange(option: AgeOption) {
     setSelectedAge(option);
     const nextUrl = option === "all" ? "/#plans" : `/?age=${option}#plans`;
     window.history.replaceState({}, "", nextUrl);
+    requestAnimationFrame(() => {
+      sliderRef.current?.scrollTo({ left: 0, behavior: "smooth" });
+    });
   }
 
   function formatLocalDate(date: string) {
@@ -93,6 +122,19 @@ export function HomeActivityFeed({
       hour: "2-digit",
       minute: "2-digit"
     }).format(new Date(date));
+  }
+
+  function scrollSlider(direction: "left" | "right") {
+    const slider = sliderRef.current;
+    if (!slider) {
+      return;
+    }
+
+    const step = Math.min(slider.clientWidth * 0.9, 380);
+    slider.scrollBy({
+      left: direction === "left" ? -step : step,
+      behavior: "smooth"
+    });
   }
 
   return (
@@ -119,94 +161,109 @@ export function HomeActivityFeed({
         </div>
       </section>
 
-      <section className="activity-grid">
-        {filteredActivities.map((activity, index) => (
-          <article className="activity-card" key={activity.id}>
-            <div className="activity-cover">
-              <Image
-                src={activity.heroImageUrl}
-                alt={activity.title}
-                fill
-                className="activity-image"
-                style={{
-                  objectPosition: `${activity.imageFocusX ?? 50}% ${activity.imageFocusY ?? 50}%`,
-                  transform: `scale(${activity.imageZoom ?? 1})`
-                }}
-              />
+      <section className="activity-slider-shell">
+        {filteredActivities.length > 0 ? (
+          <div className="activity-slider-toolbar">
+            <div className="activity-slider-controls" aria-label="Activity slider controls">
+              <button
+                type="button"
+                className="activity-slider-button"
+                onClick={() => scrollSlider("left")}
+                disabled={!canScrollLeft}
+                aria-label="Previous activities"
+              >
+                ←
+              </button>
+              <button
+                type="button"
+                className="activity-slider-button"
+                onClick={() => scrollSlider("right")}
+                disabled={!canScrollRight}
+                aria-label="Next activities"
+              >
+                →
+              </button>
             </div>
-            <div className="activity-content">
-              <div className="activity-card-accent" aria-hidden="true" />
-              <div className="activity-card-head">
-                <div className="meta-row">
-                  <span className="pill">{activity.city}</span>
-                  <span className="pill pill-soft">
-                    {activity.maxParticipants - activity.participantCount} {homeUi.spotsLeft}
-                  </span>
-                </div>
-                <div className="activity-signal-row">
-                  <span className={`signal-tag signal-tag-age ${getAgeToneClass(activity.ageRange)}`}>
-                    {homeUi.ageLabels[activity.ageRange]}
-                  </span>
-                  <span className="signal-tag">{homeUi.energy[index % homeUi.energy.length]}</span>
-                  <span className="signal-tag signal-tag-muted">
-                    {activity.requiresApproval ? homeUi.hostApproval : homeUi.instantJoin}
-                  </span>
-                </div>
-              </div>
-              <div className="activity-card-body">
-                <h3>{activity.title}</h3>
-                {activity.host ? (
-                  <p className="card-host-line">
-                    <span>{messages.host}</span>
-                    <strong>{activity.host.name}</strong>
-                  </p>
-                ) : null}
-                <p className="card-date">{formatLocalDate(activity.startsAt)}</p>
-                <p className="card-copy">{activity.summary}</p>
-              </div>
-              <div className="known-row activity-card-footer">
-                <span className="known-badge">
-                  {activity.familiarityLabel || messages.smallHostedGroup}
-                </span>
-                <div className="inline-actions">
-                  <Link href={`/activities/${activity.id}`} className="text-link">
-                    {messages.viewActivity}
-                  </Link>
-                  {activity.host ? (
-                    <Link
-                      href={`/#${getHostAnchorId(activity.ageRange)}`}
-                      className={`host-chip ${getAgeToneClass(activity.ageRange)}`}
-                      title={activity.host.name}
-                    >
-                      <span className="host-chip-label">{messages.host}</span>
-                      <img
-                        src={activity.host.avatarUrl}
-                        alt={activity.host.name}
-                        width={28}
-                        height={28}
-                        className="host-chip-avatar"
-                      />
-                    </Link>
-                  ) : null}
-                  {activity.bookingStatus === "pending" ? (
-                    <span className="pill pill-soft">{messages.pending}</span>
-                  ) : activity.joined ? (
-                    <span className="pill">{messages.joined}</span>
-                  ) : (
-                    <Link href={`/activities/${activity.id}/join`} className="button button-primary button-small">
-                      {messages.joinActivity}
-                    </Link>
-                  )}
-                </div>
-              </div>
-            </div>
-          </article>
-        ))}
-        {filteredActivities.length === 0 ? (
-          <article className="dashboard-panel">
-            <p className="empty-state">{homeUi.ageTitle}</p>
-          </article>
+          </div>
         ) : null}
+        <div className="activity-slider-track" ref={sliderRef}>
+          {filteredActivities.map((activity, index) => (
+            <article className="activity-card activity-slider-card" key={activity.id}>
+              {(() => {
+                return (
+                  <>
+                    <div className="activity-cover">
+                      <Image
+                        src={activity.heroImageUrl}
+                        alt={activity.title}
+                        fill
+                        className="activity-image"
+                        style={{
+                          objectPosition: `${activity.imageFocusX ?? 50}% ${activity.imageFocusY ?? 50}%`,
+                          transform: `scale(${activity.imageZoom ?? 1})`
+                        }}
+                      />
+                      <div className="activity-cover-overlay" aria-hidden="true" />
+                      <div className="activity-cover-top">
+                        <span className={`signal-tag signal-tag-age ${getAgeToneClass(activity.ageRange)}`}>
+                          {homeUi.ageLabels[activity.ageRange]}
+                        </span>
+                        <span className="pill pill-soft">
+                          {activity.maxParticipants - activity.participantCount} {homeUi.spotsLeft}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="activity-content">
+                      <div className="activity-card-accent" aria-hidden="true" />
+                      <div className="activity-card-body">
+                        <h3>{activity.title}</h3>
+                        <p className="card-date">{formatLocalDate(activity.startsAt)}</p>
+                        <p className="card-copy">{activity.summary}</p>
+                      </div>
+                      <div className="known-row activity-card-footer">
+                        <a href={`/activities/${activity.id}`} className="text-link activity-primary-link">
+                          {messages.viewActivity}
+                        </a>
+                        <div className="inline-actions">
+                          {activity.host ? (
+                            <a
+                              href={`/hosts#${getHostAnchorId(activity.ageRange)}`}
+                              className={`host-chip ${getAgeToneClass(activity.ageRange)}`}
+                              title={activity.host.name}
+                            >
+                              <span className="host-chip-label">{messages.host}</span>
+                              <img
+                                src={activity.host.avatarUrl}
+                                alt={activity.host.name}
+                                width={28}
+                                height={28}
+                                className="host-chip-avatar"
+                              />
+                            </a>
+                          ) : null}
+                          {activity.bookingStatus === "pending" ? (
+                            <span className="pill pill-soft">{messages.pending}</span>
+                          ) : activity.joined ? (
+                            <span className="pill">{messages.joined}</span>
+                          ) : (
+                            <a href={`/activities/${activity.id}/join`} className="button button-primary button-small">
+                              {messages.joinActivity}
+                            </a>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                );
+              })()}
+            </article>
+          ))}
+          {filteredActivities.length === 0 ? (
+            <article className="dashboard-panel activity-slider-empty">
+              <p className="empty-state">{homeUi.ageTitle}</p>
+            </article>
+          ) : null}
+        </div>
       </section>
     </>
   );

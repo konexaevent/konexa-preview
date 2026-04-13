@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { JoinRequestForm } from "@/components/join-request-form";
@@ -155,14 +154,12 @@ export default async function JoinActivityPage({
       <section className="join-request-layout">
         <article className="join-request-activity-card">
           <div className="join-request-cover">
-            <Image
+            <img
               src={detail.heroImageUrl}
               alt={detail.title}
-              fill
               className="activity-image"
               style={{
-                objectPosition: `${detail.imageFocusX ?? 50}% ${detail.imageFocusY ?? 50}%`,
-                transform: `scale(${detail.imageZoom ?? 1})`
+                objectPosition: `${detail.imageFocusX ?? 50}% ${detail.imageFocusY ?? 50}%`
               }}
             />
           </div>

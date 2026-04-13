@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cancelActivityReservationAction } from "@/app/actions";
@@ -162,14 +161,12 @@ export default async function ActivityDetailPage({ params, searchParams }: Activ
     <div className="page-stack">
       <section className="detail-hero">
         <div className="detail-cover">
-          <Image
+          <img
             src={detail.heroImageUrl}
             alt={detail.title}
-            fill
-            className="activity-image"
+            className="activity-image detail-image detail-image-static"
             style={{
-              objectPosition: `${detail.imageFocusX ?? 50}% ${detail.imageFocusY ?? 50}%`,
-              transform: `scale(${detail.imageZoom ?? 1})`
+              objectPosition: `${detail.imageFocusX ?? 50}% ${detail.imageFocusY ?? 50}%`
             }}
           />
         </div>
