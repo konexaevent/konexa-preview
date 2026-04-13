@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { HomeActivityFeed } from "@/components/home-activity-feed";
+import { getExploreContent } from "@/lib/explore-content";
 import { getMessages } from "@/lib/i18n";
 import { getLocale } from "@/lib/i18n-server";
 import { getHomepageActivities, getHomepageContent } from "@/lib/queries";
@@ -92,6 +93,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       ? selectedAge
       : "all";
   const heroCarouselImages = homepageContent.heroCarouselImages as string[];
+  const explorePage = getExploreContent(locale, messages, homepageContent);
 
   return (
     <div className="page-stack">
@@ -148,6 +150,25 @@ export default async function HomePage({ searchParams }: HomePageProps) {
             }}
             locale={locale}
           />
+        </div>
+      </section>
+
+      <section className="steps-panel" id="com-funciona">
+        <div className="section-header">
+          <div>
+            <p className="eyebrow">{explorePage.stepsEyebrow}</p>
+            <h2>{explorePage.stepsTitle}</h2>
+          </div>
+          <p className="section-note">{explorePage.stepsIntro}</p>
+        </div>
+        <div className="steps-grid">
+          {explorePage.steps.map((step, index) => (
+            <article className="step-card" key={step.title}>
+              <span className="step-number">0{index + 1}</span>
+              <h3>{step.title}</h3>
+              <p>{step.text}</p>
+            </article>
+          ))}
         </div>
       </section>
     </div>

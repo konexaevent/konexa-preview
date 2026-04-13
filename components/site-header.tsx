@@ -15,8 +15,6 @@ type SiteHeaderProps = {
   navDiscover: string;
   navHosts: string;
   navEnergy: string;
-  navHowItWorks: string;
-  navCommunity: string;
   navAdmin: string;
   navProfile: string;
   navLogin: string;
@@ -33,8 +31,6 @@ export function SiteHeader({
   navDiscover,
   navHosts,
   navEnergy,
-  navHowItWorks,
-  navCommunity,
   navAdmin,
   navProfile,
   navLogin,
@@ -146,12 +142,6 @@ export function SiteHeader({
                   </Link>
                   <Link href="/#plans" className="site-menu-link" onClick={() => setMenuOpen(false)}>
                     {navDiscover}
-                  </Link>
-                  <Link href="/com-funciona" className="site-menu-link" onClick={() => setMenuOpen(false)}>
-                    {navHowItWorks}
-                  </Link>
-                  <Link href="/comunitat" className="site-menu-link" onClick={() => setMenuOpen(false)}>
-                    {navCommunity}
                   </Link>
                   <Link href="/energia" className="site-menu-link" onClick={() => setMenuOpen(false)}>
                     {navEnergy}

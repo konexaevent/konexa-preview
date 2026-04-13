@@ -71,8 +71,6 @@ export default async function RootLayout({
             navDiscover={messages.navActivities}
             navHosts={messages.navHosts}
             navEnergy={messages.navEnergy}
-            navHowItWorks={messages.menuHowItWorks}
-            navCommunity={messages.menuCommunity}
             navAdmin={messages.navAdmin}
             navProfile={messages.myProfile}
             navLogin={messages.navLogin}
@@ -127,7 +125,7 @@ export default async function RootLayout({
                   <nav className="page-end-list">
                     <Link href="/">{messages.menuHome}</Link>
                     <Link href="/#plans">{messages.navActivities}</Link>
-                    <Link href="/com-funciona">{messages.menuHowItWorks}</Link>
+                    <Link href="/#com-funciona">{messages.menuHowItWorks}</Link>
                   </nav>
                 </div>
 

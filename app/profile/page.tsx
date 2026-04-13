@@ -28,6 +28,16 @@ type SharedConnection = {
 };
 
 type ProfileSectionId = "upcoming" | "pending" | "past" | "shared" | "edit";
+type ProfileCardItem = {
+  key: string;
+  sectionId?: ProfileSectionId;
+  href?: string;
+  accent: string;
+  eyebrow: string;
+  title: string;
+  description: string;
+  meta: string;
+};
 
 export default async function ProfilePage({ searchParams }: ProfilePageProps) {
   const [user, locale, messages] = await Promise.all([
@@ -86,6 +96,7 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
       pastDesc: "L'historial dels plans que ja has viscut i que formen part del teu recorregut.",
       sharedDesc: "Les persones amb qui ja has coincidit i la familiaritat que has anat construint.",
       editDesc: "Actualitza foto, correu, telefon i la resta de dades del teu perfil.",
+      communityDesc: "Accedeix a la part de comunitat de Konexa des del teu perfil.",
       emptyTitle: "Tot el teu perfil continua aqui, pero sense saturar.",
       emptyText:
         "Escull un bloc per entrar directament a l'apartat que vols veure.",
@@ -128,6 +139,7 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
       pastDesc: "El historial de planes que ya has vivido y forman parte de tu recorrido.",
       sharedDesc: "Las personas con las que ya has coincidido y la familiaridad que has construido.",
       editDesc: "Actualiza foto, correo, telefono y el resto de datos de tu perfil.",
+      communityDesc: "Accede a la parte de comunidad de Konexa desde tu perfil.",
       emptyTitle: "Todo tu perfil sigue aqui, pero sin saturar.",
       emptyText:
         "Escoge un bloque para entrar directamente en el apartado que quieres ver.",
@@ -170,6 +182,7 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
       pastDesc: "The history of plans you already lived and can revisit whenever you want.",
       sharedDesc: "The people you already know here and the familiarity you have built over time.",
       editDesc: "Update your photo, email, phone number, and the rest of your profile details.",
+      communityDesc: "Open the Konexa community area directly from your profile.",
       emptyTitle: "Everything is still here, just without the clutter.",
       emptyText:
         "Pick a block to open the area you want to see.",
@@ -198,9 +211,10 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
               ? profileUi.unexpectedError
               : null;
 
-  const sectionCards = [
+  const sectionCards: ProfileCardItem[] = [
     {
-      id: "upcoming" as ProfileSectionId,
+      key: "upcoming",
+      sectionId: "upcoming",
       accent: "01",
       eyebrow: messages.upcomingActivities,
       title: messages.scheduledPlans,
@@ -208,7 +222,8 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
       meta: t(profileUi.upcomingMeta, { count: dashboard.upcomingActivities.length })
     },
     {
-      id: "pending" as ProfileSectionId,
+      key: "pending",
+      sectionId: "pending",
       accent: "02",
       eyebrow: messages.pendingActivities,
       title: messages.pendingPlans,
@@ -216,7 +231,8 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
       meta: t(profileUi.pendingMeta, { count: dashboard.pendingActivities.length })
     },
     {
-      id: "past" as ProfileSectionId,
+      key: "past",
+      sectionId: "past",
       accent: "03",
       eyebrow: messages.pastActivities,
       title: messages.happenedPlans,
@@ -224,7 +240,8 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
       meta: t(profileUi.pastMeta, { count: dashboard.pastActivities.length })
     },
     {
-      id: "shared" as ProfileSectionId,
+      key: "shared",
+      sectionId: "shared",
       accent: "04",
       eyebrow: messages.sharedConnectionsTitle,
       title: messages.sharedConnectionsTitle,
@@ -232,12 +249,22 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
       meta: t(profileUi.sharedMeta, { count: dashboard.sharedConnections.length })
     },
     {
-      id: "edit" as ProfileSectionId,
+      key: "edit",
+      sectionId: "edit",
       accent: "05",
       eyebrow: messages.editProfile,
       title: messages.editProfile,
       description: profileUi.editDesc,
       meta: profileUi.editMeta
+    },
+    {
+      key: "community",
+      accent: "06",
+      eyebrow: messages.menuCommunity,
+      title: messages.menuCommunity,
+      description: profileUi.communityDesc,
+      meta: profileUi.openSectionCta,
+      href: "/comunitat"
     }
   ];
 
@@ -333,7 +360,7 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
     }
   };
 
-  const activeCard = sectionCards.find((section) => section.id === activeSection) || null;
+  const activeCard = sectionCards.find((section) => section.sectionId === activeSection) || null;
 
   return (
     <div className="page-stack profile-dashboard-shell">
@@ -429,8 +456,8 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
         <div className="profile-section-grid">
           {sectionCards.map((section) => (
             <ProfileSectionCard
-              key={section.id}
-              href={`/profile?section=${section.id}`}
+              key={section.key}
+              href={section.href || `/profile?section=${section.sectionId}`}
               eyebrow={section.eyebrow}
               title={section.title}
               description={section.description}
@@ -438,7 +465,7 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
               accent={section.accent}
               openLabel={profileUi.openSectionCta}
               activeLabel={profileUi.activeSectionCta}
-              active={section.id === activeSection}
+              active={section.sectionId === activeSection}
             />
           ))}
         </div>
