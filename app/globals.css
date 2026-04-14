@@ -1446,10 +1446,12 @@ small {
     linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(246, 244, 255, 0.92)),
     radial-gradient(circle at top right, rgba(93, 185, 255, 0.12), transparent 42%);
   box-shadow: var(--shadow);
+  overflow: hidden;
 }
 
 .steps-grid {
   display: block;
+  min-width: 0;
 }
 
 .step-card {
@@ -1476,6 +1478,8 @@ small {
   display: grid;
   gap: 0.9rem;
   overflow: hidden;
+  width: 100%;
+  min-width: 0;
 }
 
 .steps-slider-track {
@@ -1483,6 +1487,7 @@ small {
   width: 100%;
   transition: transform 420ms ease;
   will-change: transform;
+  min-width: 0;
 }
 
 .steps-slider-track-reset {
@@ -1491,6 +1496,7 @@ small {
 
 .step-slide {
   min-width: 100%;
+  max-width: 100%;
 }
 
 .steps-slider-controls {
@@ -4304,26 +4310,29 @@ textarea {
 
   .steps-panel,
   .trust-panel {
-    width: min(100%, 25.8rem);
+    width: 100%;
     margin-inline: auto;
   }
 
   .steps-slider {
-    gap: 0.72rem;
+    gap: 0.62rem;
   }
 
   .steps-slider-controls {
-    gap: 0.65rem;
+    width: 100%;
+    gap: 0.45rem;
   }
 
   .steps-slider-button {
-    width: 2.45rem;
-    height: 2.45rem;
-    font-size: 0.98rem;
+    width: 2.15rem;
+    height: 2.15rem;
+    font-size: 0.84rem;
+    flex: 0 0 auto;
   }
 
   .steps-slider-dots {
-    gap: 0.35rem;
+    min-width: 0;
+    gap: 0.28rem;
   }
 
   .section-header h2,
@@ -4347,28 +4356,31 @@ textarea {
   }
 
   .step-card {
-    padding: 0.78rem;
+    padding: 0.72rem;
+    border-radius: 18px;
   }
 
   .step-number {
-    min-width: 2.15rem;
-    min-height: 2.15rem;
-    font-size: 0.9rem;
+    min-width: 1.9rem;
+    min-height: 1.9rem;
+    margin-bottom: 0.55rem;
+    font-size: 0.8rem;
   }
 
   .step-card h3 {
-    font-size: 1rem;
+    font-size: 0.94rem;
+    line-height: 1.22;
   }
 
   .step-card p {
-    font-size: 0.88rem;
-    line-height: 1.45;
+    font-size: 0.82rem;
+    line-height: 1.36;
   }
 
   .steps-slider-button {
-    width: 2.2rem;
-    height: 2.2rem;
-    font-size: 0.92rem;
+    width: 2rem;
+    height: 2rem;
+    font-size: 0.8rem;
   }
 
   .steps-slider-dot {
@@ -4556,53 +4568,63 @@ textarea {
 
   .page-end-nav-shell {
     grid-template-columns: 1fr;
-    padding: 1.35rem 1.15rem;
+    gap: 0.9rem;
+    padding: 1rem 0.95rem;
   }
 
   .page-end-columns {
-    grid-template-columns: 1fr;
-    gap: 1.15rem;
+    display: flex;
+    gap: 0.72rem;
+    overflow-x: auto;
+    padding-bottom: 0.15rem;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .page-end-columns::-webkit-scrollbar {
+    display: none;
   }
 
   .page-end-brand {
-    gap: 0.55rem;
+    gap: 0.42rem;
   }
 
   .page-end-brand-name {
-    font-size: clamp(1.8rem, 10vw, 2.3rem);
+    font-size: clamp(1.45rem, 7vw, 1.9rem);
   }
 
   .page-end-brand-tagline {
-    font-size: 1rem;
+    font-size: 0.9rem;
   }
 
   .page-end-brand-copy {
     max-width: none;
-    font-size: 0.94rem;
-    line-height: 1.55;
+    font-size: 0.84rem;
+    line-height: 1.42;
   }
 
   .page-end-column {
-    gap: 0.72rem;
-    padding: 0.92rem;
-    border-radius: 20px;
+    flex: 0 0 15.5rem;
+    gap: 0.55rem;
+    padding: 0.78rem;
+    border-radius: 18px;
   }
 
   .page-end-nav-title {
-    font-size: 0.76rem;
+    font-size: 0.7rem;
     letter-spacing: 0.1em;
   }
 
   .page-end-list {
-    gap: 0.62rem;
+    gap: 0.46rem;
   }
 
   .page-end-list a,
   .page-end-link-button {
-    min-height: 3.05rem;
-    padding: 0.84rem 0.92rem;
-    border-radius: 16px;
-    font-size: 0.98rem;
+    min-height: 2.45rem;
+    padding: 0.62rem 0.8rem;
+    border-radius: 14px;
+    font-size: 0.88rem;
   }
 
   .footer-main {
