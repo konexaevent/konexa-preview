@@ -87,6 +87,18 @@ export default async function RootLayout({
 
           <main>{children}</main>
 
+          {!user ? (
+            <Link href="/login" className="floating-login-button">
+              <span className="floating-login-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <circle cx="12" cy="8.3" r="3.6" />
+                  <path d="M5.4 19.2c.7-3.2 3.5-5 6.6-5s5.9 1.8 6.6 5" />
+                </svg>
+              </span>
+              <span>{messages.navLogin}</span>
+            </Link>
+          ) : null}
+
           <section className="page-end-nav" aria-label={messages.navMenu}>
             <div className="page-end-nav-shell">
               <div className="page-end-brand">
