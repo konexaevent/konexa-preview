@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { HomeActivityFeed } from "@/components/home-activity-feed";
+import { HowItWorksSlider } from "@/components/how-it-works-slider";
 import { getExploreContent } from "@/lib/explore-content";
 import { getMessages } from "@/lib/i18n";
 import { getLocale } from "@/lib/i18n-server";
@@ -88,6 +89,20 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       plansAnchorHint: "Plans selected for this week"
     }
   }[locale];
+  const sliderUi = {
+    ca: {
+      previous: "Pas anterior",
+      next: "Pas següent"
+    },
+    es: {
+      previous: "Paso anterior",
+      next: "Paso siguiente"
+    },
+    en: {
+      previous: "Previous step",
+      next: "Next step"
+    }
+  }[locale];
   const selectedAgeValue =
     selectedAge === "18-25" || selectedAge === "25-35" || selectedAge === "35-50" || selectedAge === "50+"
       ? selectedAge
@@ -162,13 +177,11 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           <p className="section-note">{explorePage.stepsIntro}</p>
         </div>
         <div className="steps-grid">
-          {explorePage.steps.map((step, index) => (
-            <article className="step-card" key={step.title}>
-              <span className="step-number">0{index + 1}</span>
-              <h3>{step.title}</h3>
-              <p>{step.text}</p>
-            </article>
-          ))}
+          <HowItWorksSlider
+            steps={explorePage.steps}
+            previousLabel={sliderUi.previous}
+            nextLabel={sliderUi.next}
+          />
         </div>
       </section>
     </div>

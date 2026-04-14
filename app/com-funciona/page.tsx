@@ -1,3 +1,4 @@
+import { HowItWorksSlider } from "@/components/how-it-works-slider";
 import { getMessages } from "@/lib/i18n";
 import { getLocale } from "@/lib/i18n-server";
 import { getHomepageContent } from "@/lib/queries";
@@ -10,6 +11,20 @@ export default async function HowItWorksPage() {
     getLocale().then((resolvedLocale) => getMessages(resolvedLocale))
   ]);
   const page = getExploreContent(locale, messages, homepageContent);
+  const sliderUi = {
+    ca: {
+      previous: "Pas anterior",
+      next: "Pas següent"
+    },
+    es: {
+      previous: "Paso anterior",
+      next: "Paso siguiente"
+    },
+    en: {
+      previous: "Previous step",
+      next: "Next step"
+    }
+  }[locale];
 
   return (
     <div className="page-stack">
@@ -27,13 +42,11 @@ export default async function HowItWorksPage() {
           </div>
         </div>
         <div className="steps-grid">
-          {page.steps.map((step, index) => (
-            <article className="step-card" key={step.title}>
-              <span className="step-number">0{index + 1}</span>
-              <h3>{step.title}</h3>
-              <p>{step.text}</p>
-            </article>
-          ))}
+          <HowItWorksSlider
+            steps={page.steps}
+            previousLabel={sliderUi.previous}
+            nextLabel={sliderUi.next}
+          />
         </div>
       </section>
     </div>
