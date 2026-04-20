@@ -134,38 +134,36 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       </section>
 
       <section className="activity-section" id="plans">
-        <div className="activity-section-shell">
-          <div className="section-header section-header-stage">
-            <div>
-              {messages.feedEyebrow ? <p className="eyebrow">{messages.feedEyebrow}</p> : null}
-              <h2>{messages.feedTitle}</h2>
-            </div>
+        <div className="section-header section-header-stage">
+          <div>
+            {messages.feedEyebrow ? <p className="eyebrow">{messages.feedEyebrow}</p> : null}
+            <h2>{messages.feedTitle}</h2>
           </div>
-          <HomeActivityFeed
-            activities={activities}
-            initialSelectedAge={selectedAgeValue}
-            messages={{
-              viewActivity: messages.viewActivity,
-              host: "Host",
-              joined: messages.joined,
-              pending: messages.reservationPending,
-              joinActivity: messages.joinActivity,
-              smallHostedGroup: messages.smallHostedGroup
-            }}
-            homeUi={{
-              ageEyebrow: homeUi.ageEyebrow,
-              ageTitle: homeUi.ageTitle,
-              ageAll: homeUi.ageAll,
-              ageLabels: homeUi.ageLabels,
-              sharedAvailable: messages.sharedAvailable,
-              energy: homeUi.energy,
-              hostApproval: homeUi.hostApproval,
-              instantJoin: homeUi.instantJoin,
-              spotsLeft: homeUi.spotsLeft
-            }}
-            locale={locale}
-          />
         </div>
+        <HomeActivityFeed
+          activities={activities}
+          initialSelectedAge={selectedAgeValue}
+          messages={{
+            viewActivity: messages.viewActivity,
+            host: "Host",
+            joined: messages.joined,
+            pending: messages.reservationPending,
+            joinActivity: messages.joinActivity,
+            smallHostedGroup: messages.smallHostedGroup
+          }}
+          homeUi={{
+            ageEyebrow: homeUi.ageEyebrow,
+            ageTitle: homeUi.ageTitle,
+            ageAll: homeUi.ageAll,
+            ageLabels: homeUi.ageLabels,
+            sharedAvailable: messages.sharedAvailable,
+            energy: homeUi.energy,
+            hostApproval: homeUi.hostApproval,
+            instantJoin: homeUi.instantJoin,
+            spotsLeft: homeUi.spotsLeft
+          }}
+          locale={locale}
+        />
       </section>
 
       <section className="steps-panel" id="com-funciona">
